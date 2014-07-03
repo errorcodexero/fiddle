@@ -1,0 +1,44 @@
+~1.~George Washington~1789-97~none~
+2.~John Adams~1797-1801~Federalist~
+3.~Thomas Jefferson~1801-09~Democratic-Republican~
+4.~James Madison~1809-17~Democratic-Republican~
+5.~James Monroe~1817-25~Democratic-Republican~
+6.~John Quincy Adams~1825-29~Democratic-Republican~
+7.~Andrew Jackson~1829-37~Democrat~
+8.~Martin Van Buren~1837-41~Democrat~
+9.~William H. Harrison~1841~Whig~
+10.~John Tyler~1841-45~Whig~
+11.~James Knox Polk~1845-49~Democrat~
+12.~Zachary Taylor~1849-50~Whig~
+13.~Millard Fillmore~1850-53~Whig~
+14.~Franklin Pierce~1853-57~Democrat~
+15.~James Buchanan~1857-61~Democrat~
+16.~Abraham Lincoln~1861-65~Republican/National Union~
+17.~Andrew Johnson~1865-69~National Union~
+18.~Ulysses S. Grant~1869-77~Republican~
+19.~Rutherford B. Hayes~1877-81~Republican~
+20.~James A. Garfield~1881~Republican~
+21.~Chester A. Arthur~1881-85~Republican~
+22.~Grover Cleveland~1885-89~Democrat~
+23.~Benjamin Harrison~1889-93~Republican~
+24.~Grover Cleveland~1893-97~Democrat~
+25.~William McKinley~1897-1901~Republican~
+26.~Theodore Roosevelt~1901-09~Republican~
+27.~William Howard Taft~1909-13~Republican~
+28.~Woodrow Wilson~1913-21~Democrat~
+29.~Warren G. Harding~1921-23~Republican~
+30.~Calvin Coolidge~1923-29~Republican~
+31.~Herbert Hoover~1929-33~Republican~
+32.~Franklin Roosevelt~1933-45~Democrat~
+33.~Harry S. Truman~1945-53~Democrat~
+34.~Dwight Eisenhower~1953-61~Republican~
+35.~John F. Kennedy~1961-63~Democrat~
+36.~Lyndon B. Johnson~1963-69~Democrat~
+37.~Richard M. Nixon~1969-74~Republican~
+38.~Gerald R. Ford~1974-77~Republican~
+39.~Jimmy Carter~1977-81~Democrat~
+40.~Ronald Reagan~1981-89~Republican~
+41.~George Bush~1989-93~Republican~
+42.~Bill Clinton~1993-2001~Democrat~
+43.~George W. Bush~2001-2009~Republican~
+44.~Barack Obama~2009-2017~Democrat~
