@@ -138,10 +138,10 @@ void outputAttendance(string name, string signOutTime, string signInTime, string
 		peopleList.close();
 	}
 	else if(signInOrOut=="2"){
-		ofstream peopleList;
-		peopleList.open("peopleList.txt",ios::app);
-		peopleList<<signOutTime;
-		peopleList.close();
+		//ofstream peopleList;
+		//peopleList.open("peopleList.txt",ios::app);
+		//peopleList<<signOutTime;
+		//peopleList.close();
 	}
 }
 
