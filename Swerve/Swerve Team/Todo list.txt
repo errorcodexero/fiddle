@@ -1,0 +1,14 @@
+TODO LIST
+
+	Calvin
+		-Create a program to interpret the game pad.
+		
+	Logan
+		-Create a program that physically makes wheels obey the interpretation from Calvin.
+		
+	Jacob
+		-Create a simulator for robot's results.
+		NOTE: MUST HAVE each wheel's rotation, and travel speed as an input!
+			-Create inputs for each wheel's rotation.
+			-Create inputs for each wheel's travel speed.
+			-Create a table that calculates robot's actions based on the inputs.
