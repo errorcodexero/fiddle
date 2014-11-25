@@ -3,6 +3,8 @@
 #include <cmath>
 #include <math.h>
 
+//test words pls ignore
+
 using namespace std;
 
 double correct_radian_form(double input){//Corrects to the correct radian form (i.e. 0-(2*pi))
