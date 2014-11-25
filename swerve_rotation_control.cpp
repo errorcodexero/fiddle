@@ -58,7 +58,7 @@ double simulation(double current_rotation, double target_rotation, double radian
 	return current_rotation;
 }
 
-void current_rotation_direction(){//Uses the order of channel inputs for pins two (a) and four (b) to determine wheel rotating direction
+void current_rotation_direction(){//Uses the order of channel outputs for pins two (a) and four (b) to determine wheel rotating direction
 	char leader; 
 	bool rotating_direction;
 	cout<<"What is the leading channel? ";
