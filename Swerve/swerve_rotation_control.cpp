@@ -4,8 +4,8 @@
 #include <math.h>
 #include <vector>
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
+#ifndef M_PI//Defines a variable for pi if the variable does not exist
+#define M_PI 3.141592653589793238462643383
 #endif
 
 using namespace std;
@@ -23,6 +23,7 @@ double determine_change(double current_rotation, double target_rotation){//Deter
 	else if(target_rotation-current_rotation>M_PI)return ((target_rotation-current_rotation)-(2*M_PI));//Determine the amount of radians needed to change
 	else if(target_rotation-current_rotation<-M_PI)return ((target_rotation-current_rotation)+(2*M_PI));//Determine the amount of radians needed to change
 	else{
+		cout<<endl<<"ERROR IN DETERMINING CHANGE."<<endl;
 		return 0;
 	}
 }
@@ -39,7 +40,7 @@ double simulation(double current_rotation, double target_rotation, double radian
 	for(int i=-1;i<abs(radian_change);i++){//Simulates the wheel rotation
 		if(i==-1)i++;
 		if(i==0)cout<<"At "<<current_rotation<<" radians."<<endl;//Prints the starting rotation
-		if(radian_change<0){//Negative change
+		if(radian_change<0){//Simulates negative change
 			decimal_difference=target_rotation-current_rotation;//Sets and corrects the difference of current and target rotations for fractional calculation
 			if(decimal_difference>M_PI)decimal_difference=target_rotation-current_rotation-(2*M_PI);//Ensures it will calculate in the right direction
 			if(decimal_difference>-1 && decimal_difference<0){//Changes wheel rotation for cases when the difference is less than one radian.
@@ -51,7 +52,7 @@ double simulation(double current_rotation, double target_rotation, double radian
 			current_rotation=correct_rotating_form(current_rotation);
 			cout<<"At "<<current_rotation<<" radians."<<endl;
 		}
-		else if(radian_change>0){//Positive change
+		else if(radian_change>0){//Simulates positive change
 			decimal_difference=correct_radian_form(target_rotation-current_rotation);//Sets and corrects the difference of current and target rotations for fractional calculation 
 			if(decimal_difference>0 && decimal_difference<1){//Changes wheel rotation for cases when the difference is less than one radian.
 				current_rotation=target_rotation;
@@ -66,7 +67,7 @@ double simulation(double current_rotation, double target_rotation, double radian
 	return current_rotation;
 }
 
-struct Input{//The type of input received from the encoder -- "a" (pin two) and "b" (pin four)
+struct Input{//This is a type for the input received from the encoder -- "a" (pin two) and "b" (pin four)
 	bool a,b;
 };
 
@@ -79,7 +80,7 @@ void current_rotation_direction(){//Uses the order of channel outputs for pins t
 	double estimated_rotation=0;
 	cout<<"time | a | b | estimated rotation"<<endl;
 	vector<Input> time;
-	Input channel_value;
+	Input channel_value;//The following are example values received from the encoder for the purpose of simulation.
 	channel_value.a=0;
 	channel_value.b=0;//t=0
 	time.push_back(channel_value);
@@ -110,9 +111,9 @@ void current_rotation_direction(){//Uses the order of channel outputs for pins t
 	channel_value.a=1;
 	channel_value.b=0;//t=9
 	time.push_back(channel_value);
-	for(unsigned int i=0;i<time.size(); i++){//TURNING DOESN'T WORK YET (i.e. cannot really simulate/interpret turning)!! FIXING IS TOP PRIORITY
+	for(unsigned int i=0;i<time.size(); i++){//TURNING DOESN'T WORK YET!! FIXING THIS IS TOP PRIORITY!!
 		if(time[i].a==time[i].b){
-			//Null (i.e it assumes there was no change -- at least, for now...)
+			//Null (i.e it assumes there was no change -- at least, for now... maybe...)
 		}
 		else if(((time[i].a==1 && time[i].b==0) && (time[i-1].a==0 && time[i-1].b==0)) || ((time[i].a==0 && time[i].b==1) && (time[i-1].a==1 && time[i-1].b==1))){//Determines if wheel is rotating clockwise
 			estimated_rotation+=M_PI;
