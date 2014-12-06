@@ -5,11 +5,6 @@
 
 #define TITLE(A) cout<<""#A<<":\n";
 
-/** !!!!!!!Notice!!!!!!!
-This method of driving has been put
-on hold until further notice
-    !!!!!!!Notice!!!!!!! **/
-
 using namespace std;
 
 struct Point {
