@@ -17,11 +17,23 @@ unsigned max_pts(unsigned totes,unsigned cans,unsigned max_stack_height){
 }
 
 int main(int argc,char **argv){
-	if(argc!=2){
-		cout<<"Requires max stack height\n";
-		return 1;
+	unsigned max_height=6;
+	bool starter=0;
+	bool marginal=0;
+	for(int i=1;i<argc;i++){
+		if(argv[i]==string("--max_height")){
+			i++;
+			max_height=atoi(argv[i]);
+		}else if(argv[i]==string("--starter")){
+			starter=1;
+			//does nothing at the moment.
+		}else if(argv[i]==string("--marginal")){
+			marginal=1;
+		}else{
+			cout<<"Argument not understood:"<<argv[i]<<"\n";
+			return 1;
+		}
 	}
-	int max_height=atoi(argv[1]);
 	static const int MAX_CANS=7;
 	cout<<"\t\tcans\n\t";
 	for(unsigned i=0;i<=MAX_CANS;i++){
@@ -29,7 +41,6 @@ int main(int argc,char **argv){
 	}
 	cout<<"\n";
 
-	bool marginal=0;
 	for(unsigned i=0;i<=60;i++){
 		if(!i) cout<<"boxes";
 		cout<<"\t"<<i<<"\t";
