@@ -29,11 +29,19 @@ int main(int argc,char **argv){
 	}
 	cout<<"\n";
 
+	bool marginal=0;
 	for(unsigned i=0;i<=60;i++){
 		if(!i) cout<<"boxes";
 		cout<<"\t"<<i<<"\t";
 		for(unsigned cans=0;cans<=MAX_CANS;cans++){
-			cout<<max_pts(i,cans,max_height)<<"\t";
+			if(marginal){
+				auto base=max_pts(i,cans,max_height);
+				auto tote=max_pts(i+1,cans,max_height)-base;
+				auto can=max_pts(i,cans+1,max_height)-base;
+				cout<<tote<<","<<can<<"\t";
+			}else{
+				cout<<max_pts(i,cans,max_height)<<"\t";
+			}
 		}
 		cout<<"\n";
 	}
