@@ -104,9 +104,11 @@ T argmax(Func f,vector<T> v){
 	return max(m).second;
 }
 
+static const unsigned MAX_STACK_HEIGHT=5;
+
 pair<unsigned,unsigned> pts_at_cost(unsigned box_time,unsigned can_time){
 	return argmax(
-		[](pair<unsigned,unsigned> p){ return max_pts(p.first,p.second,6); },
+		[](pair<unsigned,unsigned> p){ return max_pts(p.first,p.second,MAX_STACK_HEIGHT); },
 		options(box_time,can_time)
 	);
 }
@@ -127,7 +129,7 @@ int main(int argc,char **argv){
 			return 1;
 		}
 	}
-	static constexpr unsigned W=20,H=30;
+	static constexpr unsigned W=30,H=30;
 	Array2<W,H,string> a;
 	for(auto p:cross(range(W),range(H))){
 		/*a(0,0)="zero";
@@ -137,19 +139,19 @@ int main(int argc,char **argv){
 		if(p.first && p.second){
 			auto best_option=pts_at_cost(p.second,p.first);
 			if(show_combo) ss<<best_option<<" ";
-			int pts=max_pts(best_option.first,best_option.second,6);
+			int pts=max_pts(best_option.first,best_option.second,MAX_STACK_HEIGHT);
 			switch(mode){
 				case Mode::NORMAL:
 					ss<<pts;
 					break;
 				case Mode::D_BOX:{
 					auto b2=pts_at_cost(p.second+1,p.first);
-					ss<<(pts-(int)max_pts(b2.first,b2.second,6));
+					ss<<(pts-(int)max_pts(b2.first,b2.second,MAX_STACK_HEIGHT));
 					break;
 				}
 				case Mode::D_CAN:{
 					auto b2=pts_at_cost(p.second,p.first+1);
-					ss<<(pts-(int)max_pts(b2.first,b2.second,6));
+					ss<<(pts-(int)max_pts(b2.first,b2.second,MAX_STACK_HEIGHT));
 					break;
 				}
 				default: assert(0);
