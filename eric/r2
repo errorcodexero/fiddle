@@ -1,0 +1,1 @@
+g++ --std=c++11 -Wall -Wextra -Werror time_limit.cpp common.cpp 2>&1 && ./a.out

@@ -3,6 +3,7 @@
 #include<vector>
 #include<cassert>
 #include<sstream>
+#include "common.h"
 
 using namespace std;
 
@@ -10,20 +11,6 @@ template<typename T>
 set<T>& operator|=(set<T> &s,T t){
 	s.insert(t);
 	return s;
-}
-
-template<typename T>
-vector<T>& operator|=(vector<T>& v,T t){
-	v.push_back(t);
-	return v;
-}
-
-vector<unsigned> range(unsigned lim){
-	vector<unsigned> r;
-	for(unsigned i=0;i<lim;i++){
-		r|=i;
-	}
-	return r;
 }
 
 template<typename T>
@@ -65,24 +52,6 @@ void write_image1(ostream& o,Func f){
 	}
 }
 
-string first_word(string s){
-	stringstream ss;
-	for(unsigned i=0;i<s.size() && s[i]!=' ';i++){
-		ss<<s[i];
-	}
-	return ss.str();
-}
-
-struct Tag{
-	string name;
-
-	explicit Tag(string s):name(first_word(s)){
-		cout<<"<"<<s<<">\n";
-	}
-
-	~Tag(){ cout<<"</"<<name<<">\n"; }
-};
-
 char to_hex_dig(unsigned u){
 	assert(u<16);
 	if(u<10) return '0'+u;
@@ -100,10 +69,10 @@ string take(unsigned i,string s){
 }
 
 template<typename Func>
-void write_image(ostream& o,Func f){
-	static const unsigned X=8,Y=40;
+void write_image(ostream& o,Func f,unsigned width){
+	static const unsigned Y=40;
 	set<decltype(f(1,2))> values;
-	for(auto x:range(X)) for(auto y:range(Y)){
+	for(auto x:range(width)) for(auto y:range(Y)){
 		values|=f(y,x);
 	}
 	auto min_val=min(values);
@@ -119,12 +88,12 @@ void write_image(ostream& o,Func f){
 		{
 			Tag a("td colspan=2 rowspan=2");
 		}
-		Tag b("td colspan="+to_string(X));
+		Tag b("td colspan="+to_string(width));
 		cout<<"Cans";
 	}
 	{
 		Tag a("tr");
-		for(auto x:range(X)){
+		for(auto x:range(width)){
 			Tag a("td");
 			cout<<x;
 		}
@@ -139,7 +108,7 @@ void write_image(ostream& o,Func f){
 			Tag x("td");
 			cout<<y;
 		}
-		for(unsigned x=0;x<X;x++){
+		for(unsigned x=0;x<width;x++){
 			auto val=f(y,x);
 			unsigned char t=(val-min_val)/(float)span*255;
 			
@@ -156,20 +125,6 @@ void write_image(ostream& o,Func f){
 			//o<<(unsigned char)(255-t);
 		}
 	}
-}
-
-unsigned max_pts(unsigned totes,unsigned cans,unsigned max_stack_height){
-	unsigned r=0;
-	while(totes && max_stack_height){
-		auto stack_height=min(totes,max_stack_height);
-		totes-=stack_height;
-		r+=2*stack_height;
-		if(cans){
-			r+=4*stack_height;
-			cans--;
-		}
-	}
-	return r;
 }
 
 unsigned max_pts_spotted(unsigned boxes,unsigned cans,unsigned max_stack_height){
@@ -247,9 +202,9 @@ int main(int argc,char **argv){
 
 	if(image){
 		if(differential){
-			write_image(cout,differential1);
+			write_image(cout,differential1,7);
 		}else{
-			write_image(cout,max_pts1);
+			write_image(cout,max_pts1,8);
 		}
 		return 0;
 	}

@@ -1,1 +1,1 @@
-g++ --std=c++11 -Wall max_pts.cpp 2>&1 && ./a.out --starter --differential 2>&1
+g++ --std=c++11 -Wall max_pts.cpp common.cpp 2>&1 && ./a.out --starter --differential 2>&1
