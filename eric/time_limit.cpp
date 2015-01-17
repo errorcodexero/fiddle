@@ -104,54 +104,46 @@ T argmax(Func f,vector<T> v){
 	return max(m).second;
 }
 
-static const unsigned MAX_STACK_HEIGHT=5;
-
-pair<unsigned,unsigned> pts_at_cost(unsigned box_time,unsigned can_time){
+pair<unsigned,unsigned> pts_at_cost(unsigned box_time,unsigned can_time,unsigned max_stack_height){
 	return argmax(
-		[](pair<unsigned,unsigned> p){ return max_pts(p.first,p.second,MAX_STACK_HEIGHT); },
+		[=](pair<unsigned,unsigned> p){ return max_pts(p.first,p.second,max_stack_height); },
 		options(box_time,can_time)
 	);
 }
 
-int main(int argc,char **argv){
-	enum class Mode{NORMAL,D_BOX,D_CAN};
-	Mode mode=Mode::NORMAL;
-	bool show_combo=0;
-	for(int i=1;i<argc;i++){
-		if(argv[i]==string("--box")){
-			mode=Mode::D_BOX;
-		}else if(argv[i]==string("--can")){
-			mode=Mode::D_CAN;
-		}else if(argv[i]==string("--combo")){
-			show_combo=1;
-		}else{
-			cout<<"Recognized args: \"--box\" \"--can\" \"--combo\"\n";
-			return 1;
-		}
-	}
-	static constexpr unsigned W=30,H=30;
+static constexpr unsigned W=30,H=30;
+
+enum class Mode{NORMAL,D_BOX,D_CAN,D_HEIGHT};
+
+Array2<W,H,string> gen_data(Mode mode,bool show_combo){
 	Array2<W,H,string> a;
+	unsigned max_stack_height=5;
 	for(auto p:cross(range(W),range(H))){
 		/*a(0,0)="zero";
 		a(0,1)="what";*/
 		stringstream ss;
 		//ss<<p;
 		if(p.first && p.second){
-			auto best_option=pts_at_cost(p.second,p.first);
+			auto best_option=pts_at_cost(p.second,p.first,max_stack_height);
 			if(show_combo) ss<<best_option<<" ";
-			int pts=max_pts(best_option.first,best_option.second,MAX_STACK_HEIGHT);
+			int pts=max_pts(best_option.first,best_option.second,max_stack_height);
 			switch(mode){
 				case Mode::NORMAL:
 					ss<<pts;
 					break;
 				case Mode::D_BOX:{
-					auto b2=pts_at_cost(p.second+1,p.first);
-					ss<<(pts-(int)max_pts(b2.first,b2.second,MAX_STACK_HEIGHT));
+					auto b2=pts_at_cost(p.second+1,p.first,max_stack_height);
+					ss<<(pts-(int)max_pts(b2.first,b2.second,max_stack_height));
 					break;
 				}
 				case Mode::D_CAN:{
-					auto b2=pts_at_cost(p.second,p.first+1);
-					ss<<(pts-(int)max_pts(b2.first,b2.second,MAX_STACK_HEIGHT));
+					auto b2=pts_at_cost(p.second,p.first+1,max_stack_height);
+					ss<<(pts-(int)max_pts(b2.first,b2.second,max_stack_height));
+					break;
+				}
+				case Mode::D_HEIGHT:{
+					auto b2=pts_at_cost(p.second,p.first,max_stack_height-1);
+					ss<<(pts-(int)max_pts(b2.first,b2.second,max_stack_height-1));
 					break;
 				}
 				default: assert(0);
@@ -159,5 +151,26 @@ int main(int argc,char **argv){
 		}
 		a[p]=ss.str();//to_string(p);
 	}
+	return a;
+}
+
+int main(int argc,char **argv){
+	Mode mode=Mode::NORMAL;
+	bool show_combo=0;
+	for(int i=1;i<argc;i++){
+		if(argv[i]==string("--box")){
+			mode=Mode::D_BOX;
+		}else if(argv[i]==string("--can")){
+			mode=Mode::D_CAN;
+		}else if(argv[i]==string("--height")){
+			mode=Mode::D_HEIGHT;
+		}else if(argv[i]==string("--combo")){
+			show_combo=1;
+		}else{
+			cout<<"Recognized args: \"--box\" \"--can\" \"--combo\"\n";
+			return 1;
+		}
+	}
+	auto a=gen_data(mode,show_combo);
 	webpage("Time per can (seconds)","Time per box (seconds)",a);
 }
