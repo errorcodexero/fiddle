@@ -5,16 +5,6 @@
 
 using namespace std;
 
-void ctest1(int *a){
-	printf("hi1\n");
-	if(a) (*a)++;
-}
-
-void ctest2(int *b){
-	printf("hi2\n");
-	if(b) (*b)*=2;
-}
-
 struct A{};
 
 #ifndef MESSAGE

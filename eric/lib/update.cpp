@@ -1,4 +1,3 @@
-/*This is the sample program to notify us for the file creation and file deletion takes place in “/tmp” directory*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -29,7 +28,7 @@ Watch::Watch(int fd1):fd(fd1){
 	assert(fd1!=-1);
 
 	//probably want to make these args all get passed in
-	wd=inotify_add_watch(fd,"/tmp",IN_CREATE|IN_DELETE);
+	wd=inotify_add_watch(fd,".",IN_CREATE|IN_DELETE);
 	if(wd<0) throw "failed to add watch";
 }
 
