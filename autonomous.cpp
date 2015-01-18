@@ -159,26 +159,95 @@ bool operator==(Environment_state a, Environment_state b) {
 	return 0;
 }
 
-void func_name(vector<Action> a, Environment_state b/*current*/, Environment_state c, vector<Environment_state> d, int e = 0){
-	e++;
-	a = get_possible_moves(b);
-	for(unsigned int o=0; o<a.size(); o++){
-		b=update_environment(a[o], b);
-		bool retrace = 0;
-		for (unsigned int i=0; i<d.size(); i++) {
-			if (b==d[i]) {
-				retrace=1;
+double distance_formula(pair<int, int> a, pair<int, int> b){
+	double distance=0;
+	distance=sqrt(((a.first-b.first)^2) + ((a.second-b.second)^2));
+	return distance;
+}
+
+bool closer(Environment_state a, Environment_state b, Environment_state c){//Work On This
+	if(c.tote_location!=a.tote_location){
+		if(a.tote_location!=a.robot.location) {
+			if(c.robot.with_tote==1 && a.robot.with_tote==1){
+				if(distance_formula(c.robot.location, a.robot.location)>distance_formula(c.robot.location, b.robot.location)) return 1;
+			}
+			if(c.robot.with_tote==0 && a.robot.with_tote==1){
+				if(distance_formula(c.tote_location, a.robot.location)>distance_formula(c.tote_location, b.robot.location)) return 1;
+			}
+			if(c.robot.with_tote==1 && a.robot.with_tote==0){
+				if(distance_formula(a.tote_location, a.robot.location)>distance_formula(a.tote_location, b.robot.location)) return 1;
+			}
+			if(c.robot.with_tote==0 && a.robot.with_tote==0){
+				if(distance_formula(a.tote_location, a.robot.location)>distance_formula(a.tote_location, b.robot.location)) return 1;
+			}
+		} else {
+		//	if(c.robot.with_tote==1 && a.r
+		}
+	}
+	if(c.tote_location==a.tote_location){
+		if(c.robot.with_tote==1 && a.robot.with_tote==0 && b.robot.with_tote==1) return 1;
+		if(c.robot.with_tote==0 && a.robot.with_tote==1 && b.robot.with_tote==0) return 1;
+	}
+	if(c.robot.location!=a.robot.location){
+
+	}/*
+	if(c.robot.with_tote==1 && a.robot.with_tote==0 && b.robot.with_tote==1) return 1;
+	if(c.robot.with_tote==0 && a.robot.with_tote==1 && b.robot.with_tote==0) return 1;
+	if(c.robot.location.first-a.robot.location.first>c.robot.location.first-b.robot.location.first) return 1;
+	if(c.robot.location.second-a.robot.location.second>c.robot.location.second-b.robot.location.second) return 1;*/	
+	return 0;
+}
+
+int function1(Environment_state c){
+	Environment_state a;
+	a.robot.location=make_pair(0,0);
+	a.tote_location=make_pair(0,0);
+	a.robot.with_tote=0;
+	Environment_state b=a;
+	vector<Action> v;
+	int distance=0;
+	while(1){
+		v=get_possible_moves(a);
+		for(unsigned int i=0; i<v.size(); i++){
+			b=update_environment(v[i], a);
+			if(a==c)break;
+			if(closer(a, b, c)){
+				distance ++;
+				cout<<"NOW: "<<a<<"        "<<v[i]<<"        TARGET: "<<c<<"        "<<distance<<endl;
+				a=update_environment(v[i], a);
 				break;
 			}
 		}
-		if (b!=c && !retrace && e<5) {
-			func_name(a, b, c, d, e);
-		} else if (b==c) {
-			cout<<e<<endl;
-			break;
+		//cout<<"RAN"<<endl;
+		if(a==c)break;
+	}
+	return distance;
+}
+
+/*void func_name(vector<Action> a, Environment_state b, Environment_state c, vector<Environment_state> d, int e = 0){
+	e++;
+	a = get_possible_moves(b);
+	if (b==c) {
+		cout<<e<<endl;
+	} else {	
+		for(unsigned int o=0; o<a.size(); o++){
+			b=update_environment(a[o], b);
+			bool retrace = 0;
+			for (unsigned int i=0; i<d.size(); i++) {
+				if (b==d[i]) {
+					retrace=1;
+					break;
+				}
+			}
+			if (b!=c && !retrace && e<10) {
+				func_name(a, b, c, d, e);
+			} else if (b==c) {
+				cout<<e<<endl;
+				break;
+			}
 		}
 	}
-}
+}*/
 
 int get_distance(Environment_state b, vector<Environment_state> v){
 	Environment_state a;
@@ -186,12 +255,13 @@ int get_distance(Environment_state b, vector<Environment_state> v){
 	a.robot.location=make_pair(0,0);
 	a.tote_location=make_pair(0,0);
 	a.robot.with_tote=0;
-	c=a;	
 	int distance=0;
-	vector<Action> steps;
-	vector<Action> possible;
-	vector<Environment_state> k;
-	func_name(steps, c, b, k);
+	//c=a;	
+	//vector<Action> steps;
+	//vector<Action> possible;
+	//vector<Environment_state> k;
+	//cout<<"BEGIN - "<<b<<endl;
+	//func_name(steps, c, b, k);
 	/*for(unsigned int i=0; i<v.size(); i++){
 		possible = get_possible_moves(b);	
 	}*/
@@ -208,11 +278,11 @@ void make_graph(){
 	r=states();
 	graphy<<"Digraph G{"<<endl;
 	for(unsigned int i=0; i<r.size(); i++){
-		v=get_possible_moves(r[i]);
+		a=r[i];
+		v=get_possible_moves(a);
+		distance=function1(b);
 		for(unsigned int o=0; o<v.size(); o++){
-			a=r[i];
 			b=update_environment(v[o], r[i]);
-			distance=get_distance(a, r);
 			//cout<<"NOW: "<<a<<"        "<<v[o]<<"        NEXT: "<<b<<"        "<<distance<<endl;
 			if(a.robot.location==make_pair(0,0) && a.tote_location==make_pair(0,0) && a.robot.with_tote==0){
 				graphy<<"        \""<<a<<"\"[color=\"red\"];"<<endl<<"        \""<<a<<"\"->\""<<b<<"\"[label=\""<<v[o]<<"\"];"<<endl;
