@@ -14,6 +14,9 @@
 #include <sys/time.h>
 #include <termios.h>
 #include <signal.h>
+#include<iostream>
+
+using namespace std;
  
 void handler (int sig)
 {
@@ -68,6 +71,7 @@ int main (int argc, char *argv[])
 			if(ev[i].value == 1 && ev[i].type == 1){ // Only read the key press event
 				printf ("Code[%d]\n", (ev[1].code));
 			}
+			cout<<"ev:"<<ev[i].type<<"\t"<<ev[i].code<<"\t"<<ev[i].value<<"\n";
 		}
 	}
 	return 0;
