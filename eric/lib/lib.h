@@ -1,5 +1,5 @@
-#ifndef CTEST_H
-#define CTEST_H
+#ifndef LIB_H
+#define LIB_H
 
 #include "interface.h"
 

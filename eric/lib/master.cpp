@@ -7,7 +7,7 @@
 #include<unistd.h>
 #include<iostream>
 #include "lib.h"
-#include "inotify/update.h"
+#include "update.h"
 
 using namespace std;
 
