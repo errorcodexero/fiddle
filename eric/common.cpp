@@ -26,17 +26,21 @@ Tag::Tag(string s):name(first_word(s)){
 
 Tag::~Tag(){ cout<<"</"<<name<<">\n"; }
 
-unsigned max_pts(unsigned totes,unsigned cans,unsigned max_stack_height){
+unsigned max_pts(unsigned totes,unsigned cans,unsigned max_stack_height,bool two_cans_per_stack){
 	unsigned r=0;
 	while(totes && max_stack_height){
 		auto stack_height=min(totes,max_stack_height);
 		totes-=stack_height;
 		r+=2*stack_height;
-		if(cans){
-			r+=4*stack_height;
-			cans--;
-		}
+
+		auto add_can=[&](){
+			if(cans){
+				r+=4*stack_height;
+				cans--;
+			}
+		};
+		add_can();
+		if(two_cans_per_stack) add_can();
 	}
 	return r;
 }
-

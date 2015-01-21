@@ -2,6 +2,7 @@
 #include<iostream>
 #include<cassert>
 #include<sstream>
+#include<functional>
 #include "common.h"
 
 using namespace std;
@@ -104,46 +105,50 @@ T argmax(Func f,vector<T> v){
 	return max(m).second;
 }
 
-pair<unsigned,unsigned> pts_at_cost(unsigned box_time,unsigned can_time,unsigned max_stack_height){
+pair<unsigned,unsigned> pts_at_cost(unsigned box_time,unsigned can_time,unsigned max_stack_height,bool two_cans_per_stack){
 	return argmax(
-		[=](pair<unsigned,unsigned> p){ return max_pts(p.first,p.second,max_stack_height); },
+		[=](pair<unsigned,unsigned> p){ return max_pts(p.first,p.second,max_stack_height,two_cans_per_stack); },
 		options(box_time,can_time)
 	);
 }
 
 static constexpr unsigned W=30,H=30;
 
-enum class Mode{NORMAL,D_BOX,D_CAN,D_HEIGHT};
+enum class Mode{NORMAL,D_BOX,D_CAN,D_HEIGHT,D_CANS_PER_STACK};
 
-Array2<W,H,string> gen_data(Mode mode,bool show_combo){
+Array2<W,H,string> gen_data(Mode mode,bool show_combo,bool two_cans_per_stack,unsigned max_stack_height){
 	Array2<W,H,string> a;
-	unsigned max_stack_height=5;
 	for(auto p:cross(range(W),range(H))){
 		/*a(0,0)="zero";
 		a(0,1)="what";*/
 		stringstream ss;
 		//ss<<p;
 		if(p.first && p.second){
-			auto best_option=pts_at_cost(p.second,p.first,max_stack_height);
+			auto best_option=pts_at_cost(p.second,p.first,max_stack_height,two_cans_per_stack);
 			if(show_combo) ss<<best_option<<" ";
-			int pts=max_pts(best_option.first,best_option.second,max_stack_height);
+			int pts=max_pts(best_option.first,best_option.second,max_stack_height,two_cans_per_stack);
 			switch(mode){
 				case Mode::NORMAL:
 					ss<<pts;
 					break;
 				case Mode::D_BOX:{
-					auto b2=pts_at_cost(p.second+1,p.first,max_stack_height);
-					ss<<(pts-(int)max_pts(b2.first,b2.second,max_stack_height));
+					auto b2=pts_at_cost(p.second+1,p.first,max_stack_height,two_cans_per_stack);
+					ss<<(pts-(int)max_pts(b2.first,b2.second,max_stack_height,two_cans_per_stack));
 					break;
 				}
 				case Mode::D_CAN:{
-					auto b2=pts_at_cost(p.second,p.first+1,max_stack_height);
-					ss<<(pts-(int)max_pts(b2.first,b2.second,max_stack_height));
+					auto b2=pts_at_cost(p.second,p.first+1,max_stack_height,two_cans_per_stack);
+					ss<<(pts-(int)max_pts(b2.first,b2.second,max_stack_height,two_cans_per_stack));
 					break;
 				}
 				case Mode::D_HEIGHT:{
-					auto b2=pts_at_cost(p.second,p.first,max_stack_height-1);
-					ss<<(pts-(int)max_pts(b2.first,b2.second,max_stack_height-1));
+					auto b2=pts_at_cost(p.second,p.first,max_stack_height-1,two_cans_per_stack);
+					ss<<(pts-(int)max_pts(b2.first,b2.second,max_stack_height-1,two_cans_per_stack));
+					break;
+				}
+				case Mode::D_CANS_PER_STACK:{
+					auto b2=pts_at_cost(p.second,p.first,max_stack_height,!two_cans_per_stack);
+					ss<<((int)max_pts(b2.first,b2.second,max_stack_height,!two_cans_per_stack)-pts);
 					break;
 				}
 				default: assert(0);
@@ -157,20 +162,37 @@ Array2<W,H,string> gen_data(Mode mode,bool show_combo){
 int main(int argc,char **argv){
 	Mode mode=Mode::NORMAL;
 	bool show_combo=0;
+	bool two_cans_per_stack=0;
+	typedef tuple<string,string,std::function<void(void)>> Option;
+	vector<Option> options{
+		make_tuple("box","Show the derivates by changing the time needed to stack a box",[&](){ mode=Mode::D_BOX; }),
+		make_tuple("can","Show the derivates by changing the time needed to stack a can",[&](){ mode=Mode::D_CAN; }),
+		make_tuple("height","Show the change in score when changing the max height by 1",[&]{ mode=Mode::D_HEIGHT; }),
+		make_tuple("combo","Include in output how many cans and boxes were used",[&]{ show_combo=1; }),
+		make_tuple("double_can","Assume that the robot is able to stack two cans on the same box",[&]{ two_cans_per_stack=1; }),
+		make_tuple("d_double_can","Difference that a double can capability makes",[&]{ mode=Mode::D_CANS_PER_STACK; })
+	};
+	auto help=[&](){
+		cout<<"Outputs HTML.  Options:\n";
+		for(auto p:options){
+			cout<<"\t--"<<get<0>(p)<<"\n\t\t"<<get<1>(p)<<"\n";
+		}
+		exit(0);
+	};
+	options|=Option("help","Print this message",help);
 	for(int i=1;i<argc;i++){
-		if(argv[i]==string("--box")){
-			mode=Mode::D_BOX;
-		}else if(argv[i]==string("--can")){
-			mode=Mode::D_CAN;
-		}else if(argv[i]==string("--height")){
-			mode=Mode::D_HEIGHT;
-		}else if(argv[i]==string("--combo")){
-			show_combo=1;
-		}else{
-			cout<<"Recognized args: \"--box\" \"--can\" \"--combo\"\n";
-			return 1;
+		bool found=0;
+		for(auto a:options){
+			if(argv[i]=="--"+get<0>(a)){
+				get<2>(a)();
+				found=1;
+			}
+		}
+		if(!found){
+			help();
 		}
 	}
-	auto a=gen_data(mode,show_combo);
+	static const unsigned max_stack_height=4;
+	auto a=gen_data(mode,show_combo,two_cans_per_stack,max_stack_height);
 	webpage("Time per can (seconds)","Time per box (seconds)",a);
 }

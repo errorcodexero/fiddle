@@ -27,6 +27,6 @@ struct Tag{
 	~Tag();
 };
 
-unsigned max_pts(unsigned totes,unsigned cans,unsigned max_stack_height);
+unsigned max_pts(unsigned totes,unsigned cans,unsigned max_stack_height,bool two_cans_per_stack);
 
 #endif
