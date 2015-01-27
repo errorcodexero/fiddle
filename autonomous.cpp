@@ -165,8 +165,7 @@ bool operator!=(Environment_state a, Environment_state b){//Sets the operator "!
 	return !(a==b);
 }
 
-vector<vector<Action>> find_available_moves(int x){//Finds all the possible instructions of length "x"
-	vector<vector<Action>> v;
+vector<vector<Action>> find_available_moves(unsigned int x){//Finds all the possible instructions of length "x"
 	vector<Action> c;
 	c.push_back(Action::FORWARD);
 	c.push_back(Action::BACKWARD);
@@ -174,79 +173,31 @@ vector<vector<Action>> find_available_moves(int x){//Finds all the possible inst
 	c.push_back(Action::LEFT);
 	c.push_back(Action::LIFT);
 	c.push_back(Action::DROP);
+	vector<vector<Action>> v, e;
 	if(x==0) return v;
-	else if(x==1){
-		for(Action move1:c){
+	for(Action move:c){
+		vector<Action> b;
+		b.push_back(move);
+		v.push_back(b);
+	}
+	for(unsigned int i=0; i<x; i++){
+		for(unsigned int o=0; o<pow(c.size(), i+1); o++){
+			for(unsigned int k=0; k<c.size(); k++){
+				vector<Action> d=v[o];
+				d.push_back(c[k]);
+				v.push_back(d);
+			}
+		}
+		for(unsigned int k=0; k<v.size(); k++){
 			vector<Action> b;
-			b.push_back(move1);
-			v.push_back(b);
-		}
-		return v;
-	}
-	else if(x==2){
-		for(Action move1:c){
-			for(Action move2:c){
-				vector<Action> b;
-				b.push_back(move1);
-				b.push_back(move2);
-				v.push_back(b);
+			b=v[k];
+			if(b.size()>x){
+				e.push_back(b);
 			}
 		}
-		return v;
+		v=e;
 	}
-	else if(x==3){
-		for(Action move1:c){
-			for(Action move2:c){
-				for(Action move3:c){
-					vector<Action> b;
-					b.push_back(move1);
-					b.push_back(move2);
-					b.push_back(move3);
-					v.push_back(b);
-				}
-			}
-		}
-		return v;
-	}
-	else if(x==4){
-		for(Action move1:c){
-			for(Action move2:c){
-				for(Action move3:c){
-					for(Action move4:c){
-						vector<Action> b;
-						b.push_back(move1);
-						b.push_back(move2);
-						b.push_back(move3);
-						b.push_back(move4);
-						v.push_back(b);
-					}
-				}
-			}
-		}
-		return v;
-	}
-	else if(x==5){
-		for(Action move1:c){
-			for(Action move2:c){
-				for(Action move3:c){
-					for(Action move4:c){
-						for(Action move5:c){
-							vector<Action> b;
-							b.push_back(move1);
-							b.push_back(move2);
-							b.push_back(move3);
-							b.push_back(move4);
-							b.push_back(move5);
-							v.push_back(b);
-						}
-					}
-				}
-			}
-		}
-		return v;
-	}
-	cout<<"Not Done";
-	exit(1);
+	return v;
 }
 
 pair<bool, Environment_state> determine_possible(Environment_state e, vector<Action> a){//Determines if a set of instructions can be carried out given an environment
@@ -276,9 +227,10 @@ bool reached_target(Environment_state a, Environment_state b, vector<Action> v){
 }
 
 void print_results(){//Prints the results from find_available_moves()
-	for(unsigned int i=0; i<5; i++){
+	for(unsigned int i=0; i<4; i++){
 		vector<vector<Action>> v;
 		v=find_available_moves(i);
+		cout<<i<<" MOVES:"<<endl;
 		for(unsigned int o=0; o<v.size(); o++){
 			cout<<v[o]<<endl;
 		}
@@ -295,7 +247,7 @@ vector<Action> get_instructions(Environment_state a, Environment_state b){//Gets
 		if(i!=0){
 			for(unsigned int k; k<v.size(); k++){
 				if(reached_target(a,b,v[k])){
-					cout<<"BEGIN: "<<a<<endl<<"TARGET: "<<b<<endl<<"COMPLETED: "<<v[k];
+					cout<<"STARTING: "<<a<<endl<<endl<<"TARGET: "<<b<<endl<<endl<<"INSTRUCTIONS: "<<v[k];
 					instructions=v[k];
 					target_reached=1;
 					break;
@@ -337,14 +289,15 @@ void make_graph(){//Makes a graphviz graph
 	graphy.close();
 }
 
-int main(){//Main, if you don't know what this is, then you shouldn't be looking at this code
-	Environment_state a,b;
+int main(){//Main, if you don't know what this is, then you shouldn't be looking at this
+	print_results();
+	/*Environment_state a,b;
 	a.robot.location=make_pair(0,0);
 	a.tote_location=make_pair(0,0);
 	a.robot.with_tote=1;
 	b.robot.location=make_pair(2,2);
 	b.tote_location=make_pair(2,2);
 	b.robot.with_tote=1;
-	get_instructions(a,b);
+	get_instructions(a,b);*/
 	return 0;
 }
