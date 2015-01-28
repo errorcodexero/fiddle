@@ -11,8 +11,8 @@
 
 using namespace std;
 
-const int X_LIMIT=3;//The limits for the field
-const int Y_LIMIT=3;
+const int X_LIMIT=11;//The limits for the field -- robot can operate within this
+const int Y_LIMIT=11;
 
 enum class Action{FORWARD, BACKWARD, RIGHT, LEFT, LIFT, DROP};//Types of actions the robot can preform during autonomous
 
@@ -165,6 +165,21 @@ bool operator!=(Environment_state a, Environment_state b){//Sets the operator "!
 	return !(a==b);
 }
 
+vector<vector<Action>> function(vector<vector<Action>> v, int x, vector<Action> c, vector<Action> moves, int y = 0){
+	if(y==x){
+		v.push_back(moves);
+		return v;
+	} else {
+		y++;
+		for(Action move:c){
+			moves.push_back(move);
+			v=function(v, x, c, moves, y);
+			moves.erase(moves.end()-1);
+		}
+	}
+	return v;
+}
+
 vector<vector<Action>> find_available_moves(unsigned int x){//Finds all the possible instructions of length "x"
 	vector<Action> c;
 	c.push_back(Action::FORWARD);
@@ -173,8 +188,11 @@ vector<vector<Action>> find_available_moves(unsigned int x){//Finds all the poss
 	c.push_back(Action::LEFT);
 	c.push_back(Action::LIFT);
 	c.push_back(Action::DROP);
-	vector<vector<Action>> v, e;
+	vector<vector<Action>> v;
 	if(x==0) return v;
+	vector<Action> moves;
+	v=function(v, x, c, moves);
+	/*if(x==0) return v;
 	for(Action move:c){
 		vector<Action> b;
 		b.push_back(move);
@@ -196,7 +214,7 @@ vector<vector<Action>> find_available_moves(unsigned int x){//Finds all the poss
 			}
 		}
 		v=e;
-	}
+	}*/
 	return v;
 }
 
@@ -227,7 +245,7 @@ bool reached_target(Environment_state a, Environment_state b, vector<Action> v){
 }
 
 void print_results(){//Prints the results from find_available_moves()
-	for(unsigned int i=0; i<4; i++){
+	for(unsigned int i=0; i<6; i++){
 		vector<vector<Action>> v;
 		v=find_available_moves(i);
 		cout<<i<<" MOVES:"<<endl;
@@ -241,19 +259,19 @@ vector<Action> get_instructions(Environment_state a, Environment_state b){//Gets
 	vector<vector<Action>> v;
 	bool target_reached=0;
 	vector<Action> instructions;
-	for(unsigned int i=0; i<6; i++){
+	unsigned int i=0;
+	while(1){
 		if(target_reached==1)break;
 		v=find_available_moves(i);
-		if(i!=0){
-			for(unsigned int k; k<v.size(); k++){
-				if(reached_target(a,b,v[k])){
-					cout<<"STARTING: "<<a<<endl<<endl<<"TARGET: "<<b<<endl<<endl<<"INSTRUCTIONS: "<<v[k];
-					instructions=v[k];
-					target_reached=1;
-					break;
-				}
+		for(unsigned int k; k<v.size(); k++){
+			if(reached_target(a,b,v[k])){
+				cout<<"STARTING: "<<a<<endl<<endl<<"TARGET: "<<b<<endl<<endl<<"INSTRUCTIONS: "<<v[k];
+				instructions=v[k];
+				target_reached=1;
+				break;
 			}
 		}
+		i++;
 	}
 	return instructions;
 }
@@ -290,14 +308,14 @@ void make_graph(){//Makes a graphviz graph
 }
 
 int main(){//Main, if you don't know what this is, then you shouldn't be looking at this
-	print_results();
-	/*Environment_state a,b;
+	//print_results();
+	Environment_state a,b;
 	a.robot.location=make_pair(0,0);
-	a.tote_location=make_pair(0,0);
-	a.robot.with_tote=1;
-	b.robot.location=make_pair(2,2);
-	b.tote_location=make_pair(2,2);
-	b.robot.with_tote=1;
-	get_instructions(a,b);*/
+	a.tote_location=make_pair(10,0);
+	a.robot.with_tote=0;
+	b.robot.location=make_pair(10,10);
+	b.tote_location=make_pair(0,10);
+	b.robot.with_tote=0;
+	get_instructions(a,b);
 	return 0;
 }
