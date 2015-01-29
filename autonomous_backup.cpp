@@ -1,4 +1,4 @@
-//Author: Logan Traffas
+//Author(s): Logan Traffas, Matthew Macovsky
 #include <iostream>
 #include <vector>
 #include <ctime>
@@ -11,8 +11,8 @@
 
 using namespace std;
 
-int X_LIMIT=2;
-int Y_LIMIT=2;
+const int X_LIMIT=2;//The limits for the field -- robot can operate within this
+const int Y_LIMIT=2;
 
 enum class Action{FORWARD, BACKWARD, RIGHT, LEFT, LIFT, DROP};//Types of actions the robot can preform during autonomous
 
@@ -38,7 +38,7 @@ ostream& operator<<(ostream & o, Action in){//How to print the types of instruct
 	return o;
 }
 
-typedef pair<int, int> Location;
+typedef pair<int, int> Location;//A type for storing the locations of things
 
 struct Environment_state{//Type to store the states of the environment
 	struct Robot_state{//Type to store the current states of the robot
@@ -50,7 +50,7 @@ struct Environment_state{//Type to store the states of the environment
 	Location tote_location;
 };
 
-ostream & operator<<(ostream & o, Location location){
+ostream & operator<<(ostream & o, Location location){//Sets how type "Location" prints
 	o<<"("<<location.first<<","<<location.second<<")";
 	return o;
 }
@@ -62,9 +62,11 @@ ostream & operator<<(ostream & o, Environment_state in){//How to print type Envi
 
 template<typename T>
 ostream & operator<<(ostream & o, vector<T> in){//How to print type vector<type>
+	o<<"[";
 	for(unsigned int i=0; i<in.size(); i++){
 		o<<in[i];
 	}
+	o<<"]";
 	return o;
 }
 
@@ -78,7 +80,7 @@ bool operator!=(pair<int, int> a, pair<int, int> b) {//Sets operator "!=" for pa
 
 Environment_state update_environment(Action instruction, Environment_state environment){//Determines what the robot does with a give instruction
 	if(instruction==Action::LEFT){
-		assert(environment.robot.location.first-1>0);
+		assert(environment.robot.location.first>0);
 		environment.robot.location.first--;
 	}
 	if(instruction==Action::RIGHT){
@@ -86,7 +88,7 @@ Environment_state update_environment(Action instruction, Environment_state envir
 		environment.robot.location.first++;
 	}
 	if(instruction==Action::BACKWARD){
-		assert(environment.robot.location.second-1>0);
+		assert(environment.robot.location.second>0);
 		environment.robot.location.second--;
 	}
 	if(instruction==Action::FORWARD){
@@ -106,21 +108,15 @@ Environment_state update_environment(Action instruction, Environment_state envir
 	return environment;
 }
 
-/*int randomize_environment(){//Returns a random number
-	srand(time(NULL));
-	int random=rand()%2;
-	return random;
-}*/
-
 vector<Action> get_possible_moves(Environment_state environment){//Determines how to print the types of "Action"
 	vector<Action> possible_moves;
-	if(environment.robot.location.first-1>0){
+	if(environment.robot.location.first>0){
 		possible_moves.push_back(Action::LEFT);
 	}
 	if(environment.robot.location.first+1<X_LIMIT){
 		possible_moves.push_back(Action::RIGHT);
 	}
-	if(environment.robot.location.second-1>0){
+	if(environment.robot.location.second>0){
 		possible_moves.push_back(Action::BACKWARD);
 	}
 	if(environment.robot.location.second+1<Y_LIMIT){
@@ -157,7 +153,7 @@ vector<Environment_state> states(){//Makes a vector of all possible environments
 	return r;
 }
 
-bool operator==(Robot a, Robot b){
+bool operator==(Environment_state::Robot_state a, Environment_state::Robot_state b){//Sets the operator "==" for Robot_state
 	return a.location==b.location && a.with_tote==b.with_tote;
 }
 
@@ -169,67 +165,91 @@ bool operator!=(Environment_state a, Environment_state b){//Sets the operator "!
 	return !(a==b);
 }
 
-double distance_formula(pair<int, int> a, pair<int, int> b){//Finds the distance between two points
-	double distance=0;
-	distance=sqrt(pow(a.first-b.first, 2)+pow(a.second-b.second, 2));
-	return distance;
-}
-
-bool closer(Environment_state a, Environment_state b, Environment_state c){//Determines if a specific move will move the robot closer to the target
-	if(a.tote_location!=c.tote_location){
-		if(a.tote_location!=a.robot.location) {
-			return (distance_formula(a.robot.location, a.tote_location)>distance_formula(b.robot.location, b.tote_location));
-		} else{
-			if(a.robot.with_tote==0 && b.robot.with_tote==1){
-				return 1;
-			} else{
-				return (distance_formula(c.tote_location, a.robot.location)>distance_formula(c.tote_location, b.tote_location));
-			}
-		}
-	} else{
-		if(a.robot.with_tote==0 && b.robot.with_tote==1){
-			return 1;
-		}
-		if(a.tote_location==c.tote_location && a.robot.with_tote==1 && c.robot.with_tote==0){
-			return !(b.robot.with_tote);
-		}
-		if(a.robot.location!=c.robot.location){
-			return (distance_formula(c.robot.location, a.robot.location)>distance_formula(c.robot.location, b.robot.location));
+vector<vector<Action>> function(vector<vector<Action>> v, int x, vector<Action> c, vector<Action> moves, int y = 0){//A program that finds all the moves for any given length
+	if(y==x){
+		v.push_back(moves);
+		return v;
+	} else {
+		y++;
+		for(Action move:c){
+			moves.push_back(move);
+			v=function(v, x, c, moves, y);
+			moves.erase(moves.end()-1);
 		}
 	}
-	return 0;
+	return v;
 }
 
-int find_distance(Environment_state c){//Determines the number of moves needed between two environments
-	Environment_state a;
-	a.robot.location=make_pair(0,0);
-	a.tote_location=make_pair(0,0);
-	a.robot.with_tote=0;
-	Environment_state b=a;
-	vector<Action> v;
-	int distance=0;
-	//cout<<endl<<"TARGET: "<<c<<endl<<endl;
+vector<vector<Action>> find_available_moves(unsigned int x){//Finds all the possible instructions of length "x"
+	vector<Action> c;
+	c.push_back(Action::FORWARD);
+	c.push_back(Action::BACKWARD);
+	c.push_back(Action::RIGHT);
+	c.push_back(Action::LEFT);
+	c.push_back(Action::LIFT);
+	c.push_back(Action::DROP);
+	vector<vector<Action>> v;
+	if(x==0) return v;
+	vector<Action> moves;
+	v=function(v, x, c, moves);
+	return v;
+}
+
+pair<bool, Environment_state> determine_possible(Environment_state e, vector<Action> a){//Determines if a set of instructions can be carried out given an environment
+	pair<bool, Environment_state> c;
+	for (unsigned int i=0; i<a.size(); i++){
+		if (i!=0) e=update_environment(a[i-1], e);
+		vector<Action> b=get_possible_moves(e);
+		for (unsigned int k=0; k<b.size(); k++) {
+			if (b[k]==a[i]) {
+				break;
+			} else if (k==(b.size()-1)) {
+				c.first= 0;
+				c.second=e;
+				return c;
+			}
+		}
+	}
+	e=update_environment(a[a.size()-1], e);
+	c.first=1;
+	c.second=e;
+	return c;
+}
+
+bool reached_target(Environment_state a, Environment_state b, vector<Action> v){//Determines if a set of instructions will take a starting robot to a target
+	pair<bool, Environment_state> c = determine_possible(a, v);
+	return c.first && c.second==b;
+}
+
+void print_results(){//Prints the results from find_available_moves()
+	for(unsigned int i=0; i<6; i++){
+		vector<vector<Action>> v;
+		v=find_available_moves(i);
+		cout<<i<<" MOVES:"<<endl;
+		for(unsigned int o=0; o<v.size(); o++){
+			cout<<v[o]<<endl;
+		}
+	}
+}
+
+vector<Action> get_instructions(Environment_state a, Environment_state b){//Gets instructions from a starting environment and a target
+	vector<vector<Action>> v;
+	bool target_reached=0;
+	vector<Action> instructions;
+	unsigned int i=0;
 	while(1){
-		if(a==c)break;
-		v=get_possible_moves(a);
-		for(unsigned int i=0; i<v.size(); i++){
-			b=update_environment(v[i], a);
-			if(a==c) break;
-			if(closer(a, b, c)){
-				distance++;
-				//cout<<"NOW: "<<a<<"    "<<v[i]<<"    OPTION: "<<b<<"    DISTANCE: "<<distance<<endl<<endl;
-				a=update_environment(v[i], a);
+		if(target_reached==1)break;
+		v=find_available_moves(i);
+		for(unsigned int k; k<v.size(); k++){
+			if(reached_target(a,b,v[k])){
+				cout<<"STARTING: "<<a<<endl<<endl<<"TARGET: "<<b<<endl<<endl<<"INSTRUCTIONS: "<<v[k];
+				instructions=v[k];
+				target_reached=1;
 				break;
 			}
 		}
-		if(a==c)break;
+		i++;
 	}
-	//if(a==c) cout<<"TARGET REACHED"<<endl<<endl;
-	return distance;
-}
-
-vector<Action> get_instructions(Environment_state environment){//Gets instructions from a random starting environment
-	vector<Action> instructions;
 	return instructions;
 }
 
@@ -246,10 +266,9 @@ void make_graph(){//Makes a graphviz graph
 	for(unsigned int i=0; i<r.size(); i++){
 		a=r[i];
 		v=get_possible_moves(a);
-		cout<<a<<"  | "<<v<<endl;
 		for(unsigned int o=0; o<v.size(); o++){
 			b=update_environment(v[o], r[i]);
-			distance=find_distance(a);
+			//distance=find_distance(a);
 			if(distance==0)color="#FF0000";
 			else if(distance==1)color="#FF2A00";
 			else if(distance==2)color="#FF4D00";
@@ -258,24 +277,23 @@ void make_graph(){//Makes a graphviz graph
 			else if(distance==5)color="#FFD000";
 			else if(distance==6)color="#FFFF00";
 			else color="#0004FF";
-			graphy<<"        \""<<a<<"  Dist: "<<distance<<"\"[color=\""<<color<<"\"];"<<endl<<"        \""<<a<<"  Dist: "<<distance<<"\"->\""<<b<<"  Dist: "<<find_distance(b)<<"\"[label=\""<<v[o]<<"\"];"<<endl;
+			graphy<<"        \""<<a<<"  Dist: "<<distance<<"\"[color=\""<<color<<"\"];"<<endl;
+			cout<<"        \""<<a<<"  Dist: "<<distance<<"\"->\""<<b<<"  Dist: "<<distance+1<<"\"[label=\""<<v[o]<<"\"];"<<endl;
 		}
 	}
 	graphy<<"}";
 	graphy.close();
 }
 
-int main(){
-	/*Environment_state environment;
-	environment.robot.location.first=0;//randomize_environment();
-	environment.robot.location.second=0;//randomize_environment();
-	environment.tote_location.first=1;//randomize_environment();
-	environment.tote_location.second=1;//randomize_environment();*/
-	make_graph();
-	/*vector<Action> instructions=get_instructions(environment);
-	for(unsigned int i=0; i<instructions.size(); i++){//Runs instructions
-		environment=update_environment(instructions[i], environment);
-		cout<<instructions[i]<<"   "<<environment<<endl;
-	}*/
+int main(){//Main, if you don't know what this is, then you shouldn't be looking at this
+	//print_results();
+	Environment_state a,b;
+	a.robot.location=make_pair(0,0);
+	a.tote_location=make_pair(0,0);
+	a.robot.with_tote=0;
+	b.robot.location=make_pair(1,1);
+	b.tote_location=make_pair(1,1);
+	b.robot.with_tote=1;
+	get_instructions(a,b);
 	return 0;
 }
