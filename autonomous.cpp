@@ -1,4 +1,5 @@
 //Author(s): Logan Traffas, Matthew Macovsky
+//A program that path finds
 #include <iostream>
 #include <vector>
 #include <ctime>
@@ -253,9 +254,9 @@ vector<Action> get_instructions(Environment_state a, Environment_state b){//Gets
 	return instructions;
 }*/
 
-pair<bool, vector<Action>> test_path(Environment_state a, Environment_state b, vector<Action> moves, int current_moves=0, int max_moves=0){
+pair<bool, vector<Action>> test_path(Environment_state a, Environment_state b, vector<Action> moves, int current_moves=0, int max_moves=0){//Actually tries to path find
 	pair<bool, vector<Action>> c;
-	if(a!=b && current_moves==max_moves){//Next up: DONT SAVE MOVES
+	if(a!=b && current_moves==max_moves){
 		c.first=0;
 		return c;
 	} else if(a==b && current_moves<=max_moves){
@@ -273,11 +274,11 @@ pair<bool, vector<Action>> test_path(Environment_state a, Environment_state b, v
 	return c;
 }
 
-void find_path(Environment_state a, Environment_state b){
+void find_path(Environment_state a, Environment_state b){//Tries to find a path to the target of length "i"
 	vector<Action> v;
 	pair<bool, vector<Action>> c;
 	for(unsigned int i=0; i<1000; i++){
-		cout<<"Testing Length "<<i<<endl;
+		cout<<"Testing length "<<i<<"."<<endl;
 		c=test_path(a, b, v, 0, i);
 		if(c.first){
 			v=c.second;
@@ -319,8 +320,7 @@ void make_graph(){//Makes a graphviz graph
 	graphy.close();
 }
 
-int main(){//Main, if you don't know what this is, then you shouldn't be looking at this
-	//print_results();
+int main(){//Main, if you don't know what this is, then you shouldn't be looking at it
 	Environment_state a,b;
 	a.robot.location=make_pair(0,0);
 	a.tote_location=make_pair(2,2);
@@ -330,5 +330,6 @@ int main(){//Main, if you don't know what this is, then you shouldn't be looking
 	b.robot.with_tote=0;
 	find_path(a, b);
 	//get_instructions(a,b);
+	//print_results();
 	return 0;
 }
