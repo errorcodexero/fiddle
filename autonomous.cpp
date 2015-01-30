@@ -253,9 +253,9 @@ vector<Action> get_instructions(Environment_state a, Environment_state b){//Gets
 	return instructions;
 }*/
 
-pair<bool, vector<Action>> test_path(Environment_state a, Environment_state b, vector<Action> moves, Action move=Action::FORWARD, int current_moves=0, int max_moves=0){
+pair<bool, vector<Action>> test_path(Environment_state a, Environment_state b, vector<Action> moves, int current_moves=0, int max_moves=0){
 	pair<bool, vector<Action>> c;
-	if(a!=b && current_moves==max_moves){
+	if(a!=b && current_moves==max_moves){//Next up: DONT SAVE MOVES
 		c.first=0;
 		return c;
 	} else if(a==b && current_moves<=max_moves){
@@ -266,7 +266,7 @@ pair<bool, vector<Action>> test_path(Environment_state a, Environment_state b, v
 	current_moves++;
 	for(Action move:get_possible_moves(a)){
 		moves.push_back(move);
-		c=test_path(update_environment(move, a), b, moves, move, current_moves, max_moves);
+		c=test_path(update_environment(move, a), b, moves, current_moves, max_moves);
 		if(c.first==1) break;
 		else moves.erase(moves.end()-1);
 	}
@@ -278,7 +278,7 @@ void find_path(Environment_state a, Environment_state b){
 	pair<bool, vector<Action>> c;
 	for(unsigned int i=0; i<1000; i++){
 		cout<<"Testing Length "<<i<<endl;
-		c=test_path(a, b, v, Action::FORWARD, 0, i);
+		c=test_path(a, b, v, 0, i);
 		if(c.first){
 			v=c.second;
 			break;
