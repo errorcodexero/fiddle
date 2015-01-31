@@ -234,7 +234,7 @@ vector<Action> get_instructions(Environment_state a, Environment_state b){//Trie
 	graphy.close();
 }*/
 
-int main(){//Main, if you don't know what this is, then you shouldn't be looking at it
+int main(){//This is main. If you don't know what this is, then you probably shouldn't be looking at any of this
 	Environment_state a,b;
 	a.robot.location=make_pair(0,0);
 	a.tote_location=make_pair(2,2);
