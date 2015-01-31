@@ -17,7 +17,7 @@ const int Y_LIMIT=3;
 
 enum class Action{FORWARD, BACKWARD, RIGHT, LEFT, LIFT, DROP};//Types of actions the robot can preform during autonomous
 
-ostream& operator<<(ostream & o, Action in){//How to print the types of instructions
+ostream& operator<<(ostream & o, Action in){//Sets how type "Action" prints
 	if(in==Action::FORWARD){
 		o<<"Instruction: FORWARD  ";
 	}
@@ -48,21 +48,11 @@ struct Environment_state{//Type to store the states of the environment
 		Robot_state():with_tote(0){}
 	};
 	Robot_state robot;
-	Location tote_location;
+	Location tote_location;//The location of the tote (assuming only one tote for now)
 };
 
-ostream & operator<<(ostream & o, Location location){//Sets how type "Location" prints
-	o<<"("<<location.first<<","<<location.second<<")";
-	return o;
-}
-
-ostream & operator<<(ostream & o, Environment_state in){//How to print type Environment_state
-	o<<"Robot location: "<<in.robot.location<<"   Tote location: "<<in.tote_location<<"   Robot with tote: "<<in.robot.with_tote;
-	return o;
-}
-
 template<typename T>
-ostream & operator<<(ostream & o, vector<T> in){//How to print type vector<type>
+ostream & operator<<(ostream & o, vector<T> in){//Sets hot type vector<type> prints
 	o<<"[";
 	for(unsigned int i=0; i<in.size(); i++){
 		o<<in[i];
@@ -71,45 +61,67 @@ ostream & operator<<(ostream & o, vector<T> in){//How to print type vector<type>
 	return o;
 }
 
-bool operator==(pair<int, int> a, pair<int, int> b) {//Sets operator "==" for pairs
+ostream & operator<<(ostream & o, Location location){//Sets how type "Location" prints
+	o<<"("<<location.first<<","<<location.second<<")";
+	return o;
+}
+
+ostream & operator<<(ostream & o, Environment_state in){//Sets how type "Environment_state" prints
+	o<<"Robot location: "<<in.robot.location<<"   Tote location: "<<in.tote_location<<"   Robot with tote: "<<in.robot.with_tote;
+	return o;
+}
+
+bool operator==(pair<int, int> a, pair<int, int> b) {//Sets operator "==" for pairs of ints
 	return a.first==b.first && a.second==b.second;
 }
 
-bool operator!=(pair<int, int> a, pair<int, int> b) {//Sets operator "!=" for pairs
+bool operator!=(pair<int, int> a, pair<int, int> b) {//Sets operator "!=" for pairs of ints
 	return !(a==b);
 }
 
-Environment_state update_environment(Action instruction, Environment_state environment){//Updates the environment with the robot following the instruction
-	if(instruction==Action::LEFT){
-		assert(environment.robot.location.first>0);
-		environment.robot.location.first--;
-	}
-	if(instruction==Action::RIGHT){
-		assert(environment.robot.location.first+1<X_LIMIT);
-		environment.robot.location.first++;
-	}
-	if(instruction==Action::BACKWARD){
-		assert(environment.robot.location.second>0);
-		environment.robot.location.second--;
-	}
-	if(instruction==Action::FORWARD){
-		assert(environment.robot.location.second+1<Y_LIMIT);
-		environment.robot.location.second++;
-	}
-	if(instruction==Action::LIFT){
-		assert(environment.robot.location==environment.tote_location);
-		assert(environment.robot.with_tote==0);
-		environment.robot.with_tote=1;
-	}
-	if(instruction==Action::DROP){
-		assert(environment.robot.with_tote==1);
-		environment.robot.with_tote=0;
-	}
-	if(environment.robot.with_tote==1)environment.tote_location=environment.robot.location;
-	return environment;
+bool operator==(Environment_state::Robot_state a, Environment_state::Robot_state b){//Sets the operator "==" for type Robot_state
+	return a.location==b.location && a.with_tote==b.with_tote;
 }
 
-vector<Action> get_possible_moves(Environment_state environment){//Determines how to print the types of "Action"
+bool operator==(Environment_state a, Environment_state b){//Sets the operator "==" for type Environment_state
+	return a.robot==b.robot && a.tote_location==b.tote_location;
+}
+
+bool operator!=(Environment_state a, Environment_state b){//Sets the operator "!=" for type Environment_state
+	return !(a==b);
+}
+
+Environment_state update_environment(Action instruction, Environment_state a){//Updates the environment with the robot following the instruction
+	if(instruction==Action::LEFT){
+		assert(a.robot.location.first>0);
+		a.robot.location.first--;
+	}
+	if(instruction==Action::RIGHT){
+		assert(a.robot.location.first+1<X_LIMIT);
+		a.robot.location.first++;
+	}
+	if(instruction==Action::BACKWARD){
+		assert(a.robot.location.second>0);
+		a.robot.location.second--;
+	}
+	if(instruction==Action::FORWARD){
+		assert(a.robot.location.second+1<Y_LIMIT);
+		a.robot.location.second++;
+	}
+	if(instruction==Action::LIFT){
+		assert(a.robot.location==a.tote_location);
+		assert(a.robot.with_tote==0);
+		a.robot.with_tote=1;
+	}
+	if(instruction==Action::DROP){
+		assert(a.robot.with_tote==1);
+		a.robot.with_tote=0;
+	}
+	if(a.robot.with_tote==1)a.tote_location=a.robot.location;
+	return a;
+}
+
+vector<Action> get_possible_moves(Environment_state environment){//Determines all the possible actions a robot can preform within a given environment
 	vector<Action> possible_moves;
 	if(environment.robot.location.first>0){
 		possible_moves.push_back(Action::LEFT);
@@ -132,41 +144,29 @@ vector<Action> get_possible_moves(Environment_state environment){//Determines ho
 	return possible_moves;
 }
 
-vector<Environment_state> get_all_states(){//Makes a vector of all possible environments
-	Environment_state environment;
-	environment.robot.with_tote=0;
+vector<Environment_state> get_all_states(){//Makes a vector of all possible environments given the X/Y limitations
+	Environment_state a;
+	a.robot.with_tote=0;
 	vector<Environment_state> r;
 	for(int x=0; x<X_LIMIT; x++){
 		for(int y=0; y<Y_LIMIT; y++){
-			environment.robot.location=make_pair(x,y);
+			a.robot.location=make_pair(x,y);
 			for(int z=0; z<X_LIMIT; z++){
 				for(int w=0; w<Y_LIMIT; w++){
-					environment.tote_location=make_pair(z,w);
-					r.push_back(environment);
+					a.tote_location=make_pair(z,w);
+					r.push_back(a);
 				}
 			}
-			environment.robot.with_tote=1;
-			environment.tote_location=environment.robot.location;
-			r.push_back(environment);
-			environment.robot.with_tote=0;
+			a.robot.with_tote=1;
+			a.tote_location=a.robot.location;
+			r.push_back(a);
+			a.robot.with_tote=0;
 		}
 	}
 	return r;
 }
 
-bool operator==(Environment_state::Robot_state a, Environment_state::Robot_state b){//Sets the operator "==" for Robot_state
-	return a.location==b.location && a.with_tote==b.with_tote;
-}
-
-bool operator==(Environment_state a, Environment_state b){//Sets the operator "==" for Environment_state
-	return a.robot==b.robot && a.tote_location==b.tote_location;
-}
-
-bool operator!=(Environment_state a, Environment_state b){//Sets the operator "!=" for Environment_state
-	return !(a==b);
-}
-
-pair<bool, vector<Action>> find_path(Environment_state a, Environment_state b, int max_moves=0){//Actually tries to find a path
+pair<bool, vector<Action>> find_path(Environment_state a, Environment_state b, int max_moves=0){//Tries to find the actions the robot must preform to reach the target environment 
 	pair<bool, vector<Action>> path_return;
 	if(a==b){
 		path_return.first=1;
@@ -187,7 +187,7 @@ pair<bool, vector<Action>> find_path(Environment_state a, Environment_state b, i
 	return path_return;
 }
 
-vector<Action> get_instructions(Environment_state a, Environment_state b){//Tries to find a path to the target of length "i"
+vector<Action> get_instructions(Environment_state a, Environment_state b){//Searches for instructions (of length "i") for the robot to reach the target environment
 	cout<<"STARTING:     "<<a<<endl<<"TARGET:       "<<b<<endl;
 	vector<Action> instructions;
 	pair<bool, vector<Action>> path_return;
@@ -203,7 +203,7 @@ vector<Action> get_instructions(Environment_state a, Environment_state b){//Trie
 	return instructions;
 }
 
-/*void make_graph(){//Makes a graphviz graph
+/*void make_graph(){//Makes a graphviz graph ***Note: currently does not work***
 	string color;
 	ofstream graphy;
 	int distance=0;
@@ -218,7 +218,7 @@ vector<Action> get_instructions(Environment_state a, Environment_state b){//Trie
 		possible_moves=get_possible_moves(a);
 		for(unsigned int o=0; o<possible_moves.size(); o++){
 			b=update_environment(possible_moves[o], r[i]);
-			//distance=find_distance(a);
+			//distance=find_distance(a);//The function "find_distance" does not exist in this version
 			if(distance==0)color="#FF0000";
 			else if(distance==1)color="#FF2A00";
 			else if(distance==2)color="#FF4D00";
@@ -236,7 +236,7 @@ vector<Action> get_instructions(Environment_state a, Environment_state b){//Trie
 }*/
 
 int main(){//This is main. If you don't know what this is, then you probably shouldn't be looking at any of this
-	Environment_state current, target;
+	Environment_state current, target;//Sets current and target environments for testing
 	current.robot.location=make_pair(0,0);
 	current.tote_location=make_pair(2,2);
 	current.robot.with_tote=0;
