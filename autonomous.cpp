@@ -166,126 +166,39 @@ bool operator!=(Environment_state a, Environment_state b){//Sets the operator "!
 	return !(a==b);
 }
 
-/*vector<vector<Action>> function(vector<vector<Action>> v, int x, vector<Action> c, vector<Action> moves, int y = 0){//A program that finds all the moves for any given length
-	if(y==x){
-		v.push_back(moves);
-		return v;
-	} else {
-		y++;
-		for(Action move:c){
-			moves.push_back(move);
-			v=function(v, x, c, moves, y);
-			moves.erase(moves.end()-1);
-		}
+pair<bool, vector<Action>> test_path(Environment_state a, Environment_state b, int max_moves=0){//Actually tries to find a path
+	pair<bool, vector<Action>> path_return;
+	if(a==b){
+		path_return.first=1;
+		return path_return;
 	}
-	return v;
-}
-
-vector<vector<Action>> find_available_moves(unsigned int x){//Finds all the possible instructions of length "x"
-	vector<Action> c;
-	c.push_back(Action::FORWARD);
-	c.push_back(Action::BACKWARD);
-	c.push_back(Action::RIGHT);
-	c.push_back(Action::LEFT);
-	c.push_back(Action::LIFT);
-	c.push_back(Action::DROP);
-	vector<vector<Action>> v;
-	if(x==0) return v;
-	vector<Action> moves;
-	v=function(v, x, c, moves);
-	return v;
-}
-
-pair<bool, Environment_state> determine_possible(Environment_state e, vector<Action> a){//Determines if a set of instructions can be carried out given an environment
-	pair<bool, Environment_state> c;
-	for (unsigned int i=0; i<a.size(); i++){
-		if (i!=0) e=update_environment(a[i-1], e);
-		vector<Action> b=get_possible_moves(e);
-		for (unsigned int k=0; k<b.size(); k++) {
-			if (b[k]==a[i]) {
-				break;
-			} else if (k==(b.size()-1)) {
-				c.first= 0;
-				c.second=e;
-				return c;
-			}
-		}
+	if(a!=b && max_moves==0){
+		path_return.first=0;
+		return path_return;
 	}
-	e=update_environment(a[a.size()-1], e);
-	c.first=1;
-	c.second=e;
-	return c;
-}
-
-bool reached_target(Environment_state a, Environment_state b, vector<Action> v){//Determines if a set of instructions will take a starting robot to a target
-	pair<bool, Environment_state> c = determine_possible(a, v);
-	return c.first && c.second==b;
-}
-
-void print_results(){//Prints the results from find_available_moves()
-	for(unsigned int i=0; i<6; i++){
-		vector<vector<Action>> v;
-		v=find_available_moves(i);
-		cout<<i<<" MOVES:"<<endl;
-		for(unsigned int o=0; o<v.size(); o++){
-			cout<<v[o]<<endl;
-		}
-	}
-}
-
-vector<Action> get_instructions(Environment_state a, Environment_state b){//Gets instructions from a starting environment and a target
-	vector<vector<Action>> v;
-	bool target_reached=0;
-	vector<Action> instructions;
-	unsigned int i=0;
-	while(1){
-		if(target_reached==1)break;
-		v=find_available_moves(i);
-		for(unsigned int k; k<v.size(); k++){
-			if(reached_target(a,b,v[k])){
-				cout<<"STARTING: "<<a<<endl<<endl<<"TARGET: "<<b<<endl<<endl<<"INSTRUCTIONS: "<<v[k];
-				instructions=v[k];
-				target_reached=1;
-				break;
-			}
-		}
-		i++;
-	}
-	return instructions;
-}*/
-
-pair<bool, vector<Action>> test_path(Environment_state a, Environment_state b, vector<Action> moves, int current_moves=0, int max_moves=0){//Actually tries to path find
-	pair<bool, vector<Action>> c;
-	if(a!=b && current_moves==max_moves){
-		c.first=0;
-		return c;
-	} else if(a==b && current_moves<=max_moves){
-		c.first=1;
-		c.second=moves;
-		return c;
-	}
-	current_moves++;
+	max_moves--;
 	for(Action move:get_possible_moves(a)){
-		moves.push_back(move);
-		c=test_path(update_environment(move, a), b, moves, current_moves, max_moves);
-		if(c.first==1) break;
-		else moves.erase(moves.end()-1);
+		path_return=test_path(update_environment(move, a), b, max_moves);
+		if(path_return.first==1){
+			path_return.second.insert(path_return.second.begin(), move);
+			return path_return;
+		}
 	}
-	return c;
+	return path_return;
 }
 
 void find_path(Environment_state a, Environment_state b){//Tries to find a path to the target of length "i"
-	vector<Action> v;
-	pair<bool, vector<Action>> c;
+	vector<Action> moves;
+	pair<bool, vector<Action>> path_return;
 	for(unsigned int i=0; i<1000; i++){
 		cout<<"Testing length "<<i<<"."<<endl;
-		c=test_path(a, b, v, 0, i);
-		if(c.first){
-			v=c.second;
+		path_return=test_path(a, b, i);
+		if(path_return.first){
+			moves=path_return.second;
 			break;
 		}
 	}
-	cout<<"STARTING:     "<<a<<endl<<"TARGET:       "<<b<<endl<<"INSTRUCTIONS: "<<v<<endl;
+	cout<<"STARTING:     "<<a<<endl<<"TARGET:       "<<b<<endl<<"INSTRUCTIONS: "<<moves<<endl;
 }
 
 void make_graph(){//Makes a graphviz graph
@@ -295,14 +208,14 @@ void make_graph(){//Makes a graphviz graph
 	Environment_state a, b;
 	graphy.open("graphy.dot");
 	vector<Environment_state> r;
-	vector<Action> v;
+	vector<Action> possible_moves;
 	r=states();
 	graphy<<"Digraph G{"<<endl;
 	for(unsigned int i=0; i<r.size(); i++){
 		a=r[i];
-		v=get_possible_moves(a);
-		for(unsigned int o=0; o<v.size(); o++){
-			b=update_environment(v[o], r[i]);
+		possible_moves=get_possible_moves(a);
+		for(unsigned int o=0; o<possible_moves.size(); o++){
+			b=update_environment(possible_moves[o], r[i]);
 			//distance=find_distance(a);
 			if(distance==0)color="#FF0000";
 			else if(distance==1)color="#FF2A00";
@@ -313,7 +226,7 @@ void make_graph(){//Makes a graphviz graph
 			else if(distance==6)color="#FFFF00";
 			else color="#0004FF";
 			graphy<<"        \""<<a<<"  Dist: "<<distance<<"\"[color=\""<<color<<"\"];"<<endl;
-			cout<<"        \""<<a<<"  Dist: "<<distance<<"\"->\""<<b<<"  Dist: "<<distance+1<<"\"[label=\""<<v[o]<<"\"];"<<endl;
+			cout<<"        \""<<a<<"  Dist: "<<distance<<"\"->\""<<b<<"  Dist: "<<distance+1<<"\"[label=\""<<possible_moves[o]<<"\"];"<<endl;
 		}
 	}
 	graphy<<"}";
