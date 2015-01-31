@@ -203,38 +203,6 @@ vector<Action> get_instructions(Environment_state a, Environment_state b){//Sear
 	return instructions;
 }
 
-/*void make_graph(){//Makes a graphviz graph ***Note: currently does not work***
-	string color;
-	ofstream graphy;
-	int distance=0;
-	Environment_state a, b;
-	graphy.open("graphy.dot");
-	vector<Environment_state> r;
-	vector<Action> possible_moves;
-	r=get_all_states();
-	graphy<<"Digraph G{"<<endl;
-	for(unsigned int i=0; i<r.size(); i++){
-		a=r[i];
-		possible_moves=get_possible_moves(a);
-		for(unsigned int o=0; o<possible_moves.size(); o++){
-			b=update_environment(possible_moves[o], r[i]);
-			//distance=find_distance(a);//The function "find_distance" does not exist in this version
-			if(distance==0)color="#FF0000";
-			else if(distance==1)color="#FF2A00";
-			else if(distance==2)color="#FF4D00";
-			else if(distance==3)color="#FF8000";
-			else if(distance==4)color="#FFA200";
-			else if(distance==5)color="#FFD000";
-			else if(distance==6)color="#FFFF00";
-			else color="#0004FF";
-			graphy<<"        \""<<a<<"  Dist: "<<distance<<"\"[color=\""<<color<<"\"];"<<endl;
-			graphy<<"        \""<<a<<"  Dist: "<<distance<<"\"->\""<<b<<"  Dist: "<<distance+1<<"\"[label=\""<<possible_moves[o]<<"\"];"<<endl;
-		}
-	}
-	graphy<<"}";
-	graphy.close();
-}*/
-
 int main(){//This is main. If you don't know what this is, then you probably shouldn't be looking at any of this
 	Environment_state current, target;//Sets current and target environments for testing
 	current.robot.location=make_pair(0,0);
