@@ -188,17 +188,18 @@ pair<bool, vector<Action>> find_path(Environment_state a, Environment_state b, i
 }
 
 vector<Action> get_instructions(Environment_state a, Environment_state b){//Tries to find a path to the target of length "i"
+	cout<<"STARTING:     "<<a<<endl<<"TARGET:       "<<b<<endl;
 	vector<Action> instructions;
 	pair<bool, vector<Action>> path_return;
 	for(unsigned int i=0; i<1000; i++){
-		cout<<"Testing length "<<i<<"."<<endl;
+		cout<<"Testing paths of length "<<i<<"."<<endl;
 		path_return=find_path(a, b, i);
 		if(path_return.first){
 			instructions=path_return.second;
 			break;
 		}
 	}
-	cout<<"STARTING:     "<<a<<endl<<"TARGET:       "<<b<<endl<<"INSTRUCTIONS: "<<instructions<<endl;
+	cout<<"INSTRUCTIONS: "<<instructions<<endl;
 	return instructions;
 }
 
@@ -235,13 +236,13 @@ vector<Action> get_instructions(Environment_state a, Environment_state b){//Trie
 }*/
 
 int main(){//This is main. If you don't know what this is, then you probably shouldn't be looking at any of this
-	Environment_state a,b;
-	a.robot.location=make_pair(0,0);
-	a.tote_location=make_pair(2,2);
-	a.robot.with_tote=0;
-	b.robot.location=make_pair(0,0);
-	b.tote_location=make_pair(0,0);
-	b.robot.with_tote=0;
-	get_instructions(a, b);
+	Environment_state current, target;
+	current.robot.location=make_pair(0,0);
+	current.tote_location=make_pair(2,2);
+	current.robot.with_tote=0;
+	target.robot.location=make_pair(0,0);
+	target.tote_location=make_pair(0,0);
+	target.robot.with_tote=0;
+	get_instructions(current, target);
 	return 0;
 }
