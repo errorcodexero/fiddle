@@ -12,7 +12,7 @@
 
 using namespace std;
 
-const int X_LIMIT=3;//The limits for the field -- robot can operate within this
+const int X_LIMIT=3;//The limits for the field -- robot can operate within this (i.e. one less)
 const int Y_LIMIT=3;
 
 enum class Action{FORWARD, BACKWARD, RIGHT, LEFT, LIFT, DROP};//Types of actions the robot can preform during autonomous
@@ -79,7 +79,7 @@ bool operator!=(pair<int, int> a, pair<int, int> b) {//Sets operator "!=" for pa
 	return !(a==b);
 }
 
-Environment_state update_environment(Action instruction, Environment_state environment){//Determines what the robot does with a give instruction
+Environment_state update_environment(Action instruction, Environment_state environment){//Updates the environment with the robot following the instruction
 	if(instruction==Action::LEFT){
 		assert(environment.robot.location.first>0);
 		environment.robot.location.first--;
@@ -132,7 +132,7 @@ vector<Action> get_possible_moves(Environment_state environment){//Determines ho
 	return possible_moves;
 }
 
-vector<Environment_state> states(){//Makes a vector of all possible environments
+vector<Environment_state> get_all_states(){//Makes a vector of all possible environments
 	Environment_state environment;
 	environment.robot.with_tote=0;
 	vector<Environment_state> r;
@@ -166,7 +166,7 @@ bool operator!=(Environment_state a, Environment_state b){//Sets the operator "!
 	return !(a==b);
 }
 
-pair<bool, vector<Action>> test_path(Environment_state a, Environment_state b, int max_moves=0){//Actually tries to find a path
+pair<bool, vector<Action>> find_path(Environment_state a, Environment_state b, int max_moves=0){//Actually tries to find a path
 	pair<bool, vector<Action>> path_return;
 	if(a==b){
 		path_return.first=1;
@@ -178,7 +178,7 @@ pair<bool, vector<Action>> test_path(Environment_state a, Environment_state b, i
 	}
 	max_moves--;
 	for(Action move:get_possible_moves(a)){
-		path_return=test_path(update_environment(move, a), b, max_moves);
+		path_return=find_path(update_environment(move, a), b, max_moves);
 		if(path_return.first==1){
 			path_return.second.insert(path_return.second.begin(), move);
 			return path_return;
@@ -187,21 +187,22 @@ pair<bool, vector<Action>> test_path(Environment_state a, Environment_state b, i
 	return path_return;
 }
 
-void find_path(Environment_state a, Environment_state b){//Tries to find a path to the target of length "i"
-	vector<Action> moves;
+vector<Action> get_instructions(Environment_state a, Environment_state b){//Tries to find a path to the target of length "i"
+	vector<Action> instructions;
 	pair<bool, vector<Action>> path_return;
 	for(unsigned int i=0; i<1000; i++){
 		cout<<"Testing length "<<i<<"."<<endl;
-		path_return=test_path(a, b, i);
+		path_return=find_path(a, b, i);
 		if(path_return.first){
-			moves=path_return.second;
+			instructions=path_return.second;
 			break;
 		}
 	}
-	cout<<"STARTING:     "<<a<<endl<<"TARGET:       "<<b<<endl<<"INSTRUCTIONS: "<<moves<<endl;
+	cout<<"STARTING:     "<<a<<endl<<"TARGET:       "<<b<<endl<<"INSTRUCTIONS: "<<instructions<<endl;
+	return instructions;
 }
 
-void make_graph(){//Makes a graphviz graph
+/*void make_graph(){//Makes a graphviz graph
 	string color;
 	ofstream graphy;
 	int distance=0;
@@ -209,7 +210,7 @@ void make_graph(){//Makes a graphviz graph
 	graphy.open("graphy.dot");
 	vector<Environment_state> r;
 	vector<Action> possible_moves;
-	r=states();
+	r=get_all_states();
 	graphy<<"Digraph G{"<<endl;
 	for(unsigned int i=0; i<r.size(); i++){
 		a=r[i];
@@ -226,12 +227,12 @@ void make_graph(){//Makes a graphviz graph
 			else if(distance==6)color="#FFFF00";
 			else color="#0004FF";
 			graphy<<"        \""<<a<<"  Dist: "<<distance<<"\"[color=\""<<color<<"\"];"<<endl;
-			cout<<"        \""<<a<<"  Dist: "<<distance<<"\"->\""<<b<<"  Dist: "<<distance+1<<"\"[label=\""<<possible_moves[o]<<"\"];"<<endl;
+			graphy<<"        \""<<a<<"  Dist: "<<distance<<"\"->\""<<b<<"  Dist: "<<distance+1<<"\"[label=\""<<possible_moves[o]<<"\"];"<<endl;
 		}
 	}
 	graphy<<"}";
 	graphy.close();
-}
+}*/
 
 int main(){//Main, if you don't know what this is, then you shouldn't be looking at it
 	Environment_state a,b;
@@ -241,8 +242,6 @@ int main(){//Main, if you don't know what this is, then you shouldn't be looking
 	b.robot.location=make_pair(0,0);
 	b.tote_location=make_pair(0,0);
 	b.robot.with_tote=0;
-	find_path(a, b);
-	//get_instructions(a,b);
-	//print_results();
+	get_instructions(a, b);
 	return 0;
 }
