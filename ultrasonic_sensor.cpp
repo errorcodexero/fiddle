@@ -1,25 +1,22 @@
 //Author(s): Logan Traffas, Adrian Hardt
-//For analogue output -- ***Note: change to PWM***
+//For PWM output
 #include <iostream>
 #include <vector>
 
 using namespace std;
 
-const float SUPPLIED_VOLTAGE=5.0;
-
-float sensor_return(){
-	float sensor_return=0.29298;//Change for actual values
-	return sensor_return;
+double get_pulse_width(){
+	double pulse_width=13230;//Change to actual values
+	return pulse_width;
 }
 
-double get_range(float SUPPLIED_VOLTAGE, float measured_voltage){
-	return measured_voltage/(SUPPLIED_VOLTAGE/512);
+double get_range(float pulse_width){
+	return pulse_width/147;
 }
 
 int main(){
-	float measured_voltage=0, range=0;
-	measured_voltage=sensor_return();
-	range=get_range(SUPPLIED_VOLTAGE, measured_voltage);
-	cout<<range<<"in.";
+	float pulse_width=get_pulse_width();
+	float range=get_range(pulse_width);
+	cout<<range;
 	return 0;
 }
