@@ -8,7 +8,7 @@ using namespace std;
 const float SUPPLIED_VOLTAGE=5.0;
 
 float sensor_return(){
-	float sensor_return=0.29298;
+	float sensor_return=0.29298;//Change for actual values
 	return sensor_return;
 }
 
