@@ -1,5 +1,5 @@
 //Author(s): Logan Traffas, Matthew Macovsky
-//A program that path finds
+//A program that path finds for future use in autonomous
 #include <iostream>
 #include <vector>
 #include <ctime>
@@ -203,7 +203,7 @@ vector<Action> get_instructions(Environment_state a, Environment_state b){//Sear
 	return instructions;
 }
 
-int main(){//This is main. If you don't know what this is, then you probably shouldn't be looking at any of this
+int main(){//This is main. If you don't know what this is, then you probably shouldn't be looking at any of this (probably)
 	Environment_state current, target;//Sets current and target environments for testing
 	current.robot.location=make_pair(0,0);
 	current.tote_location=make_pair(2,2);
