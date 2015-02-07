@@ -5,7 +5,7 @@
 
 using namespace std;
 
-double get_pulse_width(){
+double get_pulse_width(){//In microseconds
 	double pulse_width=13230;//Change to actual values
 	return pulse_width;
 }
