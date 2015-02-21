@@ -6,6 +6,7 @@ using namespace std;
 void renderengine(int gridx, int gridy, int coordx, int coordy, int choice){
 	string array [gridx] [gridy];
 	string display;
+	
 	if(choice == 0){
 		display = " ";
 	}
@@ -45,13 +46,14 @@ void renderengine(int gridx, int gridy, int coordx, int coordy, int choice){
 	if(choice == 12){
 		display = "X";
 	}
-	else{
-		cout<<"\n\nError: choice = "<<choice;
-		//assert();
+	if(choice >= 13){
+		cout<<"\n\nError: choice = "<<choice<<"\n\n";
+		assert(0);
 	}
 	
 	array [coordx] [coordy] = display;
 	int county = 0;
+	cout<<"\n\n";	
 	while(county < gridy){
 		int countx = 0;
 		while(countx < gridx){
@@ -60,8 +62,9 @@ void renderengine(int gridx, int gridy, int coordx, int coordy, int choice){
 		}
 		county++;
 	}
+	cout<<"\n\n";
 }
 
 int main(){
-	renderengine(5, 5, 2, 2, 9);
+	renderengine(5, 5, 2, 2, 3);
 }

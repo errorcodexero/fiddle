@@ -3,6 +3,9 @@
 #include <cmath>
 //#include "liftHeight.cpp"
 
+#define PRESET_POWER .75 //power per inch
+#define MANUAL_POWER .45
+
 using namespace std;
 
 /*
@@ -30,28 +33,34 @@ Set_Point → → Error (SP - PV) → → Integral → → → → → Add all T
 		  → → Error (SP - PV) → → Derivative → → →
 */
 
-struct PID_Controller {
-	double p = 0.01, //Proportional
-		   i = 0.01, //Integral
-		   d = 0.0; //Derivative
+struct PID_Values {
+	const double p = 0.1, //Proportional
+	             i = 0.0, //Integral
+       	             d = 0.0; //Derivative
 };
 
-double Proportional(double error, PID_Controller pid) {
+struct PID_Controller {
+	double p = 0.0, //Proportional
+	       i = 0.0, //Integral
+       	       d = 0.0; //Derivative
+};
+
+double Proportional(double error, PID_Values pid) {
 	return pid.p * error;
 }
 
-double Integral(double error, PID_Controller pid, double rate, double integral) {
+double Integral(double error, PID_Values pid, double rate, double integral) {
 	integral += rate * error;
 	
 	return integral * pid.i;
 }
 
-double Derivative(double error, PID_Controller pid) {
+double Derivative(double error, PID_Values pid) {
 	
 	return 0.0;
 }
 
-PID_Controller PID(double error, PID_Controller pid, double rate, double integral) {
+PID_Controller PID(double error, PID_Values pid, double rate, double integral) {
 	PID_Controller test;
 	test.p = Proportional(error, pid);
 	test.i = Integral(error, pid, rate, integral);
@@ -60,22 +69,22 @@ PID_Controller PID(double error, PID_Controller pid, double rate, double integra
 	return test;
 }
 
-#ifdef TEST_PID
+#ifdef PID_TEST
 
 int main() {
-	int currentHeight = 0,
-		desiredHeight = 0;
-	double set_point = 0.0,
-		   controller_input = 0.0,
-		   disturbances = 0.0,
-		   measured_process_variable = 0.0,
-		   process = 0.0,
-		   process_variable = 0.0,
-		   error = 0.0,
-		   power = 0.0,
-		   integral = 0.0;
-	PID_Controller original,
-				   value;
+	double currentHeight = 0,
+	       desiredHeight = 0,
+	       set_point = 0.0,
+	       controller_input = 0.0,
+	       disturbances = 0.0,
+	       measured_process_variable = 0.0,
+	       process = 0.0,
+	       process_variable = 0.0,
+	       error = 0.0,
+	       power = 0.0,
+	       integral = 0.0;
+	PID_Values original;
+	PID_Controller value;
 	
 	cout << endl << "Enter current height (0 - 100): ";
 	cin >> currentHeight;
@@ -84,17 +93,25 @@ int main() {
 	
 	set_point = desiredHeight;
 	process_variable = currentHeight;
-	
-	for(int i = 0; i < 30; i++)	{
+	//3.5 seconds to go 56 inches
+	for(int i = 0; i < 3500; i++)	{ //milliseconds
 		error = set_point - process_variable;
 		value = PID(error, original, 1.0, integral);
 		integral += value.i;
 		power = value.p + value.i + value.d;
 		
-		process_variable > set_point ? power = -original.p : power = original.p;
-		power >= 0 ? process_variable++ : process_variable--;
+		if (process_variable > set_point) {
+			
+
+			power = -original.p;
+		}
+		else {
+			power = original.p;
+		}
 		
-		cout << endl << "Time Step: " << i << endl << "Error: " << error << endl << "Power: " << power << endl << "Current Height: " << process_variable << endl;
+		process_variable+= (power * 1.00);
+		
+		cout << endl << "Time Step: " << i +1 << endl << "Error: " << error << endl << "Power: " << power << endl << "Current Height: " << process_variable << endl;
 	}
 	
 	return 0;
