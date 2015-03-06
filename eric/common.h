@@ -5,6 +5,7 @@
 #include<string>
 
 std::vector<unsigned> range(unsigned lim);
+std::vector<int> range(int,int);
 
 template<typename T>
 std::vector<T>& operator|=(std::vector<T>& v,T t){

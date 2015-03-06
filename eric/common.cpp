@@ -12,6 +12,12 @@ vector<unsigned> range(unsigned lim){
 	return r;
 }
 
+vector<int> range(int a,int b){
+	vector<int> r;
+	for(;a<b;a++) r|=a;
+	return r;
+}
+
 string first_word(string s){
 	stringstream ss;
 	for(unsigned i=0;i<s.size() && s[i]!=' ';i++){
