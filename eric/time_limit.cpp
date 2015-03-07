@@ -174,7 +174,7 @@ Array2<W,H,string> gen_data(Mode mode,bool show_combo,bool two_cans_per_stack,un
 					break;
 				}
 				case Mode::D_CAN_LIMIT:{
-					auto b2=pts_at_cost(5,p.second,p.first,max_stack_height,!two_cans_per_stack);
+					auto b2=pts_at_cost(3,p.second,p.first,max_stack_height,two_cans_per_stack);
 					ss<<(pts-(int)max_pts(b2.first,b2.second,max_stack_height,two_cans_per_stack));
 					break;
 				}
@@ -215,6 +215,10 @@ int main(int argc,char **argv){
 		make_tuple("limit_cans","Make it so that only 3 cans are available rather than 7",[&]{ cans_available=3; }),
 		make_tuple("d_can_limit","Show the different that going from 3 to 7 cans makes",[&]{ mode=Mode::D_CAN_LIMIT; })
 	};
+	unsigned max_stack_height=6;
+	for(unsigned i=1;i<=6;i++){
+		options|=Option(string("stack")+as_string(i),string("Limit stack height to ")+as_string(i),[&,i]{ max_stack_height=i; });
+	}
 	auto help=[&](){
 		cout<<"Outputs HTML.  Options:\n";
 		for(auto p:options){
@@ -235,7 +239,6 @@ int main(int argc,char **argv){
 			help();
 		}
 	}
-	static const unsigned max_stack_height=6;
 	auto a=gen_data(mode,show_combo,two_cans_per_stack,max_stack_height,cans_available);
 	webpage(as_string(args(argc,argv)),"Time per can (seconds)","Time per box (seconds)",a);
 }
