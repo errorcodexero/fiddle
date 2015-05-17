@@ -1,26 +1,34 @@
 /*
 TODO:
 	Must do:
-	-Check capitals in smart guess
-	-Use already known letters in smart guess
+	-Stop if from using words that don't contain a certain "incorrect" letter in smart_guess.
+	-Searching for words that contain 2+ specific letters not working.
+	-Check capital logic
 	Later:
 	-Stop it from replacing letters (say user says there's "e" in place one then later says there's an "h" in place one)
+	-If letter frequency is equal, then chose from the master list.
 */
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <ctime>
-#include <cstdlib>
 #include <vector>
 #include <windows.h>
 #include <algorithm>
-#include <sstream>
-#include <ctype.h>
-#include <stdlib.h>
 
 using namespace std;
 
 ostream& operator<<(ostream& o, vector<int> v){
+	o<<"<";
+	for(unsigned int i=0; i<v.size(); i++){
+		o<<v[i];
+		o<<" ";
+	}
+	o<<">";
+	return o;
+}
+
+ostream& operator<<(ostream& o, vector<unsigned int> v){
 	o<<"<";
 	for(unsigned int i=0; i<v.size(); i++){
 		o<<v[i];
@@ -50,11 +58,77 @@ ostream& operator<<(ostream& o, vector<string> v){
 	return o;
 }
 
-vector<char> set_smart_letter_frequency(string word){
-	vector<char> letter_frequency;
-	letter_frequency.resize(26);
+ostream& operator<<(ostream& o, vector<pair<char,int>> v){
+	o<<"<";
+	for(unsigned int i=0; i<v.size(); i++){
+		o<<"<";
+		o<<v[i].first;
+		o<<" ";
+		o<<v[i].second;
+		o<<"> ";
+	}
+	o<<">";
+	return o;
+}
+
+bool check_redundancy(vector<unsigned int> remove_at, unsigned int i){
+	for(unsigned int k=0; k<remove_at.size(); k++){
+		if(remove_at[k]==i)return 0;
+	}
+	return 1;
+}
+
+vector<string> remove_nonmatching(const string word, vector<string> possible_words){
+	for(unsigned int k=0; k<word.size(); k++){
+		if(word[k]!='_'){
+			possible_words=[&](){
+				vector<unsigned int> remove_at;
+				for(unsigned int i=0; i<possible_words.size(); i++){
+					if(tolower(possible_words[i][k])==word[k] || toupper(possible_words[i][k])==word[k]);
+					else if(check_redundancy(remove_at, i))remove_at.push_back(i);
+				}
+				for(unsigned int i=remove_at.size(); i>0; i--){
+					if(possible_words.size()==0)break;
+					possible_words.erase(possible_words.begin()+remove_at[i-1]);
+				}
+				return possible_words;
+			}();
+		}
+	}
+	return possible_words;
+}
+
+vector<string> get_possible_words(string word, unsigned int word_length, vector<char> all_letters, bool print_diagnostics){//Checks a word list and returns a list of words of length "n"
+	fstream input_words;
+	input_words.open("words.txt");
+	vector<string> possible_words;
+	if(print_diagnostics)cout<<"\nget_possible_words{";
+	for(unsigned int l=1; !input_words.eof(); l++){
+		string possible_word;
+		input_words>>possible_word;
+		if(possible_word.size()==word_length){
+			possible_words.push_back(possible_word);
+			for(unsigned int i=0; i<possible_word.size(); i++){
+				for(unsigned int j=0; j<all_letters.size(); j++){
+					if(tolower(possible_word[i])==all_letters[j])break;
+					if(toupper(possible_word[i])==all_letters[j])break;
+					if(j==all_letters.size())possible_words.pop_back();
+				}
+			}
+		}
+		/*if(print_diagnostics){
+			cout<<"\nline:"<<l<<"   word:"<<possible_word<<"   size:"<<possible_word.size()<<"   target"<<word_length<<"   vsize:"<<possible_words.size()<<"   vmax:"<<possible_words.max_size();
+			if(possible_words.size()!=0)cout<<"   latest:"<<possible_words.back();
+		}*/
+	}
+	input_words.close();
+	possible_words=remove_nonmatching(word,possible_words);
+	if(print_diagnostics)cout<<"\n}\n\npossible_words:"<<possible_words<<"\n";
+	return possible_words;
+}
+
+vector<char> set_smart_letter_frequency(string word, bool print_diagnostics){//Sets the frequency of letter occurrence in list of words of length "n"
 	vector<char> all_letters={'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
-	vector<char> disallowed={'\''};
 	vector<pair<char,int>> quantified_letter_frequency;
 	for(unsigned int i=0; i<all_letters.size(); i++){
 		pair<char,int> initialize;
@@ -62,75 +136,71 @@ vector<char> set_smart_letter_frequency(string word){
 		initialize.second=0;
 		quantified_letter_frequency.push_back(initialize);		
 	}
-	vector<string> possible_words;
-	fstream input_words;
-	input_words.open("words.txt");
-	for(unsigned int i=1; !input_words.eof(); i++){
-		string possible_word;
-		input_words>>possible_word;
-		if(possible_word.size()==word.size()){
-			possible_words.push_back(possible_word);
-			for(unsigned int i=0; i<possible_word.size(); i++){
-				for(unsigned int j=0; j<all_letters.size(); j++){
-					if(possible_word[i]==all_letters[j])break;
-					if(j==all_letters.size())possible_words.pop_back();
+	vector<string> possible_words=get_possible_words(word, word.size(), all_letters, print_diagnostics);
+	if(print_diagnostics)cout<<"\npossible_words:"<<possible_words<<"\n";
+	vector<char> letter_frequency;
+	if(possible_words.size()==0)letter_frequency={'e', 't', 'a', 'o', 'i', 'n', 's', 'h', 'r', 'd', 'l', 'c', 'u', 'm', 'w', 'f', 'g', 'y', 'p', 'b', 'v', 'k', 'j', 'x', 'q', 'z'};
+	else{
+		for(unsigned int i=0; i<possible_words.size(); i++){
+			for(unsigned int j=0; j<possible_words[i].size(); j++){
+				for(unsigned int k=0; k<all_letters.size(); k++){
+					if(toupper(possible_words[i][j])==all_letters[k]) quantified_letter_frequency[k].second++;
+					else if(tolower(possible_words[i][j])==all_letters[k]) quantified_letter_frequency[k].second++;
 				}
 			}
 		}
-		//cout<<"\nline:"<<i<<"   word:"<<possible_word<<"   size:"<<possible_word.size()<<"   target"<<word.size()<<"   vsize:"<<possible_words.size()<<"   vmax:"<<possible_words.max_size();
-		//if(possible_words.size()!=0)cout<<"   latest:"<<possible_words.back();
-	}
-	input_words.close();
-	for(unsigned int i=0; i<possible_words.size(); i++){
-		for(unsigned int j=0; j<possible_words[i].size(); j++){
-			for(unsigned int k=0; k<all_letters.size(); k++){
-				for(unsigned int l=0; l<disallowed.size(); l++){
-					if(possible_words[i][j]!=disallowed[l] && possible_words[i][j]==all_letters[k]) quantified_letter_frequency[k].second++;
+		vector<int> sort_letters;
+		if(print_diagnostics)cout<<"\nquantified_letter_frequency:"<<quantified_letter_frequency<<"\n";
+		for(unsigned int i=0; i<quantified_letter_frequency.size(); i++){
+			sort_letters.push_back(quantified_letter_frequency[i].second);
+		}
+		sort(sort_letters.begin(),sort_letters.end());
+		for(unsigned int i=0; i<sort_letters.size(); i++){
+			for(unsigned int j=0; j<quantified_letter_frequency.size(); j++){
+				if(sort_letters[i]==quantified_letter_frequency[j].second){
+					letter_frequency.push_back(quantified_letter_frequency[j].first);
+					quantified_letter_frequency.erase(quantified_letter_frequency.begin()+j);
+					break;
 				}
 			}
 		}
+		reverse(letter_frequency.begin(),letter_frequency.end());
 	}
-	vector<int> sort_letters;
-	for(unsigned int i=0; i<quantified_letter_frequency.size(); i++){
-		sort_letters.push_back(quantified_letter_frequency[i].second);
-	}
-	sort(sort_letters.begin(),sort_letters.end());
-	for(unsigned int i=0; i<sort_letters.size(); i++){
-		for(unsigned int j=0; j<quantified_letter_frequency.size(); j++){
-			if(sort_letters[i]==quantified_letter_frequency[j].second){
-				letter_frequency.push_back(quantified_letter_frequency[j].first);
-				quantified_letter_frequency.erase(quantified_letter_frequency.begin()+j);
-				break;
-			}
-		}
-	}
-	reverse(letter_frequency.begin(),letter_frequency.end());
-	letter_frequency.erase(letter_frequency.begin()+26,letter_frequency.end());
-	//cout<<"\n"<<letter_frequency<<"\n";
+	if(print_diagnostics)cout<<"\nletter_frequency:"<<letter_frequency<<"\n";
 	return letter_frequency;
 }
 
-char guess(vector<char> correct_letters, vector<char> incorrect_letters, const vector<char> letter_frequency){//Picks a letter to guess from letter frequency
-	vector<char> remaining_letters;
+vector<char> remove_already_guessed(vector<char> remaining_letters, const vector<char> incorrect_letters, const vector<char> correct_letters, bool print_diagnostics){
 	vector<int> remove_from_remaining;
-	remaining_letters=letter_frequency;
-	char guess_letter;
-	for(unsigned int i=0; i<letter_frequency.size(); i++){//Fills remaining_letters with the remaining possible letters
-		for(unsigned int j=0; j<correct_letters.size(); j++){
-			if(letter_frequency[i]==correct_letters[j]) remove_from_remaining.push_back(j);
-		}
-		for(unsigned int j=0; j<incorrect_letters.size(); j++){
-			if(letter_frequency[i]==incorrect_letters[j])remove_from_remaining.push_back(j);
+	vector<char> already_guessed=incorrect_letters;
+	for(unsigned int i=0; i<correct_letters.size(); i++){
+		already_guessed.push_back(correct_letters[i]);
+	}
+	if(print_diagnostics)cout<<"\ncorrect_letters:"<<correct_letters<<"\n\nincorrect_letters:"<<incorrect_letters<<"\n";
+	for(unsigned int i=0; i<remaining_letters.size(); i++){//Fills remaining_letters with the remaining possible letters
+		for(unsigned int j=0; j<already_guessed.size(); j++){
+			//if(print_diagnostics)cout<<"\nfreq:"<<remaining_letters[i]<<"   already:"<<already_guessed[j]<<"    erase:"<<(remaining_letters[i]==already_guessed[j])<<","<<j<<"\n";
+			if(remaining_letters[i]==already_guessed[j]) remove_from_remaining.push_back(i);
 		}
 	}
+	sort(remove_from_remaining.begin(), remove_from_remaining.end());
 	for(unsigned int i=remove_from_remaining.size(); i>0; i--){
 		remaining_letters.erase(remaining_letters.begin()+remove_from_remaining[i-1]);		
 	}
+	return remaining_letters;	
+}
+
+char guess(const vector<char> correct_letters, const vector<char> incorrect_letters, const vector<char> letter_frequency, bool print_diagnostics){//Picks a letter to guess from generic letter frequency
+	vector<char> remaining_letters;
+	remaining_letters=letter_frequency;
+	char guess_letter;
+	remaining_letters=remove_already_guessed(remaining_letters, incorrect_letters, correct_letters, print_diagnostics);
+	if(print_diagnostics)cout<<"\nremaining_letters:"<<remaining_letters<<"\n\n";
 	guess_letter=remaining_letters[0];
 	return guess_letter;
 }
 
-string fill_word(unsigned int word_length){
+string fill_word(const unsigned int word_length){
 	string word;
 	for(unsigned int i=0; i<word_length; i++){
 		word+="_";
@@ -138,7 +208,7 @@ string fill_word(unsigned int word_length){
 	return word;
 }
 
-string print_word(string word){
+string print_word(const string word){
 	string printout;
 	for(unsigned int i=0; i<word.length();i++){
 		printout+=word[i];
@@ -147,7 +217,7 @@ string print_word(string word){
 	return printout;
 }
 
-void function(string& word, vector<char>& correct_letters, char& letter_guess, bool& finish){
+void if_correct_guess(string& word, vector<char>& correct_letters, char& letter_guess, bool& finish){
 	char temp[10];
 	int letter_place=0;
 	cout<<"What place is it in the word? ";
@@ -157,51 +227,59 @@ void function(string& word, vector<char>& correct_letters, char& letter_guess, b
 	for(unsigned int j=0; j<word.size(); j++){
 		if(word[j]=='_') break;
 		else if(j==word.size()-1){
-			cout<<"\nI WIN!";
+			cout<<"\nI WIN! The word is \""<<word<<"\"!";
 			finish=1;
 		}
 	}
 	correct_letters.push_back(letter_guess);
 }
 
-int main(){
-	bool smart_guess=1;
-	unsigned int word_length=0;
-	string word="";
-	bool finish=0;
-	vector<char> correct_letters;
-	vector<char> incorrect_letters;
-	char letter_guess;
-	char yn='n';
-	cout<<"Enter the number of letters in the word: ";
-	cin>>word_length;
-	cout<<"Use smart guess?(y/n) ";
-	cin>>yn;
-	smart_guess=yn=='y';
-	vector<char> letter_frequency={'e', 't', 'a', 'o', 'i', 'n', 's', 'h', 'r', 'd', 'l', 'c', 'u', 'm', 'w', 'f', 'g', 'y', 'p', 'b', 'v', 'k', 'j', 'x', 'q', 'z'};
-	word=fill_word(word_length);
-	if(smart_guess)letter_frequency=set_smart_letter_frequency(word);
-	for(unsigned int i; i<26; i++){
-		yn='n';
-		letter_guess=guess(correct_letters, incorrect_letters, letter_frequency);
-		cout<<"Known: "<<print_word(word)<<". Does it have the letter \'"<<letter_guess<<"\'?(y/n) ";
-		cin>>yn;
+void process_guess_result(string& word, char letter_guess, bool correct, bool& finish, vector<char>& correct_letters, vector<char>& incorrect_letters){
+	if(correct){
+		char yn='y';
 		while(yn=='y' && !finish){
-			function(word,correct_letters,letter_guess,finish);
+			if_correct_guess(word,correct_letters,letter_guess,finish);
 			if(finish) break;
 			cout<<"Is there another instance of the letter?(y/n) ";
 			cin>>yn;
 		}
-		if(yn!='y' && !finish){
-			incorrect_letters.push_back(letter_guess);
-			if(incorrect_letters.size()==6){
-				cout<<"\nI LOSE!";
-				string temp;
-				cout<<"\nWhat was the word? ";
-				cin>>temp;
-				finish=1;
-			}
+	}
+	else{
+		incorrect_letters.push_back(letter_guess);
+		if(incorrect_letters.size()==6){
+			cout<<"\nI LOSE!";
+			string temp;
+			cout<<"\nWhat was the word? ";
+			cin>>temp;
+			finish=1;
 		}
+	}
+}
+
+int main(){
+	const bool print_diagnostics=0;
+	unsigned int word_length=0;
+	cout<<"Enter the number of letters in the word: ";
+	cin>>word_length;
+	string word="";
+	word=fill_word(word_length);
+	char yn='n';
+	cout<<"Use smart guess?(y/n) ";
+	cin>>yn;
+	bool smart_guess=0;
+	smart_guess=yn=='y';
+	vector<char> letter_frequency={'e', 't', 'a', 'o', 'i', 'n', 's', 'h', 'r', 'd', 'l', 'c', 'u', 'm', 'w', 'f', 'g', 'y', 'p', 'b', 'v', 'k', 'j', 'x', 'q', 'z'};
+	vector<char> correct_letters;
+	vector<char> incorrect_letters;	
+	for(unsigned int i=0; i<26; i++){
+		if(smart_guess)letter_frequency=set_smart_letter_frequency(word, print_diagnostics);
+		char letter_guess;
+		letter_guess=guess(correct_letters, incorrect_letters, letter_frequency, print_diagnostics);
+		yn='n';
+		cout<<"Known: "<<print_word(word)<<". Does it have the letter \'"<<letter_guess<<"\'?(y/n) ";
+		cin>>yn;
+		bool finish=0;
+		process_guess_result(word, letter_guess, yn=='y', finish, correct_letters, incorrect_letters);
 		if(finish)break;
 	}
 	return 0;
