@@ -14,14 +14,31 @@ ostream&operator<<(ostream&o,vector<pair<int,int> > v){
 	}
 	return o;
 }
-ostream&operator<<(ostream&o,map<pair<int,int>,vector<pair<int,int>>> v){
+
+ostream&operator<<(ostream&o,map<pair<T,T>,vector<pair<T,T>>> v){
 	for(pair<pair<int,int>,vector<pair<int,int>>> p:v){
-		o<<"Key X: "<<p.first.first<<" Key Y: "<<p.first.second<<"\n";
-		for(pair<int,int> x:p.second)
-		o<<"Option X: "<<x.first<<" Option Y: "<<x.second<<"\n";
+		//o<<"Key X: "<<p.first.first<<" Key Y: "<<p.first.second<<"\n";
+					
+		
+		//o<<"Option X: "<<x.first<<" Option Y: "<<x.second<<"\n";
+		
 	}
 	return o;
 }
+osream&operator<<(ostream&o,pair<int,int> v){
+	o<<"first: "<<v.first<<"\n";
+	o<<"second: "<<v.second"\n";
+	return o;
+}
+template<typename T>
+ostream&operator<<(ostream& o,vector<T> v){
+	o<<"(";
+	for(T t:v){
+		o<<t;
+	}
+	return o<<")";
+}
+
 ostream&operator<<(ostream&o,vector<vector<int> > v){
 	if(v.size() > 0){
 		unsigned boardLength = v.size();
@@ -320,7 +337,7 @@ string FindPath(
 			break;
 		}
 	}	
-return instructions;
+	return instructions;
 
 }
 

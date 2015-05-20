@@ -187,9 +187,10 @@ int main(int argc,char **argv){
 		}
 	}
 
+	static const bool TWO_CANS_PER_STACK=0;
 	auto max_pts1=[=](unsigned boxes,unsigned cans){
 		if(starter) return max_pts_spotted(boxes,cans,max_height);
-		return max_pts(boxes,cans,max_height);
+		return max_pts(boxes,cans,max_height,TWO_CANS_PER_STACK);
 	};
 
 	auto differential1=[=](unsigned boxes,unsigned cans){
