@@ -9,7 +9,6 @@
 #include <ctime>
 #include <cstdlib>
 #include <vector>
-#include <windows.h>
 #include <sstream>
 #include <ctype.h>
 using namespace std;
@@ -115,21 +114,21 @@ Comparison_return guess_v_word_comparison(string guess, string word, string blan
 }
 
 void reset_saved_statistics(){//Resets win and loss statistics
-	Sleep(750);
+	//Sleep(750);
 	cout<<endl<<endl<<"Resetting saved win and loss statistics to 0's."<<flush;
-	Sleep(750);
+	//Sleep(750);
 	cout<<" ."<<flush;
-	Sleep(750);
+	//Sleep(750);
 	cout<<" ."<<flush;
-	Sleep(750);
+	//Sleep(750);
 	cout<<" ."<<flush;
 	ofstream logger;
 	logger.open("hangman_log.txt");
 	logger<<"W:"<<0<<",L-"<<0<<",";
 	logger.close();
-	Sleep(750);
+	//Sleep(750);
 	cout<<" done!"<<endl<<endl;
-	Sleep(100);
+	//Sleep(100);
 }
 
 Wins_and_losses_return win_and_loss_saver(int won, int lost){
