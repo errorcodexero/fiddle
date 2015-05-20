@@ -9,7 +9,6 @@
 #include <ctime>
 #include <cstdlib>
 #include <vector>
-#include <windows.h>
 #include <sstream>
 #include <ctype.h>
 using namespace std;
@@ -115,21 +114,21 @@ Comparison_return guess_v_word_comparison(string guess, string word, string blan
 }
 
 void reset_saved_statistics(){//Resets win and loss statistics
-	Sleep(750);
+	//Sleep(750);
 	cout<<endl<<endl<<"Resetting saved win and loss statistics to 0's."<<flush;
-	Sleep(750);
+	//Sleep(750);
 	cout<<" ."<<flush;
-	Sleep(750);
+	//Sleep(750);
 	cout<<" ."<<flush;
-	Sleep(750);
+	//Sleep(750);
 	cout<<" ."<<flush;
 	ofstream logger;
 	logger.open("hangman_log.txt");
 	logger<<"W:"<<0<<",L-"<<0<<",";
 	logger.close();
-	Sleep(750);
+	//Sleep(750);
 	cout<<" done!"<<endl<<endl;
-	Sleep(100);
+	//Sleep(100);
 }
 
 Wins_and_losses_return win_and_loss_saver(int won, int lost){
@@ -227,7 +226,7 @@ void play_game(string word, string blanks){//Accepts user guesses and compares t
 			wins_and_losses_return=win_and_loss_saver(won, lost);
 			draw_gallows(remaining_attempts);
 			cout<<"=========================================================================="<<endl<<endl<<"Game over. You lose. The correct word ";
-			cout<<"was: \""<<word<<"\"! You have lost "<<wins_and_losses_return.loses<<" times."<<endl<<endl<<"=========================================================================="<<endl;
+			cout<<"was: \""<<word<<"\"! You have lost "<<wins_and_losses_return.loses<<" time"<<((wins_and_losses_return.loses==1)?"":"s")<<"."<<endl<<endl<<"=========================================================================="<<endl;
 			break;
 		}
 		for(unsigned int k=0; k<blanks.size(); k++){//Determines is the user has won
@@ -243,7 +242,7 @@ void play_game(string word, string blanks){//Accepts user guesses and compares t
 			wins_and_losses_return=win_and_loss_saver(won, lost);
 			draw_gallows(remaining_attempts);
 			cout<<"=========================================================================="<<endl<<endl<<"Congratulations! You win! the word";
-			cout<<" was \""<<word<<"!\" You have won "<<wins_and_losses_return.winnings<<" times!"<<endl<<endl<<"=========================================================================="<<endl;
+			cout<<" was \""<<word<<"!\" You have won "<<wins_and_losses_return.winnings<<" time"<<((wins_and_losses_return.winnings==1)?"":"s")<<"."<<endl<<endl<<"=========================================================================="<<endl;
 			break;
 		}
 	}
