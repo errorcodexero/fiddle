@@ -226,7 +226,7 @@ void play_game(string word, string blanks){//Accepts user guesses and compares t
 			wins_and_losses_return=win_and_loss_saver(won, lost);
 			draw_gallows(remaining_attempts);
 			cout<<"=========================================================================="<<endl<<endl<<"Game over. You lose. The correct word ";
-			cout<<"was: \""<<word<<"\"! You have lost "<<wins_and_losses_return.loses<<" times."<<endl<<endl<<"=========================================================================="<<endl;
+			cout<<"was: \""<<word<<"\"! You have lost "<<wins_and_losses_return.loses<<" time"<<((wins_and_losses_return.loses==1)?"":"s")<<"."<<endl<<endl<<"=========================================================================="<<endl;
 			break;
 		}
 		for(unsigned int k=0; k<blanks.size(); k++){//Determines is the user has won
@@ -242,7 +242,7 @@ void play_game(string word, string blanks){//Accepts user guesses and compares t
 			wins_and_losses_return=win_and_loss_saver(won, lost);
 			draw_gallows(remaining_attempts);
 			cout<<"=========================================================================="<<endl<<endl<<"Congratulations! You win! the word";
-			cout<<" was \""<<word<<"!\" You have won "<<wins_and_losses_return.winnings<<" times!"<<endl<<endl<<"=========================================================================="<<endl;
+			cout<<" was \""<<word<<"!\" You have won "<<wins_and_losses_return.winnings<<" time"<<((wins_and_losses_return.winnings==1)?"":"s")<<"."<<endl<<endl<<"=========================================================================="<<endl;
 			break;
 		}
 	}
