@@ -6,6 +6,7 @@
 
 #include <vector>
 
+#include <random>
 #define NYI {cout << "NYI " << __LINE__<<"\n"; exit(1);}
  
 
@@ -25,16 +26,16 @@ ostream&operator<<(ostream& o, point a){
 	
 	return o;
 }
-bool bournderies(int x,int y){
+bool bounderies(point p){
 	bool xvalid;
 	bool yvalid;
 
-	if(x>=1 && x<=4){
+	if(p.x>=1 && p.x<=4){
 		xvalid = true;
 	}else
 		xvalid = false;
 	
-	if(y>=1 && y<=3){
+	if(p.y>=1 && p.y<=3){
 		yvalid = true;
 	}else{
 		yvalid = false;
@@ -43,14 +44,14 @@ bool bournderies(int x,int y){
 	return xvalid && yvalid;
 }
 
-bool Walls(int x,int y){
+bool Walls(point p){
 	bool xvalid;
 	bool yvalid;
 
-	if(y==1 && x==3){
+	if(p.y==1 && p.x==3){
 		xvalid = false;
 		yvalid = false;
-	}else if(y==2 && x==3){
+	}else if(p.y==2 && p.x==3){
 		xvalid = false;
 		yvalid = false;
 	}else{
@@ -61,6 +62,14 @@ bool Walls(int x,int y){
 	return xvalid && yvalid;
 }
 
+bool valid(point p){
+	if(Walls(p) &&  bounderies(p)){
+		return false;
+	}
+	else{
+		return true;
+	}
+}
 int getnum(){
 	string s;
 	cout<<"Enter a value for an x,y for the start and end points"<<endl;
@@ -86,36 +95,69 @@ point downp(point p){
 
 vector<point> getpoint(point p){
 	vector<point> v;
-	v.push_back(leftp(p));
-	v.push_back(rightp(p));
-	v.push_back(upp(p));
+	if (valid(leftp(p))){
+		v.push_back(leftp(p));
+	}
+	if (valid(rightp(p))){
+
+		v.push_back(rightp(p));
+	}
+
+	if (valid(upp(p))){
+
+		v.push_back(upp(p));
+	}
+	
+	if (valid(upp(p))){
+	
 	v.push_back(downp(p));
+	}
 	return v;
 }
+int rand(int max){
+	return random() * max;
+}
+
+	
 int main(){
 	
 	//point start;
 	//point end;
 	point p;
-
+	point e;
+	int steps;
+	int direction;
+	vector<point> v;
+	
+	e.x=4;
+	e.y=1;
+	
 	p.x=1;
 	p.y=1;
+	
+	while (p != e){
+	
+		v=getpoint(p);
+
+		direction = rand(v.size());
+
+		p = v[direction];
 		
+		steps++;
+	}
+
+	cout << "It took " << steps << " steps to reach the end" << endl;	
 	
-
-	
-	cout << "original " << p << endl;
-	
-	cout << "left " << leftp(p) << endl;
-
-	cout << "right " << rightp(p) << endl;
-
-	cout << "up " << upp(p) << endl;
-
-	cout << "down " << downp(p) << endl;
-
-	//while(start != end){
-
-	//}
 	return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
