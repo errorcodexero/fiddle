@@ -1,5 +1,7 @@
 /*To do:
-	- Make maze-making easier (auto-random generate) 
+	- Auto/random generate maze functionality
+	- Change maximum path length from command line as well as import file
+	- Reconsider "--default" flag
 */
 #include <iostream>
 #include <string>
@@ -42,22 +44,8 @@ struct Maze{
 	Maze():blocks(vector<Location>{}),x_lim(0),y_lim(0),target(Location{0,0}){}
 };
 
-template<typename T>
-bool operator==(vector<T> a, vector<T> b){
-	for(unsigned int i=0; i<a.size(); i++){
-		for(unsigned int j=0; j<b.size(); j++){
-			if(a[i]!=b[j])return 0; 
-		}
-	}
-	return 1;
-}
-
-bool operator==(Maze a, Maze b){
-	return (a.x_lim=b.x_lim && a.y_lim==b.y_lim && a.solver.loc==b.solver.loc && a.solver.fin==b.solver.fin && a.blocks==b.blocks && a.target==b.target);
-}
-
-bool operator!=(Maze a, Maze b){
-	return !(a==b);
+ostream& operator<<(ostream& o, Location a){
+	return o<<"<"<<a.first<<" "<<a.second<<">";
 }
 
 template<typename T>
@@ -69,6 +57,28 @@ ostream& operator<<(ostream& o,vector<T> in){
 	}
 	o<<">";
 	return o;
+}
+
+ostream& operator<<(ostream& o, Maze a){
+	o<<"Solver("<<a.solver.loc<<" "<<a.solver.fin<<") target:"<<a.target<<" blocks("<<a.blocks<<") X_LIMIT:"<<a.x_lim<<" Y_LIMIT:"<<a.y_lim;
+	return o;
+}
+
+template<typename T>
+bool operator==(vector<T> a, vector<T> b){
+	for(unsigned int i=0; i<a.size(); i++){
+		if(a[i]!=b[i])return 0; 
+	
+	}
+	return 1;
+}
+
+bool operator==(Maze a, Maze b){
+	return (a.x_lim==b.x_lim && a.y_lim==b.y_lim && a.solver.loc==b.solver.loc && a.solver.fin==b.solver.fin && a.blocks==b.blocks && a.target==b.target);
+}
+
+bool operator!=(Maze a, Maze b){
+	return !(a==b);
 }
 
 ostream& operator<<(ostream& o,vector<vector<char>> in){
@@ -89,7 +99,7 @@ bool check(const Maze a, const Location l){
 	return 1;
 }
 
-Maze update(Move a, Maze m){
+Maze update(const Move a, Maze m){
 	int first=m.solver.loc.first;
 	int second=m.solver.loc.second;
 	if(a==Move::LEFT){
@@ -109,6 +119,7 @@ Maze update(Move a, Maze m){
 		m.solver.loc.second++;
 	}
 	if(m.solver.loc==m.target)m.solver.fin=1;
+	else m.solver.fin=0;
 	return m;
 }
 
@@ -133,7 +144,7 @@ vector<Move> get_possible_moves(const Maze a){
 
 pair<bool,vector<Move>> find_path(Maze a, Maze b, int max=0){
 	pair<bool,vector<Move>> path_return;
-	if(a==b){
+	if(a.solver.fin){
 		path_return.first=1;
 		return path_return;
 	}
@@ -155,18 +166,20 @@ pair<bool,vector<Move>> find_path(Maze a, Maze b, int max=0){
 vector<Move> get_path(Maze a, Maze b){
 	vector<Move> path;
 	pair<bool,vector<Move>> path_return;
-	for(unsigned int i=0; i<100000000; i++){
-		path_return=find_path(a, b, i); 
+	unsigned int i=0;
+	for(; i<100000000; i++){
+		path_return=find_path(a,b,i); 
 		if(path_return.first){
 			path=path_return.second;
 			return path;
 		}
 	} 
-	cout<<"\nWarning: Path length exceeds 100,000,000 -- This calculation could take a few more minutes to complete or an error may have occurred: line:"<<__LINE__<<"\n"; //100000000 is 
+	cout<<"\nWarning: Path length exceeds "<<i<<" -- This calculation could take a few more minutes to complete or an error may have occurred: line:"<<__LINE__<<"\n";
 	exit(44); 
 }
 
 void print_maze(const Maze a, vector<Move> path=vector<Move>{}){
+	//if(a==Maze{})cout<<"Maze is empty\n";
 	vector<vector<char>> maze;
 	for(int j=0; j<a.y_lim+2; j++){//Makes a maze-sized print-out vector
 		maze.push_back(vector<char>{});
@@ -203,12 +216,13 @@ Maze make_goal(const Maze a){
 	return b;
 }
 
-Maze import_maze(){
+Maze import_maze(string filename="maze.txt"){
 	Maze a;
+	a.solver.fin=0;
 	ifstream maze;
-	maze.open("maze.txt");
+	maze.open(filename);
 	vector<string> lines;
-	int k=0;
+	int k=0,l=0;
 	while(!maze.eof()){
 		k++;
 		string line;
@@ -218,22 +232,25 @@ Maze import_maze(){
 		}
 		a.x_lim=line.size();
 		lines.push_back(line);
+		if(line=="")l++;
 	}
-	if(k==0)cout<<"File \"maze.txt\" does not contain a maze\n\n";
+	if(k==l){
+		cout<<"\nError: Imported file \""<<filename<<"\" does not contain a maze: line:"<<__LINE__<<"\n";
+		exit(44); 
+	}
 	else{
 		a.y_lim=k;
 		for(int i=0; i<a.y_lim; i++){
 			string line=lines[a.y_lim-1-i];
 			for(int j=0; j<a.x_lim; j++){
 				if(line[j]=='X')a.blocks.push_back(Location{j,i});
-				if(line[j]=='S')a.solver.loc=Location{j,i};
-				if(line[j]=='T')a.target=Location{j,i};	
+				else if(line[j]=='S')a.solver.loc=Location{j,i};
+				else if(line[j]=='T')a.target=Location{j,i};	
 			}
 		}
-}
+	}
 	maze.close();
-	Maze b;
-	return b;
+	return a;
 }
 
 int main(int x,char *import[]){
@@ -242,9 +259,9 @@ int main(int x,char *import[]){
 		char import_cmp[]={"--import"};
 		char options_cmp[]={"--options"};
 		char default_cmp[]={"--default"};
-		Maze maze;
 		if(string(import[1])==string(default_cmp)){
 			cout<<"Welcome to this maze solver!\n('S' is the solver's origin. 'T' is the target. 'X' is a barrier.)\n\n";
+			Maze maze;
 			maze.x_lim=X_LIMIT;
 			maze.y_lim=Y_LIMIT;
 			maze.blocks=BLOCKS;
@@ -258,8 +275,12 @@ int main(int x,char *import[]){
 		}
 		else if(string(import[1])==string(import_cmp)){
 			cout<<"Welcome to this maze solver!\n('S' is the solver's origin. 'T' is the target. 'X' is a barrier.)\n\n";
-			print_maze(import_maze(),get_path(import_maze(),make_goal(import_maze())));
-			cout<<"\nThe path used is:\n"<<get_path(import_maze(),make_goal(import_maze()))<<"\n";
+			Maze imported=import_maze();
+			Maze goal=make_goal(imported);
+			vector<Move> path;
+			path=get_path(imported, goal);
+			print_maze(imported,get_path(imported,goal));
+			cout<<"\nThe path used is:\n"<<path<<"\n";
 		}
 		else if(string(import[1])==string(options_cmp)){
 			cout<<import[0]<<" can be used with the following flags:\n        --default\n                To run the maze solver on the built-in maze (written in the code)\n \
