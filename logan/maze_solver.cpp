@@ -1,7 +1,6 @@
 /*To do:
 	- Auto/random generate maze functionality
-	- Change maximum path length from command line as well as import file
-	- Reconsider "--default" flag
+	- Update flag usage
 */
 #include <iostream>
 #include <string>
@@ -11,6 +10,7 @@
 #include <fstream>
 #include <array>
 #include <cstdlib>
+#include <stdlib.h> 
 
 using namespace std;
 
@@ -163,18 +163,18 @@ pair<bool,vector<Move>> find_path(Maze a, Maze b, int max=0){
 	return path_return;
 }
 
-vector<Move> get_path(Maze a, Maze b){
+vector<Move> get_path(Maze a, Maze b, unsigned int max_path=100000000){
 	vector<Move> path;
 	pair<bool,vector<Move>> path_return;
 	unsigned int i=0;
-	for(; i<100000000; i++){
+	for(; i<max_path; i++){
 		path_return=find_path(a,b,i); 
 		if(path_return.first){
 			path=path_return.second;
 			return path;
 		}
 	} 
-	cout<<"\nWarning: Path length exceeds "<<i<<" -- This calculation could take a few more minutes to complete or an error may have occurred: line:"<<__LINE__<<"\n";
+	cout<<"\nWarning: Path length exceeds "<<i-1<<" -- This calculation could take a few more minutes to complete or an error may have occurred: line:"<<__LINE__<<"\n";
 	exit(44); 
 }
 
@@ -253,40 +253,84 @@ Maze import_maze(string filename="maze.txt"){
 	return a;
 }
 
-int main(int x,char *import[]){
-	if(x!=2)cout<<"\nInvalid usage (check: "<<import[0]<<" --options)";
-	else{
-		char import_cmp[]={"--import"};
-		char options_cmp[]={"--options"};
-		char default_cmp[]={"--default"};
-		if(string(import[1])==string(default_cmp)){
-			cout<<"Welcome to this maze solver!\n('S' is the solver's origin. 'T' is the target. 'X' is a barrier.)\n\n";
-			Maze maze;
-			maze.x_lim=X_LIMIT;
-			maze.y_lim=Y_LIMIT;
-			maze.blocks=BLOCKS;
-			maze.solver.loc=SOLVER_ORIGIN;
-			maze.target=TARGET_LOCATION;
-			Maze goal=make_goal(maze);
-			vector<Move> path;
-			path=get_path(maze, goal);
-			print_maze(maze,path);
-			cout<<"\nThe path used is:\n"<<path<<"\n";
+struct Args_return{
+	bool type;
+	bool change_max;
+	bool import_other;
+	int new_max;
+	string filename;
+	Args_return():type(0),change_max(0),import_other(0),new_max(100000000),filename("maze.txt"){}
+};
+
+void check_both_args(string arg_str,Args_return& args,char *arg[],bool& invalid){
+	string import_cmp="--import",usage_cmp="--usage",default_cmp="--default",max_path_cmp="--set-max-path-to=";
+	if(arg_str==default_cmp){
+		invalid=1;
+		args.type=0;
+	}
+	if(arg_str.substr(0,8)==import_cmp){
+		invalid=1;
+		args.type=1;
+		if(arg_str.size()>arg_str.substr(0,8).size()){
+			args.import_other=1;
+			args.filename=arg_str.substr(9,15);
 		}
-		else if(string(import[1])==string(import_cmp)){
-			cout<<"Welcome to this maze solver!\n('S' is the solver's origin. 'T' is the target. 'X' is a barrier.)\n\n";
-			Maze imported=import_maze();
-			Maze goal=make_goal(imported);
-			vector<Move> path;
-			path=get_path(imported, goal);
-			print_maze(imported,get_path(imported,goal));
-			cout<<"\nThe path used is:\n"<<path<<"\n";
+	}
+	if(arg_str.substr(0,18)==max_path_cmp){
+		invalid=1;
+		args.change_max=1;
+		args.new_max=atoi((arg_str.substr(18)).c_str());
+	}
+	if(arg_str==usage_cmp){
+		invalid=1;
+		cout<<arg[0]<<" can be used with the following flags:\n 	--default\n 		To run the maze solver on the built-in maze (written in the code)\n	--import=<filename>\n		To run the maze solver on an imported maze from the given file (uses maze.txt by default)\n	--set-max-path-to=<integer>\n 		To set the maximum length of the path that the program will try to find from the solver to the target.";
+		exit(44);
+	}
+}
+
+Args_return use_args(int x,char *arg[]){
+	Args_return args;
+	if(x>1){
+		string import_cmp="--import",usage_cmp="--usage",default_cmp="--default",max_path_cmp="--set-max-path-to=";
+		bool invalid=0;
+		string arg_1_str=string(arg[1]);
+		check_both_args(arg_1_str,args,arg,invalid);
+		if(x>2){
+			string arg_2_str=string(arg[2]);
+			check_both_args(arg_2_str,args,arg,invalid);
 		}
-		else if(string(import[1])==string(options_cmp)){
-			cout<<import[0]<<" can be used with the following flags:\n        --default\n                To run the maze solver on the built-in maze (written in the code)\n \
-			--import\n                To run the maze solver on an imported maze from maze.txt";
+		if(!invalid){
+			cout<<"\nInvalid usage (check: "<<arg[0]<<" --usage)";
+			exit(44);
 		}
-		else cout<<import[0]<<": error: no such option: "<<import[1]<<"\n";
+	}
+	return args;
+}
+
+int main(int x,char *arg_1[]){
+	Args_return args=use_args(x,arg_1);
+	int max_path=args.change_max?args.new_max+1:100000000;
+	cout<<"Welcome to this maze solver!\n('S' is the solver's origin. 'T' is the target. 'X' is a barrier.)\n\n";
+	if(!args.type){
+		Maze maze;
+		maze.x_lim=X_LIMIT;
+		maze.y_lim=Y_LIMIT;
+		maze.blocks=BLOCKS;
+		maze.solver.loc=SOLVER_ORIGIN;
+		maze.target=TARGET_LOCATION;
+		Maze goal=make_goal(maze);
+		vector<Move> path;
+		path=get_path(maze, goal, max_path);
+		print_maze(maze,path);
+		cout<<"\nThe path used is:\n"<<path<<"\n";
+	}
+	else if(args.type){
+		Maze imported=args.import_other?import_maze(args.filename):import_maze();
+		Maze goal=make_goal(imported);
+		vector<Move> path;
+		path=get_path(imported, goal,max_path);
+		print_maze(imported,get_path(imported,goal,max_path));
+		cout<<"\nThe path used is:\n"<<path<<"\n";
 	}
 	return 0;
 }
