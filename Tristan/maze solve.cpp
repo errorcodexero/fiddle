@@ -1,17 +1,14 @@
 #include <iostream>
-
 #include <math.h>
-
 #include <stdlib.h>
-
 #include <vector>
-
 #include <random>
+#include <time.h> 
+
 #define NYI {cout << "NYI " << __LINE__<<"\n"; exit(1);}
  
 
 using namespace std;
-
 
 struct point{
 	int x;
@@ -32,6 +29,7 @@ bool bounderies(point p){
 
 	if(p.x>=1 && p.x<=4){
 		xvalid = true;
+
 	}else
 		xvalid = false;
 	
@@ -45,29 +43,26 @@ bool bounderies(point p){
 }
 
 bool Walls(point p){
-	bool xvalid;
-	bool yvalid;
+	bool valid;
 
 	if(p.y==1 && p.x==3){
-		xvalid = false;
-		yvalid = false;
+		valid = false;
 	}else if(p.y==2 && p.x==3){
-		xvalid = false;
-		yvalid = false;
+		valid = false;
 	}else{
-		xvalid = true;
-		yvalid = true;
+		valid = true;
+		
 			
 	}
-	return xvalid && yvalid;
+	return valid;
 }
 
 bool valid(point p){
-	if(Walls(p) &&  bounderies(p)){
-		return false;
+	if(Walls(p) && bounderies(p)){
+		return true;
 	}
 	else{
-		return true;
+		return false;
 	}
 }
 int getnum(){
@@ -99,49 +94,54 @@ vector<point> getpoint(point p){
 		v.push_back(leftp(p));
 	}
 	if (valid(rightp(p))){
-
 		v.push_back(rightp(p));
 	}
 
 	if (valid(upp(p))){
-
 		v.push_back(upp(p));
 	}
 	
-	if (valid(upp(p))){
-	
-	v.push_back(downp(p));
+	if (valid(downp(p))){
+		v.push_back(downp(p));
 	}
 	return v;
 }
-int rand(int max){
-	return random() * max;
+int rando(int max){
+	int randnum;
+	
+	randnum = rand() % max;
+	
+	return randnum;
 }
 
 	
 int main(){
 	
-	//point start;
-	//point end;
-	point p;
+	point p; //declare a point type called p
 	point e;
 	int steps;
 	int direction;
 	vector<point> v;
 	
+	srand(time(NULL));
+
 	e.x=4;
 	e.y=1;
 	
 	p.x=1;
 	p.y=1;
 	
+	steps = 0;
+	
 	while (p != e){
 	
 		v=getpoint(p);
-
-		direction = rand(v.size());
-
+		direction = rando(v.size());
+		
+		
 		p = v[direction];
+		
+		cout << "got point:" << p << endl;
 		
 		steps++;
 	}
