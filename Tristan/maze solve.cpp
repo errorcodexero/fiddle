@@ -14,6 +14,10 @@ struct point{
 	int x;
 	int y;
 };
+struct twovectors{
+	vector<point> notpref;
+	vector<point> pref;
+};
 bool operator!=(point a,point b){
 	return (a.x != b.x || a.y != b.y);
 }
@@ -23,6 +27,11 @@ ostream&operator<<(ostream& o, point a){
 	
 	return o;
 }
+
+bool operator==(point a,point b){
+	return (a.x == b.x && a.y == b.y);
+}
+
 bool bounderies(point p){
 	bool xvalid;
 	bool yvalid;
@@ -57,7 +66,21 @@ bool Walls(point p){
 	return valid;
 }
 
-bool valid(point p){
+bool lastpointvalid(point p,vector<point> lp){
+	int valid;
+	int i;
+	
+	valid = true;
+
+	for (i=0; i< (int)lp.size(); i++){
+	if ( p == lp[i]){
+		valid = false;
+	}
+	}
+	return valid;
+}
+
+bool valid(point p,vector<point> lp){
 	if(Walls(p) && bounderies(p)){
 		return true;
 	}
@@ -87,24 +110,45 @@ point upp(point p){
 point downp(point p){
 	return point{p.x,p.y - 1};
 }
+ 
 
-vector<point> getpoint(point p){
-	vector<point> v;
+twovectors getpoint(point p,vector<point> lp){
+	twovectors q;
+ 
 	if (valid(leftp(p))){
-		v.push_back(leftp(p));
+		if (lastpointvalid(p,lp){
+			q.pref.push_back(leftp(p));
+		}
+		else{
+			q.notpref.push_back(leftp(p));
+		}	
 	}
 	if (valid(rightp(p))){
-		v.push_back(rightp(p));
+		if (lastpointvalid(p,lp){
+			q.pref.push_back(rightp(p));
+		}
+		else{
+			q.notpref.push_back(rightp(p));
+		}	
 	}
-
 	if (valid(upp(p))){
-		v.push_back(upp(p));
+		if (lastpointvalid(p,lp){
+			q.pref.push_back(upp(p));
+		}
+		else{
+			q.notpref.push_back(upp(p));
+		}	
+	}
+	if (valid(downp(p))){
+		if (lastpointvalid(p,lp){
+			q.pref.push_back(downp(p));
+		}
+		else{
+			q.notpref.push_back(downp(p));
+		}	
 	}
 	
-	if (valid(downp(p))){
-		v.push_back(downp(p));
-	}
-	return v;
+	return q;
 }
 int rando(int max){
 	int randnum;
@@ -121,7 +165,8 @@ int main(){
 	point e;
 	int steps;
 	int direction;
-	vector<point> v;
+	twovectors v;
+	vector<point> lstPoit;
 	
 	srand(time(NULL));
 
@@ -132,14 +177,18 @@ int main(){
 	p.y=1;
 	
 	steps = 0;
-	
+
+	lstPoit.push_back(p);
+
 	while (p != e){
 	
-		v=getpoint(p);
+		v=getpoint(p,lstPoit,v);
 		direction = rando(v.size());
 		
 		
 		p = v[direction];
+
+		lstPoit.push_back(p);
 		
 		cout << "got point:" << p << endl;
 		
