@@ -4,6 +4,7 @@
 #include <vector>
 #include <random>
 #include <time.h> 
+#include <assert.h>
 
 #define NYI {cout << "NYI " << __LINE__<<"\n"; exit(1);}
  
@@ -33,36 +34,16 @@ bool operator==(point a,point b){
 }
 
 bool bounderies(point p){
-	bool xvalid;
-	bool yvalid;
+	bool xvalid = p.x>=1 && p.x<=4;
+	bool yvalid = p.y>=1 && p.y<=3;
 
-	if(p.x>=1 && p.x<=4){
-		xvalid = true;
-
-	}else
-		xvalid = false;
-	
-	if(p.y>=1 && p.y<=3){
-		yvalid = true;
-	}else{
-		yvalid = false;
-		
-	}
 	return xvalid && yvalid;
 }
 
 bool Walls(point p){
 	bool valid;
 
-	if(p.y==1 && p.x==3){
-		valid = false;
-	}else if(p.y==2 && p.x==3){
-		valid = false;
-	}else{
-		valid = true;
-		
-			
-	}
+	valid = !((p.y==1 && p.x==3) || (p.y==2 && p.x==3));
 	return valid;
 }
 
@@ -80,7 +61,7 @@ bool lastpointvalid(point p,vector<point> lp){
 	return valid;
 }
 
-bool valid(point p,vector<point> lp){
+bool valid(point p){
 	if(Walls(p) && bounderies(p)){
 		return true;
 	}
@@ -88,35 +69,41 @@ bool valid(point p,vector<point> lp){
 		return false;
 	}
 }
-int getnum(){
-	string s;
-	cout<<"Enter a value for an x,y for the start and end points"<<endl;
-	getline(cin,s);
-
-	return atoi(s.c_str());
-}
 point leftp(point p){
-	return point{p.x-1,p.y};
+	return point{p.x - 1,p.y};
 }
-
 point rightp(point p){
 	return point{p.x + 1,p.y};
 }
-
 point upp(point p){
 	return point{p.x,p.y + 1};
 }
-
 point downp(point p){
 	return point{p.x,p.y - 1};
 }
- 
+vector<point> nearpoints(point p){
+	vector<point> p;
 
+	p.push_back(leftp(p));
+
+	p.push_back(rightp(p));
+
+	p.push_back(upp(p));
+
+	p.push_back(downp(p));
+
+	return p;
+}
 twovectors getpoint(point p,vector<point> lp){
 	twovectors q;
- 
+	vector nowall;
+	point b;
+
+	b = nowall[0];
+	
 	if (valid(leftp(p))){
-		if (lastpointvalid(p,lp){
+		nowall.push_back(left
+		if (lastpointvalid(p,lp)){
 			q.pref.push_back(leftp(p));
 		}
 		else{
@@ -124,7 +111,7 @@ twovectors getpoint(point p,vector<point> lp){
 		}	
 	}
 	if (valid(rightp(p))){
-		if (lastpointvalid(p,lp){
+		if (lastpointvalid(p,lp)){
 			q.pref.push_back(rightp(p));
 		}
 		else{
@@ -132,7 +119,7 @@ twovectors getpoint(point p,vector<point> lp){
 		}	
 	}
 	if (valid(upp(p))){
-		if (lastpointvalid(p,lp){
+		if (lastpointvalid(p,lp)){
 			q.pref.push_back(upp(p));
 		}
 		else{
@@ -140,7 +127,7 @@ twovectors getpoint(point p,vector<point> lp){
 		}	
 	}
 	if (valid(downp(p))){
-		if (lastpointvalid(p,lp){
+		if (lastpointvalid(p,lp)){
 			q.pref.push_back(downp(p));
 		}
 		else{
@@ -157,18 +144,30 @@ int rando(int max){
 	
 	return randnum;
 }
-
+vector<point> orderofpref(twovectors v){
+	vector<point> p;
+	if( v.pref.size() != 0){
+		p = v.pref;
+	}
+	else if( v.pref.size() == 0){
+		p = v.notpref;
+	}
+	assert(p.size() != 0);
 	
+	return p;
+}
+
 int main(){
 	
-	point p; //declare a point type called p
+	point p;
 	point e;
 	int steps;
 	int direction;
 	twovectors v;
-	vector<point> lstPoit;
+	vector<point> lastPoint;
+	vector<point> points;
 	
-	srand(time(NULL));
+	srand(time(NULL));points = orderofpref(v);
 
 	e.x=4;
 	e.y=1;
@@ -178,17 +177,21 @@ int main(){
 	
 	steps = 0;
 
-	lstPoit.push_back(p);
+	lastPoint.push_back(p);
 
 	while (p != e){
 	
-		v=getpoint(p,lstPoit,v);
-		direction = rando(v.size());
+		v=getpoint(p,lastPoint);
+			
+		points = orderofpref(v);
 		
-		
-		p = v[direction];
 
-		lstPoit.push_back(p);
+		direction = rando(points.size());
+		
+		
+		p = points[direction];
+
+		lastPoint.push_back(p);
 		
 		cout << "got point:" << p << endl;
 		
@@ -199,14 +202,3 @@ int main(){
 	
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
