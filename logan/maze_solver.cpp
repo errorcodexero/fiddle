@@ -1,4 +1,4 @@
-/*To do:
+/*TODO:
 	- Make maze solving faster
 	- Bug checking
 */
@@ -17,7 +17,8 @@ typedef pair<int,int> Location;
 enum class Move{FORWARD, BACKWARD, RIGHT, LEFT};
 
 //Edit the following to change the default maze (Alternatively edit the accompanying maze.txt or generate a random maze):
-static const int X_LIMIT=10, Y_LIMIT=10;
+static const int X_LIMIT=10;
+static const int Y_LIMIT=10;
 static const Location TARGET_LOCATION=Location{0,5};
 static const Location SOLVER_ORIGIN=Location{0,0};
 static const vector<Location> BLOCKS={Location{0,3}};
@@ -167,7 +168,7 @@ vector<Move> get_path(Maze a, Maze b, unsigned int max_path=40){//Tries to get a
 	exit(EXIT_FAILURE); 
 }
 
-void print_maze(const Maze a, vector<Move> path=vector<Move>{}){//Prints out a maze as a graphic
+vector<vector<char>> print_maze(const Maze a, vector<Move> path=vector<Move>{},bool print=1){//Prints out a maze as a graphic
 	if(a==Maze{})cout<<"Maze is empty\n";
 	vector<vector<char>> maze;
 	for(int j=0; j<a.y_lim+2; j++){//Makes a maze-sized print-out vector
@@ -206,7 +207,8 @@ void print_maze(const Maze a, vector<Move> path=vector<Move>{}){//Prints out a m
 		maze[a.y_lim-l.second][l.first+1]='-';
 	}
 	maze[a.y_lim-a.target.second][a.target.first+1]='T';//Draw target
-	cout<<maze;
+	if(print)cout<<maze;
+	return maze;
 }
 
 Maze make_goal(const Maze a){//Makes a Maze goal from the passed in maze
@@ -261,15 +263,15 @@ Maze import_maze(const string filename="maze.txt"){//Imports a maze from maze.tx
 }
 
 struct Args_return{//A type used to store arguments
-	bool type, change_max, import_other, generate;
+	bool type, change_max, import_other, generate, export_generated;
 	int new_max, x_lim, y_lim;
-	string filename;
-	Args_return():type(0),change_max(0),import_other(0),generate(0),new_max(30),x_lim(10),y_lim(10),filename("maze.txt"){}
+	string filename,export_filename;
+	Args_return():type(0),change_max(0),import_other(0),generate(0),export_generated(0),new_max(30),x_lim(10),y_lim(10),filename("maze.txt"),export_filename("maze.txt"){}
 };
 
 void check_all_args(string arg_str,Args_return& args,char *arg[], bool& valid){//Uses passed into arguments to set the necessary settings
 	valid=1;
-	string import_cmp="--import",usage_cmp="--usage",default_cmp="--default",max_path_cmp="--set-max-path-to=",gen_cmp="--generate";
+	string import_cmp="--import",usage_cmp="--usage",default_cmp="--default",max_path_cmp="--set-max-path-to=",gen_cmp="--generate",export_generated="--export";
 	if(arg_str==default_cmp)args.type=0;
 	else if(arg_str.substr(0,8)==import_cmp){
 		args.type=1;
@@ -299,12 +301,18 @@ void check_all_args(string arg_str,Args_return& args,char *arg[], bool& valid){/
 	else if(arg_str==usage_cmp){
 		cout<<arg[0]<<" can be used with the following flags:\n";
 		cout<<"\t--default\n\t\tTo run the maze solver on the built-in maze (written in the code)\n";
-		cout<<"\t--import=<filename>\n\t\tTo run the maze solver on an imported maze from the given file (uses maze.txt by default)\n";
+		cout<<"\t--import=<filename>\n\t\tTo run the maze solver on an imported maze from the given file (uses \"maze.txt\" by default)\n";
 		cout<<"\t--set-max-path-to=<integer>\n\t\tTo set the maximum length of the path that the program will try to find from the solver to the target.\n";
-		cout<<"\t--generate=<x_lim>:<y_lim>\n\t\tTo randomly generate a maze with the x and y limits set the user input or to ten by default(It will solve it as well).";
+		cout<<"\t--generate=<x_lim>:<y_lim>\n\t\tTo randomly generate a maze with the x and y limits set the user input or to ten by default(It will solve it as well).\n";
+		cout<<"\t--export=<filename>\n\t\tTo write the used maze to a given file (uses \"maze.txt\" by default).\n";
 		exit(EXIT_FAILURE);
 	}
+	else if(arg_str.substr(0,8)==export_generated){
+		args.export_generated=1;
+		if(arg_str.size()>arg_str.substr(0,9).size())args.export_filename=arg_str.substr(9);
+	}
 	else valid=0;
+	cout<<arg_str.substr(0,8)<<"\n";
 }
 
 Args_return use_args(const int x,char *arg[]){//Determines what arguments to use
@@ -464,9 +472,26 @@ Maze maze_gen(const int X_LIM=10,const int Y_LIM=10){//Generates a random maze
 	return a;
 }
 
+void export_generated(Maze a, string filename){
+	char yn;
+	cout<<"\""<<filename<<"\" will be overwritten. Are you sure you want to export the generated maze?(y/n) ";
+	cin>>yn;
+	if(yn!='y')exit(EXIT_SUCCESS);
+	ofstream export_maze;
+	export_maze.open(filename);
+	vector<vector<char>> maze=print_maze(a,{},0);
+	for(unsigned int i=0; i<maze.size(); i++){
+		for(unsigned int j=0; j<maze[i].size(); j++){
+			export_maze<<maze[i][j];
+		}
+		if(i<maze.size()-1)export_maze<<"\r\n";
+	}
+	export_maze.close();
+	cout<<"Export succeeded!\n";
+}
+
 int main(int x,char *arg[]){
 	Args_return args=use_args(x,arg);
-	int max_path=args.change_max?(args.new_max+1):45;
 	cout<<"Welcome to this maze solver!\n('S' is the start. 'T' is the target. '-' is the path. 'X' is a barrier.)\n\n";
 	Maze maze,goal;
 	vector<Move> path;
@@ -487,9 +512,10 @@ int main(int x,char *arg[]){
 		maze=args.import_other?import_maze(args.filename):import_maze();
 	}
 	goal=make_goal(maze);
-	path=get_path(maze, goal, max_path);
+	path=get_path(maze, goal, args.change_max?(args.new_max+1):45);
 	cout<<"The solution is:\n";
 	print_maze(maze,path);
-	cout<<"\nThe path used is:\n"<<path<<"\n";
+	cout<<"\n\nThe path used is:\n"<<path<<"\n\n";
+	if(args.export_generated)export_generated(maze,args.export_filename);
 	return 0;
 }
