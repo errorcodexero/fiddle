@@ -5,6 +5,7 @@
 #include <random>
 #include <time.h> 
 #include <assert.h>
+#include <unistd.h>
 
 #define NYI {cout << "NYI " << __LINE__<<"\n"; exit(1);}
  
@@ -41,33 +42,25 @@ bool bounderies(point p){
 }
 
 bool Walls(point p){
-	bool valid;
 
-	valid = !((p.y==1 && p.x==3) || (p.y==2 && p.x==3));
-	return valid;
+	return !((p.y==1 && p.x==3) || (p.y==2 && p.x==3));
+
 }
 
 bool lastpointvalid(point p,vector<point> lp){
-	int valid;
-	int i;
 	
-	valid = true;
+	bool valid = true;
 
-	for (i=0; i< (int)lp.size(); i++){
-	if ( p == lp[i]){
-		valid = false;
-	}
+	for (int i=0; i< (int)lp.size(); i++){
+		if ( p == lp[i]){
+			valid = false;
+		}
 	}
 	return valid;
 }
 
 bool valid(point p){
-	if(Walls(p) && bounderies(p)){
-		return true;
-	}
-	else{
-		return false;
-	}
+	return (Walls(p) && bounderies(p));
 }
 point leftp(point p){
 	return point{p.x - 1,p.y};
@@ -81,75 +74,48 @@ point upp(point p){
 point downp(point p){
 	return point{p.x,p.y - 1};
 }
-vector<point> nearpoints(point p){
-	vector<point> p;
 
-	p.push_back(leftp(p));
-
-	p.push_back(rightp(p));
-
-	p.push_back(upp(p));
-
-	p.push_back(downp(p));
-
-	return p;
+void compValid(point l, vector<point> lp,twovectors & q){
+	if (valid (l)){
+		if (lastpointvalid(l,lp)){
+			q.pref.push_back(l);
+		}
+		else{
+			q.notpref.push_back(l);
+		}	
+	}
 }
 twovectors getpoint(point p,vector<point> lp){
 	twovectors q;
-	vector nowall;
-	point b;
+	point l;
 
-	b = nowall[0];
+	l = leftp(p);
+
+	compValid(l,lp,q);
+
+	l = rightp(p);
+
+	compValid(l,lp,q);
+
+	l = upp(p);
+
+	compValid(l,lp,q);
+
+	l = downp(p);
 	
-	if (valid(leftp(p))){
-		nowall.push_back(left
-		if (lastpointvalid(p,lp)){
-			q.pref.push_back(leftp(p));
-		}
-		else{
-			q.notpref.push_back(leftp(p));
-		}	
-	}
-	if (valid(rightp(p))){
-		if (lastpointvalid(p,lp)){
-			q.pref.push_back(rightp(p));
-		}
-		else{
-			q.notpref.push_back(rightp(p));
-		}	
-	}
-	if (valid(upp(p))){
-		if (lastpointvalid(p,lp)){
-			q.pref.push_back(upp(p));
-		}
-		else{
-			q.notpref.push_back(upp(p));
-		}	
-	}
-	if (valid(downp(p))){
-		if (lastpointvalid(p,lp)){
-			q.pref.push_back(downp(p));
-		}
-		else{
-			q.notpref.push_back(downp(p));
-		}	
-	}
-	
+	compValid(l,lp,q);
+		
 	return q;
 }
-int rando(int max){
-	int randnum;
-	
-	randnum = rand() % max;
-	
-	return randnum;
+int rando(int max){	
+	return rand() % max;
 }
 vector<point> orderofpref(twovectors v){
 	vector<point> p;
 	if( v.pref.size() != 0){
 		p = v.pref;
 	}
-	else if( v.pref.size() == 0){
+	else{
 		p = v.notpref;
 	}
 	assert(p.size() != 0);
@@ -166,8 +132,9 @@ int main(){
 	twovectors v;
 	vector<point> lastPoint;
 	vector<point> points;
+	vector<point> location;
 	
-	srand(time(NULL));points = orderofpref(v);
+	srand(time(NULL));
 
 	e.x=4;
 	e.y=1;
@@ -180,22 +147,34 @@ int main(){
 	lastPoint.push_back(p);
 
 	while (p != e){
-	
-		v=getpoint(p,lastPoint);
-			
-		points = orderofpref(v);
 		
+		location.push_back(p);
+		
+		v=getpoint(p,lastPoint);
+
+		cout << v.pref.size() << " preferred points and " << v.notpref.size() << " not preffered points" << endl;
+
+		cout.flush();
+		
+		points = orderofpref(v);
 
 		direction = rando(points.size());
-		
 		
 		p = points[direction];
 
 		lastPoint.push_back(p);
 		
 		cout << "got point:" << p << endl;
+	
+		cout << "step:" << location.size() << endl;
 		
+		cout << "last point " << location[steps] << endl;
+		cout << "--------------------------------------------------------------------------------" << endl;
+
 		steps++;
+		
+		sleep (1);
+
 	}
 
 	cout << "It took " << steps << " steps to reach the end" << endl;	
