@@ -6,7 +6,7 @@
 #include <time.h> 
 #include <assert.h>
 #include <unistd.h>
-//last edited from Tristan's IPhone 
+//last edited from Tristan's IPhone//
 #define NYI {cout << "NYI " << __LINE__<<"\n"; exit(1);}
  
 
