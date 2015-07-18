@@ -165,6 +165,7 @@ int main(){
 		lastPoint.push_back(p);
 		
 		cout << "got point:" << p << endl;
+             cout << "potatoes and good << endl;
 	
 		cout << "step:" << location.size() << endl;
 		
