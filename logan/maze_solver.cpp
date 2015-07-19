@@ -1,4 +1,5 @@
 /*TODO:
+	- Simplify the function use_args
 	- Make maze solving faster
 	- Bug checking
 */
@@ -55,8 +56,7 @@ ostream& operator<<(ostream& o,vector<T> in){
 		o<<in[i];
 		if(i!=in.size()-1)o<<",";
 	}
-	o<<">";
-	return o;
+	return o<<">";
 }
 
 ostream& operator<<(ostream& o, Maze a){
@@ -79,7 +79,7 @@ bool operator!=(Maze a, Maze b){
 	return !(a==b);
 }
 
-ostream& operator<<(ostream& o,vector<vector<char>> in){
+ostream& operator<<(ostream& o,vector<vector<char>> in){//Special print-out for the maze vector of characters
 	for(unsigned int j=0; j<in.size(); j++){
 		for(unsigned int i=0; i<in[j].size(); i++){
 			o<<in[j][i];
@@ -89,9 +89,8 @@ ostream& operator<<(ostream& o,vector<vector<char>> in){
 	return o;
 }
 
-bool check_for_wall(const Maze a, const Location l){//Checks to see if a wall occupies a location 
-	if(a.blocks.size()==0)return 1;
-	for(unsigned int i; i<a.blocks.size(); i++){
+bool check_for_wall(const Maze a, const Location l){//Checks to see if a wall occupies a location
+	for(unsigned int i=0; i<a.blocks.size(); i++){
 		if(l==a.blocks[i])return 0;
 	}
 	return 1;
@@ -101,36 +100,35 @@ Maze update(const Move a, Maze m){//Updates a maze given a move
 	int first=m.solver.loc.first, second=m.solver.loc.second;
 	switch(a){
 		case Move::LEFT:
-			assert(m.solver.loc.first>0 && check_for_wall(m, Location{first-1,second}));
+			assert(first>0 && check_for_wall(m, Location{first-1,second}));
 			m.solver.loc.first--;
 			break;
 		case Move::RIGHT:
-			assert(m.solver.loc.first+1<m.x_lim && check_for_wall(m, Location{first+1,second}));
+			assert(first+1<m.x_lim && check_for_wall(m, Location{first+1,second}));
 			m.solver.loc.first++;
 			break;
 		case Move::BACKWARD:
-			assert(m.solver.loc.second>0 && check_for_wall(m, Location{first,second-1}));
+			assert(second>0 && check_for_wall(m, Location{first,second-1}));
 			m.solver.loc.second--;
 			break;
 		case Move::FORWARD:
-			assert(m.solver.loc.second+1<m.y_lim && check_for_wall(m, Location{first,second+1}));
+			assert(second+1<m.y_lim && check_for_wall(m, Location{first,second+1}));
 			m.solver.loc.second++;
 			break;
 		default:
 			assert(0);
 	}
-	if(m.solver.loc==m.target)m.solver.fin=1;
-	else m.solver.fin=0;
+	m.solver.fin=(m.solver.loc==m.target);
 	return m;
 }
 
 vector<Move> get_possible_moves(const Maze a){//Returns possible moves
 	int first=a.solver.loc.first, second=a.solver.loc.second;
 	vector<Move> possible_moves;
-	if(a.solver.loc.first>0 && check_for_wall(a, Location{first-1,second})) possible_moves.push_back(Move::LEFT);
-	if(a.solver.loc.first+1<a.x_lim && check_for_wall(a, Location{first+1,second})) possible_moves.push_back(Move::RIGHT);
-	if(a.solver.loc.second>0 && check_for_wall(a, Location{first,second-1})) possible_moves.push_back(Move::BACKWARD);
-	if(a.solver.loc.second+1<a.y_lim && check_for_wall(a, Location{first,second+1})) possible_moves.push_back(Move::FORWARD);
+	if(first>0 && check_for_wall(a, Location{first-1,second})) possible_moves.push_back(Move::LEFT);
+	if(first+1<a.x_lim && check_for_wall(a, Location{first+1,second})) possible_moves.push_back(Move::RIGHT);
+	if(second>0 && check_for_wall(a, Location{first,second-1})) possible_moves.push_back(Move::BACKWARD);
+	if(second+1<a.y_lim && check_for_wall(a, Location{first,second+1})) possible_moves.push_back(Move::FORWARD);
 	return possible_moves;
 }
 
@@ -160,15 +158,14 @@ vector<Move> get_path(const Maze a, const Maze b, unsigned int max_path=40){//Tr
 		cout<<"Testing paths of length "<<i<<"\n";
 		pair<bool,vector<Move>> path_return=find_path(a,b,i); 
 		if(path_return.first){
-			vector<Move> path=path_return.second;
-			return path;
+			return path_return.second;
 		}
 	} 
 	cout<<"\nWarning: Path length exceeds "<<max_path-1<<": This calculation could take a lot of time to complete or an error may have occurred: line:"<<__LINE__<<"\n";
 	exit(44); 
 }
 
-void add_border(Maze& a){
+void add_border(Maze& a){//Ads a border to a given maze
 	a.x_lim+=2;
 	a.y_lim+=2;
 	a.target=Location{a.target.first+1,a.target.second+1};
@@ -195,18 +192,11 @@ vector<vector<char>> print_maze(Maze a, vector<Move> path=vector<Move>{},bool ad
 			maze[j].push_back(' ');
 		}
 	}
-	maze[a.y_lim-a.solver.loc.second-1][a.solver.loc.first]='S';//Draw solver
-	maze[a.y_lim-a.target.second-1][a.target.first]='T';//Draw target
 	for(unsigned int i=0; i<a.blocks.size(); i++){
-		maze[a.y_lim-a.blocks[i].second-1][a.blocks[i].first]='X';//draw block
+		maze[a.y_lim-a.blocks[i].second-1][a.blocks[i].first]='X';//draw blocks
 	}
-	/*for(int j=0; j<a.y_lim+2; j++){//Draw border
-		for(int i=0; i<a.x_lim+2; i++){
-			if(j==0 || j==a.y_lim+1 || i==0 || i==a.x_lim+1)maze[j][i]='X';
-		}
-	}*/
 	Location l=a.solver.loc;
-	for(unsigned int i=0; i<path.size(); i++){
+	for(unsigned int i=0; i<path.size(); i++){//Draw path
 		switch(path[i]){
 			case Move::FORWARD:
 				l.second++;
@@ -223,22 +213,22 @@ vector<vector<char>> print_maze(Maze a, vector<Move> path=vector<Move>{},bool ad
 			default:
 				assert(0);
 		}
-		maze[a.y_lim-l.second][l.first+1]='-';
+		maze[a.y_lim-l.second-1][l.first]='-';
 	}
+	maze[a.y_lim-a.solver.loc.second-1][a.solver.loc.first]='S';//Draw solver
+	maze[a.y_lim-a.target.second-1][a.target.first]='T';//Draw target
 	if(print)cout<<maze;
 	return maze;
 }
 
-Maze make_goal(const Maze a){//Makes a Maze goal from the passed in maze
-	Maze b=a;
-	b.solver.loc=a.target;
-	b.solver.fin=1;
-	return b;
+Maze make_goal(Maze a){//Makes a Maze goal from the passed in maze
+	a.solver.loc=a.target;
+	a.solver.fin=1;
+	return a;
 }
 
 Maze import_maze(const string filename="maze.txt"){//Imports a maze from maze.txt or the given text file
 	Maze a;
-	a.solver.fin=0;
 	ifstream maze;
 	maze.open(filename);
 	vector<string> lines;
@@ -251,27 +241,25 @@ Maze import_maze(const string filename="maze.txt"){//Imports a maze from maze.tx
 			if(line[i]=='\r')line.erase(line.begin()+i);
 		}
 		int length=line.size();
+		if(length==0)blank_lines++;
 		if(length>a.x_lim)a.x_lim=length;
 		lines.push_back(line);
-		if(line=="")blank_lines++;
-	}
-	for(unsigned int i=0; i<lines.size(); i++){
-		int length=lines[i].size();
-		if(length<a.x_lim)lines[i]+=" ";
 	}
 	if(iterator==blank_lines){
 		cout<<"\nError: Imported file \""<<filename<<"\" does not contain a maze: line:"<<__LINE__<<"\n";
 		exit(44); 
 	}
-	else{
-		a.y_lim=iterator;
-		for(int i=0; i<a.y_lim; i++){
-			string line=lines[a.y_lim-1-i];
-			for(int j=0; j<a.x_lim; j++){
-				if(line[j]=='X')a.blocks.push_back(Location{j,i});
-				else if(line[j]=='S')a.solver.loc=Location{j,i};
-				else if(line[j]=='T')a.target=Location{j,i};	
-			}
+	for(unsigned int i=0; i<lines.size(); i++){
+		int length=lines[i].size();
+		if(length<a.x_lim)lines[i]+=" ";
+	}
+	a.y_lim=iterator;
+	for(int i=0; i<a.y_lim; i++){
+		string line=lines[a.y_lim-1-i];
+		for(int j=0; j<a.x_lim; j++){
+			if(line[j]=='X')a.blocks.push_back(Location{j,i});
+			else if(line[j]=='S')a.solver.loc=Location{j,i};
+			else if(line[j]=='T')a.target=Location{j,i};	
 		}
 	}
 	maze.close();
@@ -335,13 +323,16 @@ void check_all_args(string arg_str,Args_return& args,char *arg[], bool& valid){/
 Args_return use_args(const int x,char *arg[]){//Determines what arguments to use
 	Args_return args;
 	if(x>1){
-		string import_cmp="--import",usage_cmp="--usage",default_cmp="--default",max_path_cmp="--set-max-path-to=",gen_cmp="--generate";
 		bool valid=0;
-		string arg_1_str=string(arg[1]);
-		check_all_args(arg_1_str,args,arg,valid);
+		string arg_str=string(arg[1]);
+		check_all_args(arg_str,args,arg,valid);
 		if(x>2){
-			string arg_2_str=string(arg[2]);
-			check_all_args(arg_2_str,args,arg,valid);
+			arg_str=string(arg[2]);
+			check_all_args(arg_str,args,arg,valid);
+		}
+		if(x>3){
+			arg_str=string(arg[3]);
+			check_all_args(arg_str,args,arg,valid);
 		}
 		if(!valid){
 			cout<<"\nInvalid usage (try: "<<arg[0]<<" --usage)";
@@ -434,7 +425,7 @@ pair<vector<Location>, bool> wall_generator(const int X_LIM=10,const int Y_LIM=1
 	return generator_return;
 }
 
-void invert(vector<Location>& v, const int X_LIM, const int Y_LIM){//Inverts a vector of Locations to contain the opposite Locations within x/y boundaries
+vector<Location> invert(vector<Location> v, const int X_LIM, const int Y_LIM){//Inverts a vector of Locations to contain the opposite Locations within x/y boundaries
 	vector<Location> full;
 	for(int i=0; i<X_LIM; i++){
 		for(int j=0; j<Y_LIM; j++){
@@ -451,16 +442,14 @@ void invert(vector<Location>& v, const int X_LIM, const int Y_LIM){//Inverts a v
 		full.erase(full.begin()+to_remove[i-1]);
 	}
 	v=full;
+	return v;
 }
 
 Maze maze_gen(const int X_LIM=10,const int Y_LIM=10){//Generates a random maze
 	Maze a;
 	a.x_lim=X_LIM;
 	a.y_lim=Y_LIM;
-	pair<vector<Location>,bool> generator_return=wall_generator(X_LIM,Y_LIM);
-	vector<Location> walls=((generator_return.first).size()>0)?generator_return.first:vector<Location>{};
-	a.blocks=walls;
-	invert(a.blocks,X_LIM,Y_LIM);
+	a.blocks=invert(wall_generator(a.x_lim,a.y_lim).first,a.x_lim,a.y_lim);
 	vector<Location> possible_locs;
 	for(int i=0; i<X_LIM; i++){
 		for(int j=0; j<Y_LIM; j++){
@@ -484,15 +473,14 @@ Maze maze_gen(const int X_LIM=10,const int Y_LIM=10){//Generates a random maze
 	a.target=possible_locs[random];
 	possible_locs.erase(possible_locs.begin()+random);
 	a.solver.loc=possible_locs[get_random(possible_locs.size())];
-	cout<<"\n"<<a<<"\n";
 	cout<<"The generated maze is:\n";
 	print_maze(a);
 	return a;
 }
 
 void export_maze(const Maze a, const string filename){
-	char yn;
 	cout<<"File \""<<filename<<"\" will be overwritten. Are you sure you want to export the generated maze?(y/n) ";
+	char yn;
 	cin>>yn;
 	if(yn!='y')exit(44);
 	ofstream export_maze;
@@ -509,9 +497,9 @@ void export_maze(const Maze a, const string filename){
 }
 
 int main(int x,char *arg[]){
-	Args_return args=use_args(x,arg);
 	cout<<"Welcome to this maze solver!\n('S' is the start. 'T' is the target. '-' is the path. 'X' is a barrier.)\n\n";
 	Maze maze;
+	Args_return args=use_args(x,arg);
 	if(args.generate){
 		srand(time(NULL));
 		maze=maze_gen(args.x_lim,args.y_lim);
@@ -528,8 +516,7 @@ int main(int x,char *arg[]){
 	else{
 		maze=args.import_other?import_maze(args.filename):import_maze();
 	}
-	Maze goal=make_goal(maze);
-	vector<Move> 	path=get_path(maze, goal, args.change_max?(args.new_max+1):45);
+	vector<Move> path=get_path(maze, make_goal(maze), args.change_max?(args.new_max+1):45);
 	cout<<"The solution is:\n";
 	print_maze(maze,path);
 	cout<<"\n\nThe path used is:\n"<<path<<"\n\n";
