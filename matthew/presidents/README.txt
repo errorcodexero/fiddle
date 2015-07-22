@@ -14,7 +14,6 @@ Associated files and their purposes:
   config.ini - Edit to change settings
   presidents.txt - Edit or view stored information on the presidents
   stats.txt - View statistics of correct or incorrect answers - key is provided in the file
-  stats_temp.txt - Used to store data temporarily when resetting statistics
   stats_template.txt - Used to store the template for the statistics file
 
   
