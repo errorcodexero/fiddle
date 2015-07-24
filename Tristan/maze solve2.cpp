@@ -130,7 +130,7 @@ int lastp(vector<list> v){
 	return i;
 }
 vector<point> getpoint(vector<list>){
-	valid(v.pt)
+	
 
 
 int main(){
