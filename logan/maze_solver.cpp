@@ -2,6 +2,7 @@
 	- Generating large mazes doesn't work
 	- Make maze solving faster
 	- Bug checking
+	- Get rid of in code maze
 */
 #include <iostream>
 #include <string>
@@ -19,8 +20,7 @@ enum class Move{FORWARD, BACKWARD, RIGHT, LEFT};
 
 //Edit the following to change the default maze (Alternatively, edit the accompanying maze.txt or generate a random maze):
 static const int X_LIMIT=10, Y_LIMIT=10;
-static const Location TARGET_LOCATION=Location{0,5};
-static const Location SOLVER_ORIGIN=Location{0,0};
+static const Location TARGET_LOCATION=Location{0,5}, SOLVER_ORIGIN=Location{0,0};
 static const vector<Location> BLOCKS={Location{0,3}};
 //End.
 
@@ -59,7 +59,7 @@ ostream& operator<<(ostream& o,vector<T> in){
 }
 
 ostream& operator<<(ostream& o, Maze a){
-	return o<<"Solver("<<a.solver.loc<<" "<<a.solver.fin<<") target:"<<a.target<<" blocks("<<a.blocks<<") X_LIMIT:"<<a.x_lim<<" Y_LIMIT:"<<a.y_lim;
+	return o<<"Solver(loc:"<<a.solver.loc<<" fin:"<<a.solver.fin<<") target:"<<a.target<<" blocks("<<a.blocks<<") x_lim:"<<a.x_lim<<" y.lim:"<<a.y_lim;
 }
 
 template<typename T>
@@ -131,34 +131,29 @@ vector<Move> get_possible_moves(const Maze a){//Returns possible moves
 	return possible_moves;
 }
 
-pair<bool,vector<Move>> find_path(const Maze a,const Maze b,int max){//Recursive path finder
-	pair<bool,vector<Move>> path_return;
-	if(a.solver.fin){
-		path_return.first=1;
-		return path_return;
-	}
-	else if(max==0){
-		path_return.first=0;
-		return path_return;
-	}
+vector<Move> find_path(const Maze a,bool& found, int max){//Recursive path finder
+	vector<Move> path;
+	found=a.solver.fin;
+	if(found) return path;
+	if(max==0) return path;
 	max--;
 	for(Move move:get_possible_moves(a)){
-		path_return=find_path(update(move,a),b,max);
-		if(path_return.first==1){
-			path_return.second.insert(path_return.second.begin(),move);
-			return path_return;
+		path=find_path(update(move,a),found,max);
+		if(found){
+			path.insert(path.begin(),move);
+			return path;
 		}
 	}
-	return path_return;
+	return path;
 }
 
-vector<Move> get_path(const Maze a, const Maze b, unsigned int max_path=40){//Tries to get a path of the shortest length
+vector<Move> get_path(const Maze a, unsigned int max_path=45){//Tries to get a path of the shortest length
+	if(a.solver.loc==a.target)return vector<Move>{};
 	for(unsigned int i=0; i<max_path; i++){
+		bool found=0;
 		cout<<"Testing paths of length "<<i<<"\n";
-		pair<bool,vector<Move>> path_return=find_path(a,b,i); 
-		if(path_return.first){
-			return path_return.second;
-		}
+		vector<Move> path=find_path(a,found,i); 
+		if(found) return path;
 	} 
 	cout<<"\nWarning: Path length exceeds "<<max_path-1<<": This calculation could take a lot of time to complete or an error may have occurred: line:"<<__LINE__<<"\n";
 	exit(44); 
@@ -218,12 +213,6 @@ vector<vector<char>> print_maze(Maze a, vector<Move> path=vector<Move>{},bool ad
 	maze[a.y_lim-a.target.second-1][a.target.first]='T';//Draw target
 	if(print)cout<<maze;
 	return maze;
-}
-
-Maze make_goal(Maze a){//Makes a Maze goal from the passed in maze
-	a.solver.loc=a.target;
-	a.solver.fin=1;
-	return a;
 }
 
 Maze import_maze(const string filename="maze.txt"){//Imports a maze from maze.txt or the given text file
@@ -470,7 +459,7 @@ Maze maze_gen(const int X_LIM=10,const int Y_LIM=10){//Generates a random maze
 void export_maze(const Maze a, const string filename){
 	cout<<"File \""<<filename<<"\" will be overwritten. Are you sure you want to export the generated maze?(y/n) ";
 	char yn;
-	cin>>yn;
+	cin.get(yn);
 	if(yn!='y')exit(44);
 	ofstream export_maze;
 	export_maze.open(filename);	
@@ -502,10 +491,8 @@ int main(int x,char *arg[]){
 		maze.target=TARGET_LOCATION;
 		print_maze(maze);
 	}
-	else{
-		maze=args.import_other?import_maze(args.filename):import_maze();
-	}
-	vector<Move> path=get_path(maze, make_goal(maze), args.change_max?(args.new_max+1):45);
+	else maze=args.import_other?import_maze(args.filename):import_maze();	
+	vector<Move> path=get_path(maze, args.change_max?(args.new_max+1):45);
 	cout<<"The solution is:\n";
 	print_maze(maze,path);
 	cout<<"\n\nThe path used is:\n"<<path<<"\n\n";
