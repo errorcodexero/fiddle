@@ -1,5 +1,5 @@
 /*TODO:
-	- Simplify the function use_args
+	- Generating large mazes doesn't work
 	- Make maze solving faster
 	- Bug checking
 */
@@ -18,8 +18,7 @@ typedef pair<int,int> Location;
 enum class Move{FORWARD, BACKWARD, RIGHT, LEFT};
 
 //Edit the following to change the default maze (Alternatively, edit the accompanying maze.txt or generate a random maze):
-static const int X_LIMIT=10;
-static const int Y_LIMIT=10;
+static const int X_LIMIT=10, Y_LIMIT=10;
 static const Location TARGET_LOCATION=Location{0,5};
 static const Location SOLVER_ORIGIN=Location{0,0};
 static const vector<Location> BLOCKS={Location{0,3}};
@@ -84,7 +83,7 @@ ostream& operator<<(ostream& o,vector<vector<char>> in){//Special print-out for 
 		for(unsigned int i=0; i<in[j].size(); i++){
 			o<<in[j][i];
 		}
-		cout<<"\n";
+		o<<"\n";
 	}
 	return o;
 }
@@ -334,10 +333,8 @@ Args_return use_args(const int x,char *arg[]){//Determines what arguments to use
 	return args;
 }
 
-int get_random(const unsigned int max){//Returns a random integer less than the passed in integer
-	if(max==0)return 0;
-	unsigned int random=(rand()%max);
-	return random;
+int get_random(const unsigned int max){//Returns a random integer less than the passed in integer 
+	return (max>0)?(rand()%max):0;
 }
 
 bool check_for_adjacent_wall(const vector<Location> visited, const vector<Location> stack, const Location test){//Checks a location to see if there are any walls in adjacent locations 
@@ -489,9 +486,9 @@ void export_maze(const Maze a, const string filename){
 }
 
 int main(int x,char *arg[]){
-	cout<<"Welcome to this maze solver!\n('S' is the start. 'T' is the target. '-' is the path. 'X' is a barrier.)\n\n";
-	Maze maze;
 	Args_return args=use_args(x,arg);
+	Maze maze;
+	cout<<"Welcome to this maze solver!\n('S' is the start. 'T' is the target. '-' is the path. 'X' is a barrier.)\n\n";
 	if(args.generate){
 		srand(time(NULL));
 		maze=maze_gen(args.x_lim,args.y_lim);
