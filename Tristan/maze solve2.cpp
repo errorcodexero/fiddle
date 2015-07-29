@@ -37,9 +37,13 @@ bool operator==(point a,point b){
 	return (a.x == b.x && a.y == b.y);
 }
 
-
-bool lastpointvalid(point p,vector<point> lp){
-	
+/////////////////////////////////////////////////////////////////////////////
+// lastpointvalid
+//
+// returns true if the given point is not in the vector
+/////////////////////////////////////////////////////////////////////////////
+bool lastpointvalid(point p,vector<point> lp)
+{
 	bool valid = true;
 
 	for (int i=0; i< (int)lp.size(); i++){
@@ -81,6 +85,12 @@ bool Walls(point p){
 bool valid(point p){
 	return (Walls(p) && bounderies(p));
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// validpoint
+//
+// returns true if the given point is not a wall or boundry and has not been visited
+/////////////////////////////////////////////////////////////////////////////
 bool validpoint(vector<list> v,point q){
 	int i;
 	int max;
@@ -97,6 +107,12 @@ bool validpoint(vector<list> v,point q){
 	}
 	return valid(q) & !p;
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// [dir]p
+//
+// returns adjacent points
+/////////////////////////////////////////////////////////////////////////////
 point leftp(point p){
 	return point{p.x - 1,p.y};
 }
@@ -112,8 +128,12 @@ point upp(point p){
 point downp(point p){
 	return point{p.x,p.y - 1};
 }
-
-int lastp(vector<list> v){
+/////////////////////////////////////////////////////////////////////////////
+// nextp
+//
+//returns next point that has not been visited
+////////////////////////////////////////////////////////////////////////////
+int nextp(vector<list> v){
 	int max;
 	point p;
 	int i;
@@ -124,15 +144,47 @@ int lastp(vector<list> v){
 		if( !v[i].v){
 			p = v[i].pt;
 		}
-	break;
+		break;
 	}
 	assert(i<max);
 	return i;
 }
-vector<point> getpoint(vector<list>){
+/////////////////////////////////////////////////////////////////////////////
+// getpoint
+//
+// given a point will return a vector of points that are valid
+/////////////////////////////////////////////////////////////////////////////
+vector<point> getpoint(vector<list> v,point p){
+	point a;
+	point b;
+	point c;
+	point d;
+	vector<point> validpoints;
 	
+	a = leftp(p);
+	b = rightp(p);
+	c = upp(p);
+	d = downp(p);
 
+	if(validpoint(v,a)){
+		validpoints.push_back(a);		
+	}
 
+	if(validpoint(v,b)){
+		validpoints.push_back(a);		
+	}
+
+	if(validpoint(v,c)){
+		validpoints.push_back(a);		
+	}
+
+	if(validpoint(v,d)){
+		validpoints.push_back(a);		
+	}
+	
+	return validpoints;
+
+}
 int main(){
 vector<point> pt;
 vector<point> prev;
