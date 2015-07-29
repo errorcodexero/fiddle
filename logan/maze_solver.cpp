@@ -322,18 +322,10 @@ void check_all_args(string arg_str,Args_return& args,char *arg[], bool& valid){/
 
 Args_return use_args(const int x,char *arg[]){//Determines what arguments to use
 	Args_return args;
-	if(x>1){
+	for(int i=1; i<x; i++){
 		bool valid=0;
-		string arg_str=string(arg[1]);
+		string arg_str=string(arg[i]);
 		check_all_args(arg_str,args,arg,valid);
-		if(x>2){
-			arg_str=string(arg[2]);
-			check_all_args(arg_str,args,arg,valid);
-		}
-		if(x>3){
-			arg_str=string(arg[3]);
-			check_all_args(arg_str,args,arg,valid);
-		}
 		if(!valid){
 			cout<<"\nInvalid usage (try: "<<arg[0]<<" --usage)";
 			exit(44);
