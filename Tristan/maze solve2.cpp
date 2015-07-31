@@ -13,16 +13,28 @@
  
 
 using namespace std;
-
+/////////////////////////////////////////////////////////////////////////////
+// Structures
+//
+// All Structures
+/////////////////////////////////////////////////////////////////////////////
 struct point{
 	int x;
 	int y;
 };
+
 struct list{
 point pt;
 point prev;
 bool v;
 };
+//////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////
+// operatior point
+//
+// allow the use of diffrent things with the structure point
+/////////////////////////////////////////////////////////////////////////////
 bool operator!=(point a,point b){
 	return (a.x != b.x || a.y != b.y);
 }
@@ -36,6 +48,8 @@ ostream&operator<<(ostream& o, point a){
 bool operator==(point a,point b){
 	return (a.x == b.x && a.y == b.y);
 }
+/////////////////////////////////////////////////////////////////////////////
+
 
 /////////////////////////////////////////////////////////////////////////////
 // lastpointvalid
@@ -182,28 +196,34 @@ vector<point> getpoint(vector<list> v,point p){
 		validpoints.push_back(a);		
 	}
 	
-	return validpoints;
+	return validpoints; 
 
 }
 int main(){
-vector<point> pt;
-vector<point> prev;
-
+//declarations	
+int lineofvector;
 point p;
 point e;
 vector<list> info;
-p.x = 1;
-p.y = 1;
+vector<point> nextpoint;
 
-e.x = 1;
-e.y = 4;
+p.x = 1;//set
+p.y = 1;//location of start point
 
-e = e;
+e.x = 1;//set
+e.y = 4;//location of end point
 
-p = p;
 
-//while p != e{
-//}
+info.push_back(p);
+
+while p != e{
+	lineofvector = nextp(info); //finds what saved vector is the first valid
+	nextpoints = getpoint(info,p); // set a vector to have all posable points that are legal
+	info.push_back(nextpoint[lineofvector]);//save thatloacation that you want to go to
+	info[lineofvector] = true;//set the valid of lineofvector to true (setting it to be visited)
+	p = info[lineofvector];//change p to the point that you have moved to
+	
+}
 
 
 
