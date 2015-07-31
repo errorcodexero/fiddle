@@ -2,7 +2,7 @@
 	- Generating large mazes doesn't work
 	- Make maze solving faster
 	- Bug checking
-	- Get rid of in code maze
+	- Get rid of the in-code maze
 */
 #include <iostream>
 #include <string>
@@ -367,40 +367,24 @@ Location update_location(Location a,const Move b,const vector<Location> visited,
 	return a;
 }
 
-pair<vector<Location>, bool> wall_generator(const int X_LIM=10,const int Y_LIM=10,pair<vector<Location>,bool> generator_return=make_pair(vector<Location>{{0,0}},0),vector<Location> stack={},int counter=0){//generates the walls for a maze
-	if(counter==0){
-		stack.push_back({0,0});
-		generator_return.first={Location{0,0}};
-		generator_return.second=0;
+vector<Location> wall_generator(const int X_LIM,const int Y_LIM,bool& found,vector<Location> visited={{0,0}},vector<Location> stack={{0,0}}){//generates the walls for a maze
+	if(found)return visited;
+	vector<Move> possible_moves;
+	int first=stack.back().first, second=stack.back().second;
+	if(first>0 && check_for_adjacent_wall(visited, stack, Location{first-1,second})) possible_moves.push_back(Move::LEFT);
+	if(first+1<X_LIM && check_for_adjacent_wall(visited, stack, Location{first+1,second})) possible_moves.push_back(Move::RIGHT);
+	if(second>0 && check_for_adjacent_wall(visited, stack, Location{first,second-1})) possible_moves.push_back(Move::BACKWARD);
+	if(second+1<Y_LIM && check_for_adjacent_wall(visited, stack, Location{first,second+1})) possible_moves.push_back(Move::FORWARD);
+	if(possible_moves.size()>0){
+		stack.push_back(update_location(stack.back(),possible_moves[get_random(possible_moves.size())],visited,stack,first,second,Y_LIM,X_LIM));
+		visited.push_back(stack.back());
 	}
-	if(generator_return.second)return generator_return;
-	if(counter>=X_LIM*Y_LIM+100000){
-		generator_return.second=0;
-		cout<<"Maze generation failed: attempted too many times("<<counter<<"): line:"<<__LINE__<<"\n";
-		exit(44);
-	}
-	counter++;
-	if(1){
-		vector<Move> possible_moves;
-		int first=stack.back().first, second=stack.back().second;
-		if(first>0 && check_for_adjacent_wall(generator_return.first, stack, Location{first-1,second})) possible_moves.push_back(Move::LEFT);
-		if(first+1<X_LIM && check_for_adjacent_wall(generator_return.first, stack, Location{first+1,second})) possible_moves.push_back(Move::RIGHT);
-		if(second>0 && check_for_adjacent_wall(generator_return.first, stack, Location{first,second-1})) possible_moves.push_back(Move::BACKWARD);
-		if(second+1<Y_LIM && check_for_adjacent_wall(generator_return.first, stack, Location{first,second+1})) possible_moves.push_back(Move::FORWARD);
-		int random=get_random(possible_moves.size());
-		if(possible_moves.size()>0){
-			stack.push_back(update_location(stack.back(),possible_moves[random],generator_return.first,stack,first,second,Y_LIM,X_LIM));
-			generator_return.first.push_back(stack.back());
-		}
-		else{
-			stack.pop_back();
-		}
-		generator_return.second=(stack.size()==0 && generator_return.first.size()>0);
-		if(generator_return.second)return generator_return;
-		generator_return=wall_generator(X_LIM, Y_LIM, generator_return, stack, counter);
-		if(generator_return.second)return generator_return;
-	}
-	return generator_return;
+	else stack.pop_back();
+	found=(stack.size()==0 && visited.size()>0);
+	if(found)return visited;
+	visited=wall_generator(X_LIM, Y_LIM, found, visited, stack);
+	if(found)return visited;
+	return visited;
 }
 
 vector<Location> invert(vector<Location> v, const int X_LIM, const int Y_LIM){//Inverts a vector of Locations to contain the opposite Locations within x/y boundaries
@@ -427,7 +411,12 @@ Maze maze_gen(const int X_LIM=10,const int Y_LIM=10){//Generates a random maze
 	Maze a;
 	a.x_lim=X_LIM;
 	a.y_lim=Y_LIM;
-	a.blocks=invert(wall_generator(a.x_lim,a.y_lim).first,a.x_lim,a.y_lim);
+	bool found=0;
+	a.blocks=invert(wall_generator(a.x_lim,a.y_lim,found),a.x_lim,a.y_lim);
+	if(!found){
+		cout<<"Error: Wall generation failed: line: "<<__LINE__<<"\n";
+		exit(44);
+	}
 	vector<Location> possible_locs;
 	for(int i=0; i<X_LIM; i++){
 		for(int j=0; j<Y_LIM; j++){
