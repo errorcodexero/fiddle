@@ -199,13 +199,20 @@ vector<point> getpoint(vector<list> v,point p){
 	return validpoints; 
 
 }
+
+
 int main(){
-//declarations	
-int lineofvector;
-point p;
-point e;
-vector<list> info;
-vector<point> nextpoint;
+	//declarations	
+	int lineofvector;
+	point p;
+	point e;
+	vector<list> info;
+	vector<point> nextpoint;
+	list log;
+	point f;
+	
+f.x = -1;
+f.y = -1;
 
 p.x = 1;//set
 p.y = 1;//location of start point
@@ -213,16 +220,42 @@ p.y = 1;//location of start point
 e.x = 1;//set
 e.y = 4;//location of end point
 
+cout << "setting log.prev" << f << endl;
 
-info.push_back(p);
+log.prev = f;
 
-while p != e{
-	lineofvector = nextp(info); //finds what saved vector is the first valid
-	nextpoints = getpoint(info,p); // set a vector to have all posable points that are legal
-	info.push_back(nextpoint[lineofvector]);//save thatloacation that you want to go to
-	info[lineofvector] = true;//set the valid of lineofvector to true (setting it to be visited)
-	p = info[lineofvector];//change p to the point that you have moved to
+cout << "set log.prev to:" << f << endl;
+
+cout << "setting log.pt to:" << p << endl;
+
+log.pt = p; 
+
+cout << "set log.pt to:" << p << endl;
+
+cout << "setting log.v to false" << endl;
+
+log.v = false;
+
+cout << "set log.v to false" << endl;
+
+info.push_back(log);
+cout << "start loop" << endl;
+while (p != e){
+	lineofvector = nextp(info);
 	
+	nextpoint = getpoint(info,p); // set a vector to have all posable points that are legal
+	
+	for (i=0; i < nextpoint.size(); i++){
+		log.prev = p;
+		log.v = false;
+		log.pt = nextpoint[i];
+		info.push_back(log);
+	}
+	
+	info[lineofvector].v = true;
+	
+	p = nextpoint[0];//save that loacation that you want to go to/going to
+	cout << p << endl;
 }
 
 
