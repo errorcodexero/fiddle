@@ -23,4 +23,7 @@ int main(){
 	if(s=="11"){
 		cout<<"go to 1 again.\n";
 	}
+	if(s=="14"){
+		cout<<"yous find's a secret.\n";
+	}
 }
