@@ -114,7 +114,7 @@ bool validpoint(vector<list> v,point q){
 	max = v.size();
 	for(i=0; i<max; i++){
 		if(v[i].pt == q){
-			p = true;  // got it
+			p = true;
 			break;
 		}
 		
@@ -211,8 +211,8 @@ int main(){
 	list log;
 	point f;
 	
-f.x = -1;
-f.y = -1;
+f.x = -1;//set
+f.y = -1;//inital location for previus
 
 p.x = 1;//set
 p.y = 1;//location of start point
@@ -220,47 +220,30 @@ p.y = 1;//location of start point
 e.x = 1;//set
 e.y = 4;//location of end point
 
-cout << "setting log.prev" << f << endl;
+log.prev = f; //sets a prev point 
+log.pt = p; //set the original point
+log.v = false; // set the visited to not visited
+info.push_back(log); //Push the info to the vector of structures 
 
-log.prev = f;
 
-cout << "set log.prev to:" << f << endl;
-
-cout << "setting log.pt to:" << p << endl;
-
-log.pt = p; 
-
-cout << "set log.pt to:" << p << endl;
-
-cout << "setting log.v to false" << endl;
-
-log.v = false;
-
-cout << "set log.v to false" << endl;
-
-info.push_back(log);
-cout << "start loop" << endl;
-while (p != e){
-	lineofvector = nextp(info);
+	while (p != e){
+		lineofvector = nextp(info);//find the line of stored data that is next in line
 	
-	nextpoint = getpoint(info,p); // set a vector to have all posable points that are legal
+		nextpoint = getpoint(info,p); // set a vector to have all posable points that are legal
 	
-	for (i=0; i < nextpoint.size(); i++){
-		log.prev = p;
-		log.v = false;
-		log.pt = nextpoint[i];
-		info.push_back(log);
+		for (unsigned int i = 0; i < nextpoint.size(); i++){//loop tell for the size of the vector nextpoint
+			log.prev = p; //store prev point
+			log.v = false;//set the visisted to not visited
+			log.pt = nextpoint[i];// the point that you are storing
+			info.push_back(log);// store all the stored point
+		}
+	
+		info[lineofvector].v = true;// set the visited status to visited
+	
+		assert(nextpoint.size() != 0);
+
+		p = nextpoint[0];//save that loacation that you want to go to going to
+
+		cout << p << endl; //print out the location if the point
 	}
-	
-	info[lineofvector].v = true;
-	
-	p = nextpoint[0];//save that loacation that you want to go to/going to
-	cout << p << endl;
-}
-
-
-
-
-
-
 }
