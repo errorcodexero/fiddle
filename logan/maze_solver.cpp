@@ -83,7 +83,7 @@ ostream& operator<<(ostream& o,vector<vector<char>> in){//Special print-out for 
 	return o;
 }
 
-void add_border(Maze& a){//Ads a border to a given maze
+void add_border(Maze& a){//Adds a border to a given maze
 	a.x_lim+=2;
 	a.y_lim+=2;
 	a.target=Location{a.target.first+1,a.target.second+1};
@@ -101,20 +101,20 @@ void add_border(Maze& a){//Ads a border to a given maze
 	}
 }
 
-vector<vector<char>> print_maze(Maze a, vector<Move> path=vector<Move>{},bool add_boundary=1){//Prints out a maze as a graphic
+vector<vector<char>> print_maze(Maze a, vector<Move> path=vector<Move>{},bool add_boundary=1){//Makes a maze print-out in a way humans would appreciate
 	if(add_boundary)add_border(a);
 	vector<vector<char>> maze;
-	for(int j=0; j<a.y_lim; j++){//Makes a maze-sized print-out vector
+	for(int j=0; j<a.y_lim; j++){
 		maze.push_back(vector<char>{});
 		for(int i=0; i<a.x_lim; i++){
 			maze[j].push_back(' ');
 		}
 	}
 	for(unsigned int i=0; i<a.blocks.size(); i++){
-		maze[a.y_lim-a.blocks[i].second-1][a.blocks[i].first]='X';//draw blocks
+		maze[a.y_lim-a.blocks[i].second-1][a.blocks[i].first]='X';
 	}
 	Location l=a.solver.loc;
-	for(unsigned int i=0; i<path.size(); i++){//Draw path
+	for(unsigned int i=0; i<path.size(); i++){
 		switch(path[i]){
 			case Move::FORWARD:
 				l.second++;
@@ -202,8 +202,8 @@ vector<Move> find_path(const Maze a,bool& found, int max){//Recursive path finde
 }
 
 vector<Move> get_path(const Maze a, unsigned int max_path=45){//Tries to get a path of the shortest length
-	int minimum=fabs(a.target.first-a.solver.loc.first)+fabs(a.target.second-a.solver.loc.second);
 	if(a.solver.loc==a.target)return vector<Move>{};
+	int minimum=fabs(a.target.first-a.solver.loc.first)+fabs(a.target.second-a.solver.loc.second);
 	for(unsigned int i=minimum; i<max_path; i++){
 		cout<<"Testing paths of length "<<i<<"\n";
 		bool found=0;
@@ -436,7 +436,7 @@ Maze maze_gen(const int X_LIM=10,const int Y_LIM=10){//Generates a random maze
 	return a;
 }
 
-void export_maze(const Maze a, const string filename){
+void export_maze(const Maze a, const string filename){//Exports maze unsed in program to a text file
 	cout<<"File \""<<filename<<"\" will be overwritten. Are you sure you want to export the generated maze?(y/n) ";
 	char yn;
 	cin.get(yn);
