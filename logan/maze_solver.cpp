@@ -1,5 +1,6 @@
 /*Author: Logan Traffas
 TODO:
+	- Consider changing how the path is printed out (as instructions in a vector)
 	- Bug checking
 */
 #include <iostream>
@@ -194,7 +195,7 @@ Move opposite_move(const Move a){//Returns a move that moves the solver in the o
 	assert(0);
 }
 
-vector<Move> solver(Maze a,bool& found,vector<Move>& path,vector<Location>& visited,bool& again, int counter=0){//generates the walls for a maze
+vector<Move> solver(Maze& a,bool& found,vector<Move>& path,vector<Location>& visited,bool& again, int counter=0){//generates the walls for a maze
 	counter++;
 	if(counter>=3000){
 		again=1;
@@ -220,7 +221,7 @@ vector<Move> solver(Maze a,bool& found,vector<Move>& path,vector<Location>& visi
 	return path;
 }
 
-vector<Move> get_path(const Maze a, unsigned int max_path=45){//Tries to get a path of the shortest length
+vector<Move> get_path(Maze a, unsigned int max_path=45){//Tries to get a path of the shortest length
 	if(a.solver.loc==a.target)return vector<Move>{};
 	bool found=0,again=1;
 	vector<Move> path;
@@ -421,7 +422,7 @@ vector<Location> wall_generator(const int X_LIM,const int Y_LIM,bool& found,bool
 void estimator(const int A){//Estimates maze generation time based on an area
 	double a=(4.3161773*pow(10,-7)),b=(2.5209481*pow(10,-5)),c=(.0107013401);//,d=();
 	int t=nearbyint(a*pow(A,2)+b*A+c);
-	if(t>=10) cout<<"Warning: Estimated generation-time is "<<t<<" seconds: (Press CTRL+C to abort): Increased generation-time implies increased solving-time\n";	
+	if(t>=10) cout<<"Warning: Estimated generation-time is "<<t<<" seconds (Varies depending on processing power): (Press CTRL+C to abort): Increased generation-time implies increased solving-time\n";	
 }
 
 Maze maze_gen(const int X_LIM=10,const int Y_LIM=10){//Generates a random maze
