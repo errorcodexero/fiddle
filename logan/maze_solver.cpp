@@ -1,7 +1,6 @@
 /*Author: Logan Traffas
 TODO:
-	- Remove the ability to set maximum path length (make-solving is so fast that calculation time is no longer a problem)
-	- Generating large mazes doesn't work (around/above 50)
+	- Solving large mazes doesn't work (around/above 50)
 	- Bug checking
 */
 #include <iostream>
@@ -188,7 +187,7 @@ vector<Move> get_possible_moves(const Maze a, const vector<Location> visited){//
 	return possible_moves;
 }
 
-Move opposite_move(const Move a){
+Move opposite_move(const Move a){//Returns a move that moves the solver in the opposite direction
 	if(a==Move::FORWARD)return Move{Move::BACKWARD};
 	if(a==Move::BACKWARD)return Move{Move::FORWARD};
 	if(a==Move::RIGHT)return Move{Move::LEFT};
@@ -214,7 +213,6 @@ vector<Move> solver(Maze a,bool& found,vector<Move>& path,vector<Location>& visi
 		if(path.size()>0)path.pop_back();
 	}
 	found=a.solver.fin;
-	if(found)return path;
 	path=solver(a,found,path,visited,counter);
 	return path;
 }
@@ -272,9 +270,9 @@ Maze import_maze(const string filename="maze.txt"){//Imports a maze from maze.tx
 
 struct Args_return{//A type used to store arguments
 	bool import,change_max, import_other, export_maze;
-	int new_max, x_lim, y_lim;
+	int x_lim, y_lim;
 	string import_filename,export_filename;
-	Args_return():import(0),change_max(0),import_other(0),export_maze(0),new_max(30),x_lim(10),y_lim(10),import_filename("maze.txt"),export_filename("maze.txt"){}
+	Args_return():import(0),change_max(0),import_other(0),export_maze(0),x_lim(10),y_lim(10),import_filename("maze.txt"),export_filename("maze.txt"){}
 };
 
 void check_all_args(string arg_str,Args_return& args,char *arg[], bool& valid){//Uses passed into arguments to set the necessary settings
@@ -286,10 +284,6 @@ void check_all_args(string arg_str,Args_return& args,char *arg[], bool& valid){/
 			args.import_other=1;
 			args.import_filename=arg_str.substr(9,15);
 		}
-	}
-	else if(arg_str.substr(0,18)==max_path_cmp){
-		args.change_max=1;
-		args.new_max=atoi((arg_str.substr(18)).c_str());
 	}
 	else if(arg_str.substr(0,10)==gen_cmp){
 		if(arg_str.size()>arg_str.substr(0,10).size()){
@@ -307,7 +301,6 @@ void check_all_args(string arg_str,Args_return& args,char *arg[], bool& valid){/
 	else if(arg_str==usage_cmp){
 		cout<<arg[0]<<" can be used with the following flags:\n";
 		cout<<"\t--import=<filename>\n\t\tTo run the maze solver on an imported maze from the given file (uses \"maze.txt\" by default)\n";
-		cout<<"\t--set-max-path-to=<integer>\n\t\tTo set the maximum length of the path that the program will try to find from the solver to the target.\n";
 		cout<<"\t--generate=<x_lim>:<y_lim>\n\t\tTo randomly generate a maze with the x and y limits set the user input or to ten by default(It will solve it as well).\n";
 		cout<<"\t--export=<filename>\n\t\tTo write the used maze to a given file (uses \"maze.txt\" by default).\n";
 		exit(44);
@@ -372,25 +365,6 @@ Location update_location(Location a,const Move b,const vector<Location> visited,
 	return a;
 }
 
-vector<Location> wall_generator(const int X_LIM,const int Y_LIM,bool& found,vector<Location> visited={{0,0}},vector<Location> stack={{0,0}}){//generates the walls for a maze
-	if(found)return visited;
-	vector<Move> possible_moves;
-	int first=stack.back().first, second=stack.back().second;
-	if(first>0 && check_for_adjacent_wall(visited, stack, Location{first-1,second})) possible_moves.push_back(Move::LEFT);
-	if(first+1<X_LIM && check_for_adjacent_wall(visited, stack, Location{first+1,second})) possible_moves.push_back(Move::RIGHT);
-	if(second>0 && check_for_adjacent_wall(visited, stack, Location{first,second-1})) possible_moves.push_back(Move::BACKWARD);
-	if(second+1<Y_LIM && check_for_adjacent_wall(visited, stack, Location{first,second+1})) possible_moves.push_back(Move::FORWARD);
-	if(possible_moves.size()>0){
-		stack.push_back(update_location(stack.back(),possible_moves[get_random(possible_moves.size())],visited,stack,first,second,Y_LIM,X_LIM));
-		visited.push_back(stack.back());
-	}
-	else stack.pop_back();
-	found=(stack.size()==0 && visited.size()>0);
-	if(found)return visited;
-	visited=wall_generator(X_LIM, Y_LIM, found, visited, stack);
-	return visited;
-}
-
 vector<Location> invert_blocks(vector<Location> v, const int X_LIM, const int Y_LIM){//Inverts a vector of Locations to contain the opposite Locations within x/y boundaries
 	vector<Location> full;
 	for(int i=0; i<X_LIM; i++){
@@ -411,13 +385,54 @@ vector<Location> invert_blocks(vector<Location> v, const int X_LIM, const int Y_
 	return v;
 }
 
+vector<Location> wall_generator(const int X_LIM,const int Y_LIM,bool& found,bool& again,vector<Location>& stack,vector<Location> visited={{0,0}},int counter=0){//generates the walls for a maze
+	counter++;
+	//cout<<counter<<"\n";
+	if(counter>=3000){
+		again=1;
+		return visited;
+	}
+	//cout<<"\nREACHED LINE: "<<__LINE__<<"\n";
+	vector<Move> possible_moves;
+	int first=stack.back().first, second=stack.back().second;
+	if(first>0 && check_for_adjacent_wall(visited, stack, Location{first-1,second})) possible_moves.push_back(Move::LEFT);
+	if(first+1<X_LIM && check_for_adjacent_wall(visited, stack, Location{first+1,second})) possible_moves.push_back(Move::RIGHT);
+	if(second>0 && check_for_adjacent_wall(visited, stack, Location{first,second-1})) possible_moves.push_back(Move::BACKWARD);
+	if(second+1<Y_LIM && check_for_adjacent_wall(visited, stack, Location{first,second+1})) possible_moves.push_back(Move::FORWARD);
+	if(possible_moves.size()>0){
+		stack.push_back(update_location(stack.back(),possible_moves[get_random(possible_moves.size())],visited,stack,first,second,Y_LIM,X_LIM));
+		visited.push_back(stack.back());
+	}
+	else stack.pop_back();
+	found=(stack.size()==0 && visited.size()>0);
+	if(found){
+		again=0;
+		return visited;
+	}
+	visited=wall_generator(X_LIM,Y_LIM,found,again,stack,visited,counter);
+	return visited;
+}
+
+void estimator(const int A){//Estimates maze generation time based on an area
+	double a=(4.3161773*pow(10,-7)),b=(2.5209481*pow(10,-5)),c=(.0107013401);//,d=();
+	int t=nearbyint(a*pow(A,2)+b*A+c);
+	if(t>=10) cout<<"Warning: Estimated generation time is "<<t<<" seconds: (Press CTRL+C to abort)\n";	
+}
+
 Maze maze_gen(const int X_LIM=10,const int Y_LIM=10){//Generates a random maze
+	estimator(X_LIM*Y_LIM);
 	Maze a;
 	a.x_lim=X_LIM;
 	a.y_lim=Y_LIM;
 	bool found=0;
 	srand(time(NULL));
-	a.blocks=invert_blocks(wall_generator(a.x_lim,a.y_lim,found),a.x_lim,a.y_lim);
+	bool again=0;
+	vector<Location> stack={{0,0}};
+	vector<Location> walls=wall_generator(a.x_lim,a.y_lim,found,again,stack);
+	while(again){
+		walls=wall_generator(a.x_lim,a.y_lim,found,again,stack,walls);
+	}
+	a.blocks=invert_blocks(walls,a.x_lim,a.y_lim);
 	if(!found){
 		cout<<"Error: Wall generation failed: line: "<<__LINE__<<"\n";
 		exit(44);
@@ -473,7 +488,7 @@ int main(int x,char *arg[]){
 	cout<<"Welcome to this maze solver!\n('S' is the start. 'T' is the target. '-' is the path. 'X' is a barrier.)\n\n";
 	if(!args.import) maze=maze_gen(args.x_lim,args.y_lim);
 	else maze=args.import_other?import_maze(args.import_filename):import_maze();	
-	vector<Move> path=get_path(maze, args.change_max?(args.new_max+1):45);
+	vector<Move> path=get_path(maze);
 	cout<<"The solution is:\n"<<print_maze(maze,path)<<"\nThe path used is:\n"<<path<<"\n\n";
 	if(args.export_maze)export_maze(maze,args.export_filename);
 	return 0;
