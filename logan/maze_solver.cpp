@@ -1,6 +1,5 @@
 /*Author: Logan Traffas
 TODO:
-	- Solving large mazes doesn't work (around/above 50)
 	- Bug checking
 */
 #include <iostream>
@@ -195,11 +194,11 @@ Move opposite_move(const Move a){//Returns a move that moves the solver in the o
 	assert(0);
 }
 
-vector<Move> solver(Maze a,bool& found,vector<Move>& path,vector<Location>& visited, int counter=0){//generates the walls for a maze
+vector<Move> solver(Maze a,bool& found,vector<Move>& path,vector<Location>& visited,bool& again, int counter=0){//generates the walls for a maze
 	counter++;
-	if(counter>=3300){
-		cout<<"\nSolving Attempts exceding "<<counter<<": line: "<<__LINE__<<"\n";
-		exit(44);
+	if(counter>=3000){
+		again=1;
+		return path;
 	}
 	if(found)return path;
 	vector<Move> possible_moves=get_possible_moves(a,visited);
@@ -213,16 +212,22 @@ vector<Move> solver(Maze a,bool& found,vector<Move>& path,vector<Location>& visi
 		if(path.size()>0)path.pop_back();
 	}
 	found=a.solver.fin;
-	path=solver(a,found,path,visited,counter);
+	if(found){
+		again=0;
+		return path;
+	}
+	path=solver(a,found,path,visited,again,counter);
 	return path;
 }
 
 vector<Move> get_path(const Maze a, unsigned int max_path=45){//Tries to get a path of the shortest length
 	if(a.solver.loc==a.target)return vector<Move>{};
-	bool found=0;
+	bool found=0,again=1;
 	vector<Move> path;
 	vector<Location> visited={a.solver.loc};
-	path=solver(a,found,path,visited); 
+	while(again){
+		path=solver(a,found,path,visited,again); 
+	}
 	if(found)return path;
 	cout<<"\nWarning: Path length exceeds "<<max_path-1<<": This calculation could take a lot of time to complete or an error may have occurred: line:"<<__LINE__<<"\n";
 	exit(44); 
@@ -416,7 +421,7 @@ vector<Location> wall_generator(const int X_LIM,const int Y_LIM,bool& found,bool
 void estimator(const int A){//Estimates maze generation time based on an area
 	double a=(4.3161773*pow(10,-7)),b=(2.5209481*pow(10,-5)),c=(.0107013401);//,d=();
 	int t=nearbyint(a*pow(A,2)+b*A+c);
-	if(t>=10) cout<<"Warning: Estimated generation time is "<<t<<" seconds: (Press CTRL+C to abort)\n";	
+	if(t>=10) cout<<"Warning: Estimated generation-time is "<<t<<" seconds: (Press CTRL+C to abort): Increased generation-time implies increased solving-time\n";	
 }
 
 Maze maze_gen(const int X_LIM=10,const int Y_LIM=10){//Generates a random maze
@@ -424,11 +429,10 @@ Maze maze_gen(const int X_LIM=10,const int Y_LIM=10){//Generates a random maze
 	Maze a;
 	a.x_lim=X_LIM;
 	a.y_lim=Y_LIM;
-	bool found=0;
+	bool found=0,again=1;
 	srand(time(NULL));
-	bool again=0;
 	vector<Location> stack={{0,0}};
-	vector<Location> walls=wall_generator(a.x_lim,a.y_lim,found,again,stack);
+	vector<Location> walls;
 	while(again){
 		walls=wall_generator(a.x_lim,a.y_lim,found,again,stack,walls);
 	}
