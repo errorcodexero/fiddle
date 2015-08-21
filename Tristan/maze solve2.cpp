@@ -119,7 +119,7 @@ bool validpoint(vector<list> v,point q){
 		}
 		
 	}
-	return valid(q) & !p;
+	return valid(q) && !p;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -149,16 +149,14 @@ point downp(point p){
 ////////////////////////////////////////////////////////////////////////////
 int nextp(vector<list> v){
 	int max;
-	point p;
 	int i;
 
 	max = v.size();
 
 	for (i=0; i<max; i++){
 		if( !v[i].v){
-			p = v[i].pt;
+			break;
 		}
-		break;
 	}
 	assert(i<max);
 	return i;
@@ -185,22 +183,40 @@ vector<point> getpoint(vector<list> v,point p){
 	}
 
 	if(validpoint(v,b)){
-		validpoints.push_back(a);		
+		validpoints.push_back(b);		
 	}
 
 	if(validpoint(v,c)){
-		validpoints.push_back(a);		
+		validpoints.push_back(c);		
 	}
 
 	if(validpoint(v,d)){
-		validpoints.push_back(a);		
+		validpoints.push_back(d);		
 	}
 	
 	return validpoints; 
 
 }
 
+/////////////////////////////////////////////////////////////////////////////
+//Find Point
+//
+//finds point
+////////////////////////////////////////////////////////////////////////////
+int findpoint(vector<list> v,point q){
+	int max;
+	int i;
 
+	max = v.size();
+
+	for (i=0; i<max; i++){
+		if( v[i].pt == q){
+			break;
+		}
+	}
+	assert(i<max);
+	return i;
+}
 int main(){
 	//declarations	
 	int lineofvector;
@@ -210,15 +226,21 @@ int main(){
 	vector<point> nextpoint;
 	list log;
 	point f;
-	
+	bool endpoint;
+	point l;
+	point q;
+	int lastline;
+l.x = 1;
+l.y = 1;
+endpoint = false;
 f.x = -1;//set
 f.y = -1;//inital location for previus
 
 p.x = 1;//set
 p.y = 1;//location of start point
 
-e.x = 1;//set
-e.y = 4;//location of end point
+e.x = 4;//set
+e.y = 1;//location of end point
 
 log.prev = f; //sets a prev point 
 log.pt = p; //set the original point
@@ -226,24 +248,38 @@ log.v = false; // set the visited to not visited
 info.push_back(log); //Push the info to the vector of structures 
 
 
-	while (p != e){
-		lineofvector = nextp(info);//find the line of stored data that is next in line
-	
-		nextpoint = getpoint(info,p); // set a vector to have all posable points that are legal
-	
-		for (unsigned int i = 0; i < nextpoint.size(); i++){//loop tell for the size of the vector nextpoint
-			log.prev = p; //store prev point
-			log.v = false;//set the visisted to not visited
-			log.pt = nextpoint[i];// the point that you are storing
-			info.push_back(log);// store all the stored point
-		}
-	
-		info[lineofvector].v = true;// set the visited status to visited
-	
-		assert(nextpoint.size() != 0);
+	while (!endpoint){
+		lineofvector = nextp(info); //find the line of stored data that is next in line
 
-		p = nextpoint[0];//save that loacation that you want to go to going to
+		cout << "lineofvector;" << lineofvector << endl;
+
+		p = info[lineofvector].pt;//save that loacation that you want to go to going to
 
 		cout << p << endl; //print out the location if the point
+
+		nextpoint = getpoint(info,p); // set a vector to have all posable points that are legal
+		
+		cout << "nextpoint:" << nextpoint.size() << endl;
+		
+		for (unsigned int i = 0; i < nextpoint.size(); i++){//loop tell for the size of the vector nextpoint
+			log.prev = p; //store prev point
+			log.v = false; //set the visisted to not visited
+			log.pt = nextpoint[i]; // the point that you are storing
+			if(log.pt == e){
+				endpoint = true;
+			}
+			info.push_back(log); // store all the stored point
+		}
+	
+		info[lineofvector].v = true; // set the visited status to visited
+
 	}
+
+	lastline = findpoint(info,e)
+
+	while(!q = l){
+	 
+		
+	}
+	
 }
