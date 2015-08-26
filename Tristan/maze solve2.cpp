@@ -68,6 +68,7 @@ bool lastpointvalid(point p,vector<point> lp)
 	return valid;
 }
 
+
 /////////////////////////////////////////////////////////////////////////////
 // bounderies
 //
@@ -227,11 +228,9 @@ int main(){
 	list log;
 	point f;
 	bool endpoint;
-	point l;
-	point q;
 	int lastline;
-l.x = 1;
-l.y = 1;
+	vector<point> path;
+
 endpoint = false;
 f.x = -1;//set
 f.y = -1;//inital location for previus
@@ -240,7 +239,7 @@ p.x = 1;//set
 p.y = 1;//location of start point
 
 e.x = 4;//set
-e.y = 1;//location of end point
+e.y = 1;//location of en/d point
 
 log.prev = f; //sets a prev point 
 log.pt = p; //set the original point
@@ -251,15 +250,11 @@ info.push_back(log); //Push the info to the vector of structures
 	while (!endpoint){
 		lineofvector = nextp(info); //find the line of stored data that is next in line
 
-		cout << "lineofvector;" << lineofvector << endl;
-
 		p = info[lineofvector].pt;//save that loacation that you want to go to going to
 
-		cout << p << endl; //print out the location if the point
 
 		nextpoint = getpoint(info,p); // set a vector to have all posable points that are legal
 		
-		cout << "nextpoint:" << nextpoint.size() << endl;
 		
 		for (unsigned int i = 0; i < nextpoint.size(); i++){//loop tell for the size of the vector nextpoint
 			log.prev = p; //store prev point
@@ -274,12 +269,18 @@ info.push_back(log); //Push the info to the vector of structures
 		info[lineofvector].v = true; // set the visited status to visited
 
 	}
+	
+	cout << "Path" << endl;
 
-	lastline = findpoint(info,e)
-
-	while(!q = l){
-	 
-		
+	lastline = findpoint(info,e);
+	while(lastline != 0){
+		path.push_back(info[lastline].pt);
+		lastline = findpoint(info,info[lastline].prev);
+	}
+	path.push_back(info[0].pt)
+;
+	for(int i = path.size() - 1; i >= 0;i--){
+		cout << path[i] << endl;
 	}
 	
 }
