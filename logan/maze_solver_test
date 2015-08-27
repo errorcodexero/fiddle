@@ -1,0 +1,1 @@
+g++ -Wall -Wextra -Werror --std=c++11 -DMAZE_SOLVER -o solver maze_solver.cpp 2>&1 && ./solver 2>&1
