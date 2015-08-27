@@ -1,7 +1,7 @@
 This program is intended to test knowledge of the presidents.
 
-Compiling:
-  Compile with "g++ presidents.cpp" -o "presidents.exe"
+Compiling/Using the makefile:
+  Compile with "make" and use "make clean" to delete the executable
   
 Running:
   Run with "./presidents" or "./presidents.exe"
