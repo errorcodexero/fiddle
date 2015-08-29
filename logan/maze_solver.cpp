@@ -1,8 +1,5 @@
 /*Author: Logan Traffas
-TODO:
-	- Consider changing how the path is printed out (as instructions in a vector)
-	- Bug checking
-*/
+
 #include <iostream>
 #include <string>
 #include <utility>
