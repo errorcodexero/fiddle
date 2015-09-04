@@ -20,7 +20,7 @@ int main(){
 	bob.y=0;
 	
 	point goal;
-	goal.x=4;
+	goal.x=3;
 	goal.y=0;
 
 	while(true){
@@ -31,5 +31,6 @@ int main(){
 			bob.x--;
 			cout<<"move left/n";
 		}
+		
 	}
 }

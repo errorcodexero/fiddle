@@ -20,15 +20,17 @@ int main(){
 	bob.y=0;
 	
 	point goal;
-	goal.x=4;
+	goal.x=3;
 	goal.y=0;
 
 	while(true){
-	if (bob.x<goal.x){
-		bob.x++;
-		cout<<"move right/n";
-	} else if(bob.x>goal.x){
-		bob.x--;
-		cout<<"move left/n";
+		if (bob.x<goal.x){
+			bob.x++;
+			cout<<"move right/n";
+		} else if(bob.x>goal.x){
+			bob.x--;
+			cout<<"move left/n";
+		}
+		cout<<" hi world\n";
 	}
 }
