@@ -218,6 +218,25 @@ int findpoint(vector<list> v,point q){
 	assert(i<max);
 	return i;
 }
+string dir(point p, point q){
+	string s;
+
+	if(q.< p.x){
+		s = "Left";
+	}
+	else if(q.x > p.x){
+	
+		s = "Right";
+	}
+	else if(q.y < p.y){
+		s = "Up";
+
+	}	
+	else if(q.y > p.y){
+		s = "Down";
+	}
+	return s;
+}	
 int main(){
 	//declarations	
 	int lineofvector;
@@ -277,10 +296,12 @@ info.push_back(log); //Push the info to the vector of structures
 		path.push_back(info[lastline].pt);
 		lastline = findpoint(info,info[lastline].prev);
 	}
-	path.push_back(info[0].pt)
-;
+
+	path.push_back(info[0].pt);
+
 	for(int i = path.size() - 1; i >= 0;i--){
-		cout << path[i] << endl;
+		cout << path[i] << "and" << path[i-1]
+ << dir(path[i],path[i-1]) << endl;
 	}
 	
 }
