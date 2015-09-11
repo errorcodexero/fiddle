@@ -49,7 +49,8 @@ int main(){
 		cout<<" left window is closed, the shades are open, right window is closed.\n";
 	}
 	for(int i=0; i<5;i++){
-		cout<<"hi\n";
+		
+fcout<<"hi\n";
 	}
 	cout<<' ';
 	cout<<v[0].first;

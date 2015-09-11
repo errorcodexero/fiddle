@@ -10,7 +10,7 @@ struct point {
 };
 
 int main(){
-	vector<vector<int>> maze{
+	vector<vector<int> > maze{
 		{0,0,1,0},
 		{0,0,1,0},
 		{0,0,0,0}
@@ -22,12 +22,12 @@ int main(){
 	point goal;
 	goal.x=4;
 	goal.y=0;
-
+	
 	while(true){
-		if (bob.x<goal.x){
+		if(bob.x<goal.x){
 			bob.x++;
 			cout<<"move right/n";
-		} else if(bob.x>goal.x){
+		}else if(bob.x>goal.x){
 			bob.x--;
 			cout<<"move left/n";
 		}
