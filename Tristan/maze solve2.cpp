@@ -14,6 +14,7 @@
 
 using namespace std;
 /////////////////////////////////////////////////////////////////////////////
+
 // Structures
 //
 // All Structures
@@ -41,7 +42,7 @@ bool operator!=(point a,point b){
 ostream&operator<<(ostream& o, point a){
 	
 	o<< a.x << "," << a.y << endl;
-	
+
 	return o;
 }
 
@@ -123,6 +124,7 @@ bool validpoint(vector<list> v,point q){
 	return valid(q) && !p;
 }
 
+
 /////////////////////////////////////////////////////////////////////////////
 // [dir]p
 //
@@ -146,6 +148,7 @@ point downp(point p){
 /////////////////////////////////////////////////////////////////////////////
 // nextp
 //
+
 //returns next point that has not been visited
 ////////////////////////////////////////////////////////////////////////////
 int nextp(vector<list> v){
@@ -172,6 +175,7 @@ vector<point> getpoint(vector<list> v,point p){
 	point b;
 	point c;
 	point d;
+
 	vector<point> validpoints;
 	
 	a = leftp(p);
@@ -188,6 +192,7 @@ vector<point> getpoint(vector<list> v,point p){
 	}
 
 	if(validpoint(v,c)){
+
 		validpoints.push_back(c);		
 	}
 
@@ -212,12 +217,32 @@ int findpoint(vector<list> v,point q){
 
 	for (i=0; i<max; i++){
 		if( v[i].pt == q){
+
 			break;
 		}
 	}
 	assert(i<max);
 	return i;
 }
+string dir(point p, point q){
+	string s;
+
+	if(q.y < p.x){
+		s = "Up";
+	}
+	else if(q.x > p.x){
+	
+		s = "Right";
+	}
+	else if(q.y < p.y){
+		s = "Left";
+
+	}	
+	else if(q.y > p.y){
+		s = "Down";
+	}
+	return s;
+}	
 int main(){
 	//declarations	
 	int lineofvector;
@@ -230,8 +255,30 @@ int main(){
 	bool endpoint;
 	int lastline;
 	vector<point> path;
+	int px;
+	int py;
+	int ex;
+	int ey;
 
 endpoint = false;
+	/////////////////////////////////////////////////////////////////////////////
+	//get in
+	//
+	//request for ints and then input it into a string
+	////////////////////////////////////////////////////////////////////////////
+	cout << "Insert an int between 1 and 4 for the start postion ""x"" " << endl;
+	cin >> px;
+	cout << "Insert an int between 1 and 3 for the start postion ""y"" " << endl;
+	cin >> py;
+	cout << "Insert an int between 1 and 4 for the end postion ""x"" " << endl;
+	cin >> ex;
+	cout << "Insert an int between 1 and 3 for the end postion ""y"" " << endl;
+	cin >> ey;
+
+	cout << px << endl;
+	cout << py << endl;
+	cout << ex << endl;
+	cout << ey << endl;
 f.x = -1;//set
 f.y = -1;//inital location for previus
 
@@ -269,18 +316,19 @@ info.push_back(log); //Push the info to the vector of structures
 		info[lineofvector].v = true; // set the visited status to visited
 
 	}
-	
-	cout << "Path" << endl;
+
+	cout << "PATH:" << endl << endl;
 
 	lastline = findpoint(info,e);
 	while(lastline != 0){
 		path.push_back(info[lastline].pt);
 		lastline = findpoint(info,info[lastline].prev);
 	}
-	path.push_back(info[0].pt)
-;
-	for(int i = path.size() - 1; i >= 0;i--){
-		cout << path[i] << endl;
+
+	path.push_back(info[0].pt);
+
+	for(int i = path.size() - 1; i > 0;i--){
+		cout << dir(path[i],path[i-1]) << endl << endl;
 	}
 	
 }
