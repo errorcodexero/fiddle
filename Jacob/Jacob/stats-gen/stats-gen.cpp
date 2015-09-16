@@ -1,4 +1,6 @@
 #include<stdlib.h>
+
+#include<fstream>
 #include<iostream>
 
 using namespace std;
@@ -38,10 +40,29 @@ void findInfo(float x, int type){
 			cin>>x;
 			break;
 		default:
-			cout<<"Error: ln 32, Switch case failure!
-			exit(33);
+			cout<<"Error: ln 32, Switch case failure!";
+			exit(1);
 			break;
 	}
+}
+
+void readValues(float &tochange, int type){
+	string line;
+	int linei;
+	float linef;
+	ifstream myfile ("stats-gen-savefile.txt");
+	if(myfile.is_open()){
+		for(int i = 0; i < type; i++){
+					getline(myfile, line);
+		}
+		myfile.close();
+	} else {
+		cout<<"stats-gen-savefile.txt not open!";
+	}
+	
+	linei = atoi(line.c_str());
+	linef = (float)linei;
+	tochange = linef;
 }
 
 int main(){
@@ -57,69 +78,35 @@ int main(){
 	
 	int type; //used as second arg in findInfo()
 	
-/*
-float find_lengths_per_game(float robot_travel_speed, float field_length){
-	float answer;
-	
-	return answer;
-}
-
-int main(){
-	float robot_travel_speed;
-	float robot_rotation_speed;
-	float pickup_speed;
-	float pass_speed;
-	float reload_time;
-	float accuracy;
-	float field_length;
-	float field_width;
-	float total_game_time;
-	float auto_game_time;
-
-	string answer;
-	
-	field_length = 54;
-	field_width = 0;
-	//-----START-----
-	
-	system("clear");
-	cout<<"Current built-in settings: \n";
-	cout<<"   Field length (ft): "<<field_length;
-	cout<<"\n   Field width (ft): "<<field_width;
-	cout<<"\n\nDo you want to use built-in settings? (y/n): ";
-	cin>>answer;
-	cout<<"\n----------------------------------------------\n\n";
-	cout<<"Please fill in the following: \n\n";
-	
-	if(answer == "n"){
-		cout<<"\nField length (ft): ";
-		cin>>field_length;
-		cout<<"\nField width (ft): ";
-		cin>>field_width;
-		cout<<"\nTotal game time (sec. only): ";
-		cin>>total_game_time;
-		cout<<"\nAutonomus game time (sec. only): ;
-		cin>>
-	} else if(answer != "y"){
-		cout<<"\n\nError: 'y' or 'n' not selected.\n\n";
-		exit(1);
+	ifstream checkfile ("stats-gen-savefile.txt");
+	if(checkfile.is_open()){
+		for(type = 1; type < 8; type++){
+			readValues(robot_travel_speed, type);
+			readValues(robot_rotation_speed, type);
+			readValues(pickup_speed, type);
+			readValues(pass_speed, type);
+			readValues(reload_time, type);
+			readValues(accuracy, type);
+			readValues(field_length, type);
+			readValues(field_width, type);
+		}
+	} else {
+		cout<<"Error: savefile doesn't exist!";
+		cout<<"\n\nFixing: 
 	}
-	cout<<"\nTravel speed (ft/sec): ";
-	cin>>robot_travel_speed;
-	cout<<"\nRotation speed (rpm): ";
-	cin>>robot_rotation_speed;
-	cout<<"\nCollection speed (ground->robot): ";
-	cin>>pickup_speed;
-	cout<<"\nPass_speed (estimated ball transfer time): ";
-	cin>>pass_speed;
-	cout<<"\nReload_time (optional, collected->read to fire): ";
-	cin>>reload_time;
-	cout<<"\nAccuracy (%): ";
-	cin>>accuracy;
-
-	//find_lengths_per_game(robot_travel_speed, field_length);
-
-		
->>>>>>> 03baf4f24f248913cdf042eccbb80a14253d4828
-*/	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
