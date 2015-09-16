@@ -242,7 +242,12 @@ string dir(point p, point q){
 		s = "Down";
 	}
 	return s;
-}	
+}
+int  getnum(){
+	string s;
+	getline(cin,s);
+	return atoi(s.c_str());
+}
 int main(){
 	//declarations	
 	int lineofvector;
@@ -255,26 +260,54 @@ int main(){
 	bool endpoint;
 	int lastline;
 	vector<point> path;
-	int px;
-	int py;
-	int ex;
-	int ey;
+	string stringpx;
+	string stringpy;
+	string stringex;
+	string stringey;
+	int px = -15;
+	int py = -15;
+	int ex = -15;
+	int ey = -15;
+	int wtestx;
+	int wtesty;
+	int etestx;
+	int etesty;
+	bool validp = false;
+	bool valide = false;
+	
 
 endpoint = false;
 	/////////////////////////////////////////////////////////////////////////////
-	//get in
+	//getline
 	//
 	//request for ints and then input it into a string
 	////////////////////////////////////////////////////////////////////////////
 	cout << "Insert an int between 1 and 4 for the start postion ""x"" " << endl;
-	cin >> px;
+	wtestx = getnum();
 	cout << "Insert an int between 1 and 3 for the start postion ""y"" " << endl;
-	cin >> py;
+	wtesty = getnum();
+	while((wtestx == 3 && wtesty ==  1) || (wtestx == 3 && wtesty == 2)){
+		if ((wtestx == 3 && wtesty ==  1) || (wtestx == 3 && wtesty == 2)){
+			cout << "You Values are invalid please try agian" << endl;
+			cout << "Insert an int between 1 and 4 for the start postion ""x"" " << endl;
+			wtestx = getnum();
+			cout << "Insert an int between 1 and 3 for the start postion ""y"" " << endl;
+			wtesty = getnum();
+		}
+	}
 	cout << "Insert an int between 1 and 4 for the end postion ""x"" " << endl;
-	cin >> ex;
+	etestx = getnum();
 	cout << "Insert an int between 1 and 3 for the end postion ""y"" " << endl;
-	cin >> ey;
+	etesty = getnum();
 
+
+	//string to int conversions	
+	px = wtestx;
+	py = wtesty;
+	ex = etestx;
+	ey = etesty;
+	//printing out values before assigning them to points
+	cout << "getlined points:" << endl;
 	cout << px << endl;
 	cout << py << endl;
 	cout << ex << endl;
