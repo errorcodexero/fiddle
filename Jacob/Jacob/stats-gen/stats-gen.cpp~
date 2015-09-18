@@ -90,6 +90,9 @@ int main(){
 			readValues(field_length, type);
 			readValues(field_width, type);
 		}
+	} else {
+		cout<<"Error: savefile doesn't exist!";
+		cout<<"\n\nFixing: 
 	}
 	
 	
