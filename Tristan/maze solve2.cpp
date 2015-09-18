@@ -299,6 +299,15 @@ endpoint = false;
 	etestx = getnum();
 	cout << "Insert an int between 1 and 3 for the end postion ""y"" " << endl;
 	etesty = getnum();
+       while((etestx == 3 && etesty ==  1) || (etestx == 3 && etesty == 2)){
+		if ((etestx == 3 && etesty ==  1) || (etestx == 3 && etesty == 2)){
+			cout << "You Values are invalid please try agian" << endl;
+			cout << "Insert an int between 1 and 4 for the start postion ""x"" " << endl;
+			etestx = getnum();
+			cout << "Insert an int between 1 and 3 for the start postion ""y"" " << endl;
+			etesty = getnum();
+		}
+	}
 
 
 	//string to int conversions	
