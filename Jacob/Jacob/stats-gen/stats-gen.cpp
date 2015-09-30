@@ -1,9 +1,63 @@
 #include<stdlib.h>
-
 #include<fstream>
 #include<iostream>
 
 using namespace std;
+
+void userMenuString(int cpu_count){
+	//cpu_count is the requested terminal output
+	switch (cpu_count) {
+		case 0:
+			//Start menu
+			cout<< string(50, '\n');
+			cout<<"Menu:\n";
+			cout<<"1) Statistical analysis calculator\n";
+			//cout<<"2) Statistical team ranking\n;
+			//cout<<"3) Single team statistics\n";
+			//cout<<"4) Options\n";
+			cout<<"5) Exit\n";
+			break;
+		case 1:
+			//Statistical analysis calculator menu
+			cout<< string(50, '\n');
+			cout<<"Statistical analysis calculator:\n";
+			cout<<"1) Initiate\n";
+			cout<<"2) Return to menu\n";
+			break;
+		case 2:
+			//Statistical team ranking list
+			cout<< string(50, '\n');
+			cout<<"Statisitical team ranking:\n\n";
+			break;
+		case 3:
+			//Single team statistics
+			cout<< string(50, '\n');
+			cout<<"Single team statistics:\n";
+			cout<<"Enter nothing to return to menu\n"; 
+			cout<<"Enter team number: ";
+			break;
+		case 4:
+			//Options
+			cout<< string(50, '\n');
+			cout<<"Options:\n";
+			cout<<"1) Change field dimensions\n";
+			cout<<"2) Change team settings\n";
+			cout<<"3) Return to menu\n";
+			break;
+		case 5:
+			//Options->Change team settings
+			cout<< string(50, '\n');
+			cout<<"Change team settings:\n";
+			cout<<"Enter nothing to return to menu\n";
+			cout<<"Enter team number: \n";
+			break;
+		default:
+			cout<<"\n\nError: No output requested!";
+			cout<<"\nRequest number: "<<cpu_count;
+			exit(2);
+			break;
+	}
+}
 
 void findInfo(float x, int type){
 	switch (type) {
@@ -46,10 +100,55 @@ void findInfo(float x, int type){
 	}
 }
 
-float readSaveFile(int ){
+void userMenu(float& robot_travel_speed, float& robot_rotation_speed, float& pickup_speed, float& pass_speed, float& reload_time, float& accuracy, float& field_length, float& field_width, int& type, int& cpu_count){
+	
+	int input;
+	
+	Start:
+		userMenuString(0);
+		cout<<"\n>";
+		cin>>input;
+		switch (input) {
+			case 1:
+				goto SAC_menu; //Statistical Analysis Calculator
+				break;
+			/*case 2:
+				goto STR; //Statistical Team Ranking
+				break;
+			case 3:
+				goto STS; //Single team statistics
+				break;
+			case 4:
+				goto O_menu; //Options
+				break;*/
+			default:
+				exit(0);
+				break;
+		}
+
+	SAC_menu:
+		userMenuString(1);
+		cout<<"\n>";
+		cin>>input;
+		switch (input) {
+			case 1:
+				//SAC_calculator();
+				cout<<"Works\n\n";
+				exit(0);
+				break;
+			case 2:
+				goto Start;
+				break;
+			default:
+				exit(3);
+				break;
+		}		
+}
+
+/*float readSaveFile(int ){
 	ifstream savefile("stats-gen-savefile.txt");
 	
-}
+}*/
 
 int main(){
 	//Can be used as first arg in findInfo()
@@ -63,7 +162,46 @@ int main(){
 	float field_width = 0; //type 8  //?'
 	
 	int type; //used as second arg in findInfo()
+	int cpu_count = 0; //used to determine what to print to the console.
 	
+	userMenu(robot_travel_speed, robot_rotation_speed, pickup_speed, pass_speed, reload_time, accuracy, field_length, field_width, type, cpu_count);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/*
 	ifstream checkfile ("stats-gen-savefile.txt");
 	if(checkfile.is_open()){
 		for(type = 1; type < 8; type++){
@@ -78,9 +216,10 @@ int main(){
 		}
 	} else {
 		cout<<"Error: savefile doesn't exist!";
-		cout<<"\n\nFixing: 
+		cout<<"\nFixing...";
+
 	}
-	
+	*/
 	
 	
 	
