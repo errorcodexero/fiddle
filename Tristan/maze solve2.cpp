@@ -272,8 +272,6 @@ int main(){
 	int wtesty;
 	int etestx;
 	int etesty;
-	bool validp = false;
-	bool valide = false;
 	
 
 endpoint = false;
@@ -286,19 +284,31 @@ endpoint = false;
 	wtestx = getnum();
 	cout << "Insert an int between 1 and 3 for the start postion ""y"" " << endl;
 	wtesty = getnum();
-	while((wtestx == 3 && wtesty ==  1) || (wtestx == 3 && wtesty == 2)){
-		if ((wtestx == 3 && wtesty ==  1) || (wtestx == 3 && wtesty == 2)){
+
+	while((wtestx == 3 && wtesty ==  1) || (wtestx == 3 && wtesty == 2) || (wtestx < 1 && wtesty > 4) || (wtestx < 1 && wtesty > 3)) {
+
 			cout << "You Values are invalid please try agian" << endl;
 			cout << "Insert an int between 1 and 4 for the start postion ""x"" " << endl;
 			wtestx = getnum();
 			cout << "Insert an int between 1 and 3 for the start postion ""y"" " << endl;
 			wtesty = getnum();
-		}
+		
 	}
+
 	cout << "Insert an int between 1 and 4 for the end postion ""x"" " << endl;
 	etestx = getnum();
 	cout << "Insert an int between 1 and 3 for the end postion ""y"" " << endl;
 	etesty = getnum();
+
+       while((etestx == 3 && etesty ==  1) || (etestx == 3 && etesty == 2) || (etestx < 1 && etesty > 4) || (etestx < 1 && etesty > 3)){
+	
+			cout << "You Values are invalid please try agian" << endl;
+			cout << "Insert an int between 1 and 4 for the start postion ""x"" " << endl;
+			etestx = getnum();
+			cout << "Insert an int between 1 and 3 for the start postion ""y"" " << endl;
+			etesty = getnum();
+
+	}
 
 
 	//string to int conversions	
@@ -308,18 +318,17 @@ endpoint = false;
 	ey = etesty;
 	//printing out values before assigning them to points
 	cout << "getlined points:" << endl;
-	cout << px << endl;
-	cout << py << endl;
-	cout << ex << endl;
-	cout << ey << endl;
-f.x = -1;//set
-f.y = -1;//inital location for previus
+	cout << px << "," << py << endl;
+	cout << ex << "," << ey << endl;
+	
+f.x = px - 1;//set
+f.y = py - 1;//inital location for previus
 
-p.x = 1;//set
-p.y = 1;//location of start point
+p.x = px;//set
+p.y = py;//location of start point
 
-e.x = 4;//set
-e.y = 1;//location of en/d point
+e.x = ex;//set
+e.y = ey;//location of en/d point
 
 log.prev = f; //sets a prev point 
 log.pt = p; //set the original point
@@ -340,9 +349,11 @@ info.push_back(log); //Push the info to the vector of structures
 			log.prev = p; //store prev point
 			log.v = false; //set the visisted to not visited
 			log.pt = nextpoint[i]; // the point that you are storing
+			
 			if(log.pt == e){
 				endpoint = true;
 			}
+
 			info.push_back(log); // store all the stored point
 		}
 	
@@ -353,9 +364,12 @@ info.push_back(log); //Push the info to the vector of structures
 	cout << "PATH:" << endl << endl;
 
 	lastline = findpoint(info,e);
+	cout << lastline << "first" << endl;
 	while(lastline != 0){
+		cout << info[lastline].prev << endl;
 		path.push_back(info[lastline].pt);
 		lastline = findpoint(info,info[lastline].prev);
+		cout << lastline << endl;
 	}
 
 	path.push_back(info[0].pt);

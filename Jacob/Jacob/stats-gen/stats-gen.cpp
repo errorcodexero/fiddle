@@ -46,23 +46,9 @@ void findInfo(float x, int type){
 	}
 }
 
-void readValues(float &tochange, int type){
-	string line;
-	int linei;
-	float linef;
-	ifstream myfile ("stats-gen-savefile.txt");
-	if(myfile.is_open()){
-		for(int i = 0; i < type; i++){
-					getline(myfile, line);
-		}
-		myfile.close();
-	} else {
-		cout<<"stats-gen-savefile.txt not open!";
-	}
+float readSaveFile(int ){
+	ifstream savefile("stats-gen-savefile.txt");
 	
-	linei = atoi(line.c_str());
-	linef = (float)linei;
-	tochange = linef;
 }
 
 int main(){
@@ -81,14 +67,14 @@ int main(){
 	ifstream checkfile ("stats-gen-savefile.txt");
 	if(checkfile.is_open()){
 		for(type = 1; type < 8; type++){
-			readValues(robot_travel_speed, type);
-			readValues(robot_rotation_speed, type);
-			readValues(pickup_speed, type);
-			readValues(pass_speed, type);
-			readValues(reload_time, type);
-			readValues(accuracy, type);
-			readValues(field_length, type);
-			readValues(field_width, type);
+			robot_travel_speed = changeValuesFromSaveFile(type);
+			robot_rotation_speed = changeValuesFromSaveFile(type);
+			pickup_speed = changeValuesFromSaveFile(type);
+			pass_speed = changeValuesFromSaveFile(type);
+			reload_time = changeValuesFromSaveFile(type);
+			accuracy = changeValuesFromSaveFile(type);
+			field_length = changeValuesFromSaveFile(type);
+			field_width = changeValuesFromSaveFile(type);
 		}
 	} else {
 		cout<<"Error: savefile doesn't exist!";
