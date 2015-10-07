@@ -133,7 +133,7 @@ void userMenu(float& robot_travel_speed, float& robot_rotation_speed, float& pic
 		switch (input) {
 			case 1:
 				//SAC_calculator();
-				cout<<"Works";
+				cout<<"Works\n\n";
 				exit(0);
 				break;
 			case 2:

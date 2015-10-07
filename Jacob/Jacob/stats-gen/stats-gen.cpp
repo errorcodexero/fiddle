@@ -100,7 +100,13 @@ void findInfo(float x, int type){
 	}
 }
 
-void userMenu(float& robot_travel_speed, float& robot_rotation_speed, float& pickup_speed, float& pass_speed, float& reload_time, float& accuracy, float& field_length, float& field_width, int& type, int& cpu_count){
+void statisticalCalculator(float& robot_travel_speed, float& robot_rotation_speed, float& pickup_speed, float& pass_speed, float& reload_time, float& accuracy, float& field_length, float& field_width, int& type, int& cpu_count){
+	
+	
+}
+
+
+void userMenu(){
 	
 	int input;
 	
@@ -119,7 +125,7 @@ void userMenu(float& robot_travel_speed, float& robot_rotation_speed, float& pic
 				goto STS; //Single team statistics
 				break;
 			case 4:
-				goto O_menu; //Options
+				goto OPT; //Options
 				break;*/
 			default:
 				exit(0);
@@ -142,7 +148,16 @@ void userMenu(float& robot_travel_speed, float& robot_rotation_speed, float& pic
 			default:
 				exit(3);
 				break;
-		}		
+		}
+
+	STR:
+		userMenuString(2);
+		cout<<"\n";
+		cout<<"Works";
+		exit(0);
+
+//	STS:
+//		userMenuString(3);
 }
 
 /*float readSaveFile(int ){
