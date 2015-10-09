@@ -23,7 +23,11 @@ struct point{
 	int x;
 	int y;
 };
-
+struct mapstruct{
+int width;
+int length;
+bool walls[6][4];
+};
 struct list{
 point pt;
 point prev;
@@ -32,7 +36,7 @@ bool v;
 //////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////
-// operatior point
+// operatior
 //
 // allow the use of diffrent things with the structure point
 /////////////////////////////////////////////////////////////////////////////
@@ -75,9 +79,9 @@ bool lastpointvalid(point p,vector<point> lp)
 //
 // returns true if p is in the grid
 /////////////////////////////////////////////////////////////////////////////
-bool bounderies(point p){
-	bool xvalid = p.x>=1 && p.x<=4;
-	bool yvalid = p.y>=1 && p.y<=3;
+bool bounderies(point p,mapstruct map){
+	bool xvalid = p.x>=0 && p.x< map.width;
+	bool yvalid = p.y>=0 && p.y< map.length;
 
 	return xvalid && yvalid;
 }
@@ -87,9 +91,9 @@ bool bounderies(point p){
 //
 // returns true if p is not a wall
 //////////////////////////////////////////////////////////////////////////////
-bool Walls(point p){
+bool Walls(point p,mapstruct map){
 
-	return !((p.y==1 && p.x==3) || (p.y==2 && p.x==3));
+	return map.walls[p.x][p.y];	
 
 }
 
@@ -98,8 +102,8 @@ bool Walls(point p){
 //																		   
 // returns true if p is not a wall or boundry                              
 /////////////////////////////////////////////////////////////////////////////
-bool valid(point p){
-	return (Walls(p) && bounderies(p));
+bool valid(point p,mapstruct map){
+	return (Walls(p,map) && bounderies(p,map));
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -107,7 +111,7 @@ bool valid(point p){
 //
 // returns true if the given point is not a wall or boundry and has not been visited
 /////////////////////////////////////////////////////////////////////////////
-bool validpoint(vector<list> v,point q){
+bool validpoint(vector<list> v,point q,mapstruct map){
 	int i;
 	int max;
 	bool p ;
@@ -121,7 +125,7 @@ bool validpoint(vector<list> v,point q){
 		}
 		
 	}
-	return valid(q) && !p;
+	return valid(q,map) && !p;
 }
 
 
@@ -170,7 +174,7 @@ int nextp(vector<list> v){
 //
 // given a point will return a vector of points that are valid
 /////////////////////////////////////////////////////////////////////////////
-vector<point> getpoint(vector<list> v,point p){
+vector<point> getpoint(vector<list> v,point p,mapstruct map){
 	point a;
 	point b;
 	point c;
@@ -183,20 +187,20 @@ vector<point> getpoint(vector<list> v,point p){
 	c = upp(p);
 	d = downp(p);
 
-	if(validpoint(v,a)){
+	if(validpoint(v,a,map)){
 		validpoints.push_back(a);		
 	}
 
-	if(validpoint(v,b)){
+	if(validpoint(v,b,map)){
 		validpoints.push_back(b);		
 	}
 
-	if(validpoint(v,c)){
+	if(validpoint(v,c,map)){
 
 		validpoints.push_back(c);		
 	}
 
-	if(validpoint(v,d)){
+	if(validpoint(v,d,map)){
 		validpoints.push_back(d);		
 	}
 	
@@ -227,15 +231,16 @@ int findpoint(vector<list> v,point q){
 string dir(point p, point q){
 	string s;
 
-	if(q.y < p.x){
-		s = "Up";
+	if(q.x < p.x){
+	
+		s = "Left";
 	}
 	else if(q.x > p.x){
 	
 		s = "Right";
 	}
 	else if(q.y < p.y){
-		s = "Left";
+		s = "Up";
 
 	}	
 	else if(q.y > p.y){
@@ -248,6 +253,23 @@ int  getnum(){
 	getline(cin,s);
 	return atoi(s.c_str());
 }
+void loadmap(mapstruct & a){
+	a.width = 6;
+	a.length = 4;
+
+	for(int i=0; i < a.length; i++)
+		for(int j=0; j < a.width; j++)
+			a.walls[i][j] = false;
+
+	a.walls[2][0] = true;
+	a.walls[2][1] = true;
+	a.walls[2][2] = true;
+	a.walls[4][0] = true;
+	a.walls[4][1] = true;
+	
+}
+
+
 int main(){
 	//declarations	
 	int lineofvector;
@@ -272,7 +294,9 @@ int main(){
 	int wtesty;
 	int etestx;
 	int etesty;
+	mapstruct map;
 	
+	loadmap(map);
 
 endpoint = false;
 	/////////////////////////////////////////////////////////////////////////////
@@ -285,7 +309,7 @@ endpoint = false;
 	cout << "Insert an int between 1 and 3 for the start postion ""y"" " << endl;
 	wtesty = getnum();
 
-	while((wtestx == 3 && wtesty ==  1) || (wtestx == 3 && wtesty == 2) || (wtestx < 1 && wtesty > 4) || (wtestx < 1 && wtesty > 3)) {
+	while((map.walls[wtestx][wtesty]) || (wtestx < 0 && wtestx >= map.width) || (wtesty < 0 && wtesty >= map.length)) {
 
 			cout << "You Values are invalid please try agian" << endl;
 			cout << "Insert an int between 1 and 4 for the start postion ""x"" " << endl;
@@ -300,7 +324,7 @@ endpoint = false;
 	cout << "Insert an int between 1 and 3 for the end postion ""y"" " << endl;
 	etesty = getnum();
 
-       while((etestx == 3 && etesty ==  1) || (etestx == 3 && etesty == 2) || (etestx < 1 && etesty > 4) || (etestx < 1 && etesty > 3)){
+       while((map.walls[etestx][etesty]) || (etestx < 0 && etestx >= map.width) || (etesty < 0 && etesty >= map.length)){
 	
 			cout << "You Values are invalid please try agian" << endl;
 			cout << "Insert an int between 1 and 4 for the start postion ""x"" " << endl;
@@ -341,8 +365,7 @@ info.push_back(log); //Push the info to the vector of structures
 
 		p = info[lineofvector].pt;//save that loacation that you want to go to going to
 
-
-		nextpoint = getpoint(info,p); // set a vector to have all posable points that are legal
+		nextpoint = getpoint(info,p,map); // set a vector to have all posable points that are legal
 		
 		
 		for (unsigned int i = 0; i < nextpoint.size(); i++){//loop tell for the size of the vector nextpoint
@@ -356,6 +379,7 @@ info.push_back(log); //Push the info to the vector of structures
 
 			info.push_back(log); // store all the stored point
 		}
+		
 	
 		info[lineofvector].v = true; // set the visited status to visited
 
@@ -364,17 +388,18 @@ info.push_back(log); //Push the info to the vector of structures
 	cout << "PATH:" << endl << endl;
 
 	lastline = findpoint(info,e);
-	cout << lastline << "first" << endl;
+	cout << lastline << "last line" << endl;
 	while(lastline != 0){
 		cout << info[lastline].prev << endl;
 		path.push_back(info[lastline].pt);
 		lastline = findpoint(info,info[lastline].prev);
-		cout << lastline << endl;
+		cout << lastline << "saved vector" << endl;
 	}
 
 	path.push_back(info[0].pt);
 
 	for(int i = path.size() - 1; i > 0;i--){
+		
 		cout << dir(path[i],path[i-1]) << endl << endl;
 	}
 	
