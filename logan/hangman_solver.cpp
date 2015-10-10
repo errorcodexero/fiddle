@@ -1,4 +1,4 @@
-/*
+/*Author: Logan Traffas
 TODO:
 	Must do:
 	-If letter frequency is equal, then chose from the master list. (in function order_same_frequency)
@@ -282,7 +282,7 @@ void if_correct_guess(string& word, vector<char>& correct_letters, char& letter_
 	letter_place=atoi(temp);
 	if(word[letter_place-1]=='_')word[letter_place-1]=letter_guess;
 	else{
-		cout<<"\nThere is already a letter there, the letter \""<<word[letter_place-1]<<".\" Are you sure you mean to replace it?(y/n)";
+		cout<<"\nThere is already a letter there, the letter \""<<word[letter_place-1]<<"\". Are you sure you mean to replace it?(y/n)";
 		cin>>yn;
 		nyi;
 		if(yn=='y')correct_misplaced();
@@ -335,7 +335,7 @@ int main(){
 	cout<<"Use smart guess?(y/n) ";
 	cin>>yn;
 	bool smart_guess=0;
-	smart_guess=yn=='y';
+	smart_guess=tolower(yn)=='y';
 	vector<char> correct_letters, incorrect_letters, letter_frequency;
 	letter_frequency={'e', 't', 'a', 'o', 'i', 'n', 's', 'h', 'r', 'd', 'l', 'c', 'u', 'm', 'w', 'f', 'g', 'y', 'p', 'b', 'v', 'k', 'j', 'x', 'q', 'z'};
 	for(unsigned int i=0; i<26; i++){
@@ -346,7 +346,7 @@ int main(){
 		cout<<"Known: "<<print_word(word)<<". Does it have the letter \'"<<letter_guess<<"\'?(y/n) ";
 		cin>>yn;
 		bool finish=0;
-		process_guess_result(word, letter_guess, yn=='y', finish, correct_letters, incorrect_letters);
+		process_guess_result(word, letter_guess, tolower(yn)=='y', finish, correct_letters, incorrect_letters);
 		if(finish)break;
 	}
 	return 0;

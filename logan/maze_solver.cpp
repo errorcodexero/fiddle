@@ -1,7 +1,7 @@
 /*Author: Logan Traffas
 TODO:
-	- Consider changing how the path is printed out (as instructions in a vector)
 	- Bug checking
+	- Speed up maze generation
 */
 #include <iostream>
 #include <string>
@@ -100,7 +100,7 @@ void add_border(Maze& a){//Adds a border to a given maze
 	}
 }
 
-vector<vector<char>> print_maze(Maze a, vector<Move> path=vector<Move>{},bool add_boundary=1){//Makes a maze print-out in a way humans would appreciate
+vector<vector<char>> print_maze(Maze a, vector<Move> path=vector<Move>{},bool add_boundary=1,bool print_line=0){//Makes a maze print-out in a way humans would appreciate
 	if(add_boundary)add_border(a);
 	vector<vector<char>> maze;
 	for(int j=0; j<a.y_lim; j++){
@@ -134,6 +134,24 @@ vector<vector<char>> print_maze(Maze a, vector<Move> path=vector<Move>{},bool ad
 	}
 	maze[a.y_lim-a.solver.loc.second-1][a.solver.loc.first]='S';//Draw solver
 	maze[a.y_lim-a.target.second-1][a.target.first]='T';//Draw target
+	if(print_line){
+		vector<vector<char>> temp;
+		for(int j=0; j<a.y_lim; j++){
+			temp.push_back(vector<char>{});
+			if(j==a.y_lim-a.solver.loc.second-1 || j==a.y_lim-a.target.second-1)temp[j].push_back('>');
+			else temp[j].push_back(' ');
+			for(int i=0; i<a.x_lim+1; i++){
+				temp[j].push_back(maze[j][i-1]);
+			}
+		}
+		temp.push_back(vector<char>{});
+		for(int i=0; i<a.y_lim; i++){
+			if(i==a.solver.loc.first+1)temp.back().push_back('^');
+			else if(i==a.target.first+1)temp.back().push_back('^');
+			else temp.back().push_back(' ');
+		}
+		maze=temp;
+	}
 	return maze;
 }
 
@@ -141,33 +159,44 @@ int get_random(const unsigned int max){//Returns a random integer less than the 
 	return (max>0)?(rand()%max):0;
 }
 
-bool check_if_visitable(const Maze a, const Location l, const vector<Location> visited){//Checks to see if a wall occupies a location
+bool check_if_visitable(const Maze a,const Location l,const vector<Location> visited={{}},bool back=0){//Checks to see if a wall occupies a location
 	for(unsigned int i=0; i<a.blocks.size(); i++){
 		if(l==a.blocks[i])return 0;
 	}
+	if(back)return 1;
 	for(unsigned int i=0; i<visited.size(); i++){
 		if(l==visited[i])return 0;
 	}
 	return 1;
 }
 
-Maze update(const Move a, Maze m, const vector<Location> visited={{}}){//Updates a maze given a move
-	int first=m.solver.loc.first, second=m.solver.loc.second;
+vector<Move> get_possible_moves(const Maze a,const vector<Location> visited={{}}){//Returns possible moves
+	int first=a.solver.loc.first,second=a.solver.loc.second;
+	vector<Move> possible_moves;
+	if(first>0 && check_if_visitable(a,Location{first-1,second},visited)) possible_moves.push_back(Move::LEFT);
+	if(first+1<a.x_lim && check_if_visitable(a,Location{first+1,second},visited)) possible_moves.push_back(Move::RIGHT);
+	if(second>0 && check_if_visitable(a,Location{first,second-1},visited)) possible_moves.push_back(Move::BACKWARD);
+	if(second+1<a.y_lim && check_if_visitable(a,Location{first,second+1},visited)) possible_moves.push_back(Move::FORWARD);
+	return possible_moves;
+}
+
+Maze update(const Move a,Maze m,const vector<Location> visited={{}},bool back=0){//Updates a maze given a move
+	int first=m.solver.loc.first,second=m.solver.loc.second;
 	switch(a){
 		case Move::LEFT:
-			assert(first>0 && check_if_visitable(m, Location{first-1,second},visited));
+			assert(first>0 && check_if_visitable(m,Location{first-1,second},visited,back));
 			m.solver.loc.first--;
 			break;
 		case Move::RIGHT:
-			assert(first+1<m.x_lim && check_if_visitable(m, Location{first+1,second},visited));
+			assert(first+1<m.x_lim && check_if_visitable(m,Location{first+1,second},visited,back));
 			m.solver.loc.first++;
 			break;
 		case Move::BACKWARD:
-			assert(second>0 && check_if_visitable(m, Location{first,second-1},visited));
+			assert(second>0 && check_if_visitable(m,Location{first,second-1},visited,back));
 			m.solver.loc.second--;
 			break;
 		case Move::FORWARD:
-			assert(second+1<m.y_lim && check_if_visitable(m, Location{first,second+1},visited));
+			assert(second+1<m.y_lim && check_if_visitable(m,Location{first,second+1},visited,back));
 			m.solver.loc.second++;
 			break;
 		default:
@@ -177,15 +206,6 @@ Maze update(const Move a, Maze m, const vector<Location> visited={{}}){//Updates
 	return m;
 }
 
-vector<Move> get_possible_moves(const Maze a, const vector<Location> visited){//Returns possible moves
-	int first=a.solver.loc.first, second=a.solver.loc.second;
-	vector<Move> possible_moves;
-	if(first>0 && check_if_visitable(a, Location{first-1,second},visited)) possible_moves.push_back(Move::LEFT);
-	if(first+1<a.x_lim && check_if_visitable(a, Location{first+1,second},visited)) possible_moves.push_back(Move::RIGHT);
-	if(second>0 && check_if_visitable(a, Location{first,second-1},visited)) possible_moves.push_back(Move::BACKWARD);
-	if(second+1<a.y_lim && check_if_visitable(a, Location{first,second+1},visited)) possible_moves.push_back(Move::FORWARD);
-	return possible_moves;
-}
 
 Move opposite_move(const Move a){//Returns a move that moves the solver in the opposite direction
 	if(a==Move::FORWARD)return Move{Move::BACKWARD};
@@ -195,42 +215,50 @@ Move opposite_move(const Move a){//Returns a move that moves the solver in the o
 	assert(0);
 }
 
-vector<Move> solver(Maze& a,bool& found,vector<Move>& path,vector<Location>& visited,bool& again, int counter=0){//generates the walls for a maze
-	counter++;
-	if(counter>=3000){
-		again=1;
-		return path;
+unsigned int weight(const Maze a,vector<Move> possible_moves,vector<Location> visited){
+	unsigned int priority=0; 
+	Maze m=a;
+	for(unsigned int i=0; i<possible_moves.size(); i++){
+		Maze b=a;
+		b=update(possible_moves[i],b,visited);
+		double test=sqrt(pow((b.solver.loc.first-a.target.first),2)+pow((b.solver.loc.second-a.target.second),2)),compare=sqrt(pow((a.solver.loc.first-a.target.first),2)+pow((a.solver.loc.second-a.target.second),2));
+		if(test<compare){
+			priority=i;	
+			m=b;
+		}
 	}
-	if(found)return path;
+	return priority;
+}
+
+vector<Move> solver(Maze& a,bool& found,vector<Move>& path,vector<Location>& visited,int counter=0){//generates the walls for a maze
+	counter++;
+	if(counter>=3000)return path;
 	vector<Move> possible_moves=get_possible_moves(a,visited);
 	if(possible_moves.size()>0){
-		path.push_back(possible_moves[get_random(possible_moves.size())]);
+		path.push_back(possible_moves[weight(a,possible_moves,visited)]);//get_random(possible_moves.size())]);
 		a=update(path.back(),a,visited);
 		visited.push_back(a.solver.loc);
 	}
 	else{
-		a=update(opposite_move(path.back()),a,{});
+		a=update(opposite_move(path.back()),a,{{}},1);
 		if(path.size()>0)path.pop_back();
 	}
 	found=a.solver.fin;
-	if(found){
-		again=0;
-		return path;
-	}
-	path=solver(a,found,path,visited,again,counter);
+	if(found)return path;
+	path=solver(a,found,path,visited,counter);
 	return path;
 }
 
-vector<Move> get_path(Maze a, unsigned int max_path=45){//Tries to get a path of the shortest length
+vector<Move> get_path(Maze a){//Tries to get a path of the shortest length
 	if(a.solver.loc==a.target)return vector<Move>{};
-	bool found=0,again=1;
+	bool found=0;
 	vector<Move> path;
 	vector<Location> visited={a.solver.loc};
-	while(again){
-		path=solver(a,found,path,visited,again); 
+	while(!found){
+		path=solver(a,found,path,visited); 
 	}
 	if(found)return path;
-	cout<<"\nWarning: Path length exceeds "<<max_path-1<<": This calculation could take a lot of time to complete or an error may have occurred: line:"<<__LINE__<<"\n";
+	cout<<"\nAn error may have occurred: line:"<<__LINE__<<"\n";
 	exit(44); 
 }
 
@@ -270,7 +298,7 @@ Maze import_maze(const string filename="maze.txt"){//Imports a maze from maze.tx
 		}
 	}
 	maze.close();
-	cout<<"The imported maze is:\n"<<print_maze(a)<<"\n";
+	cout<<"The imported maze is:\nStart: "<<a.solver.loc<<"   Target: "<<a.target<<"\n"<<print_maze(a,{},1,1)<<"\n";
 	return a;
 }
 
@@ -281,7 +309,7 @@ struct Args_return{//A type used to store arguments
 	Args_return():import(0),change_max(0),import_other(0),export_maze(0),x_lim(10),y_lim(10),import_filename("maze.txt"),export_filename("maze.txt"){}
 };
 
-void check_all_args(string arg_str,Args_return& args,char *arg[], bool& valid){//Uses passed into arguments to set the necessary settings
+void check_all_args(string arg_str,Args_return& args,char *arg[],bool& valid){//Uses passed into arguments to set the necessary settings
 	valid=1;
 	string import_cmp="--import",usage_cmp="--usage",max_path_cmp="--set-max-path-to=",gen_cmp="--generate",export_maze="--export";
 	if(arg_str.substr(0,8)==import_cmp){
@@ -332,11 +360,11 @@ Args_return use_args(const int x,char *arg[]){//Determines what arguments to use
 	return args;
 }
 
-bool check_for_adjacent_wall(const vector<Location> visited, const vector<Location> stack, const Location test){//Checks a location to see if there are any walls in adjacent locations 
+bool check_for_adjacent_wall(const vector<Location> visited,const vector<Location> stack,const Location test){//Checks a location to see if there are any walls in adjacent locations 
 	if(test==stack.back())return 0;
 	for(unsigned int i=0; i<visited.size(); i++){
-		int first=test.first, second=test.second;
-		bool right=(stack.back()!=Location{first+1,second}), left=(stack.back()!=Location{first-1,second}),forward=(stack.back()!=Location{first,second+1}),backward=(stack.back()!=Location{first,second-1});
+		int first=test.first,second=test.second;
+		bool right=(stack.back()!=Location{first+1,second}),left=(stack.back()!=Location{first-1,second}),forward=(stack.back()!=Location{first,second+1}),backward=(stack.back()!=Location{first,second-1});
 		if( test==visited[i] ||
 			right*(visited[i]==Location{first+1,second}) ||
 			left*(visited[i]==Location{first-1,second}) ||
@@ -350,19 +378,19 @@ bool check_for_adjacent_wall(const vector<Location> visited, const vector<Locati
 Location update_location(Location a,const Move b,const vector<Location> visited,const vector<Location> stack,const int first,const int second,const int Y_LIM,const int X_LIM){//Updates a location (used in wall generation)
 	switch(b){
 		case Move::FORWARD:
-			assert(second+1<Y_LIM && check_for_adjacent_wall(visited, stack, Location{first,second+1}));
+			assert(second+1<Y_LIM && check_for_adjacent_wall(visited,stack,Location{first,second+1}));
 			a.second++;
 			break;
 		case Move::BACKWARD:
-			assert(second>0 && check_for_adjacent_wall(visited, stack, Location{first,second-1}));
+			assert(second>0 && check_for_adjacent_wall(visited,stack,Location{first,second-1}));
 			a.second--;
 			break;
 		case Move::RIGHT:
-			assert(first+1<X_LIM && check_for_adjacent_wall(visited, stack, Location{first+1,second}));
+			assert(first+1<X_LIM && check_for_adjacent_wall(visited,stack,Location{first+1,second}));
 			a.first++;
 			break;
 		case Move::LEFT:
-			assert(first>0 && check_for_adjacent_wall(visited, stack, Location{first-1,second}));
+			assert(first>0 && check_for_adjacent_wall(visited,stack,Location{first-1,second}));
 			a.first--;
 			break;
 		default:
@@ -371,7 +399,7 @@ Location update_location(Location a,const Move b,const vector<Location> visited,
 	return a;
 }
 
-vector<Location> invert_blocks(vector<Location> v, const int X_LIM, const int Y_LIM){//Inverts a vector of Locations to contain the opposite Locations within x/y boundaries
+vector<Location> invert_blocks(vector<Location> v,const int X_LIM,const int Y_LIM){//Inverts a vector of Locations to contain the opposite Locations within x/y boundaries
 	vector<Location> full;
 	for(int i=0; i<X_LIM; i++){
 		for(int j=0; j<Y_LIM; j++){
@@ -391,38 +419,30 @@ vector<Location> invert_blocks(vector<Location> v, const int X_LIM, const int Y_
 	return v;
 }
 
-vector<Location> wall_generator(const int X_LIM,const int Y_LIM,bool& found,bool& again,vector<Location>& stack,vector<Location> visited={{0,0}},int counter=0){//generates the walls for a maze
+vector<Location> wall_generator(const int X_LIM,const int Y_LIM,bool& found,vector<Location>& stack,vector<Location> visited={{0,0}},int counter=0){//generates the walls for a maze
 	counter++;
-	//cout<<counter<<"\n";
-	if(counter>=3000){
-		again=1;
-		return visited;
-	}
-	//cout<<"\nREACHED LINE: "<<__LINE__<<"\n";
+	if(counter>=3000)return visited;
 	vector<Move> possible_moves;
-	int first=stack.back().first, second=stack.back().second;
-	if(first>0 && check_for_adjacent_wall(visited, stack, Location{first-1,second})) possible_moves.push_back(Move::LEFT);
-	if(first+1<X_LIM && check_for_adjacent_wall(visited, stack, Location{first+1,second})) possible_moves.push_back(Move::RIGHT);
-	if(second>0 && check_for_adjacent_wall(visited, stack, Location{first,second-1})) possible_moves.push_back(Move::BACKWARD);
-	if(second+1<Y_LIM && check_for_adjacent_wall(visited, stack, Location{first,second+1})) possible_moves.push_back(Move::FORWARD);
+	int first=stack.back().first,second=stack.back().second;
+	if(first>0 && check_for_adjacent_wall(visited,stack,Location{first-1,second}))possible_moves.push_back(Move::LEFT);
+	if(first+1<X_LIM && check_for_adjacent_wall(visited,stack,Location{first+1,second}))possible_moves.push_back(Move::RIGHT);
+	if(second>0 && check_for_adjacent_wall(visited,stack,Location{first,second-1}))possible_moves.push_back(Move::BACKWARD);
+	if(second+1<Y_LIM && check_for_adjacent_wall(visited,stack,Location{first,second+1}))possible_moves.push_back(Move::FORWARD);
 	if(possible_moves.size()>0){
 		stack.push_back(update_location(stack.back(),possible_moves[get_random(possible_moves.size())],visited,stack,first,second,Y_LIM,X_LIM));
 		visited.push_back(stack.back());
 	}
 	else stack.pop_back();
-	found=(stack.size()==0 && visited.size()>0);
-	if(found){
-		again=0;
-		return visited;
-	}
-	visited=wall_generator(X_LIM,Y_LIM,found,again,stack,visited,counter);
+	found=stack.size()==0;
+	if(found)return visited;
+	visited=wall_generator(X_LIM,Y_LIM,found,stack,visited,counter);
 	return visited;
 }
 
 void estimator(const int A){//Estimates maze generation time based on an area
-	double a=(4.3161773*pow(10,-7)),b=(2.5209481*pow(10,-5)),c=(.0107013401);//,d=();
-	int t=nearbyint(a*pow(A,2)+b*A+c);
-	if(t>=10) cout<<"Warning: Estimated generation-time is "<<t<<" seconds (Varies depending on processing power): (Press CTRL+C to abort): Increased generation-time implies increased solving-time\n";	
+	double a=(4.1459087*pow(10,-7)),b=(3.6702795*pow(10,-5)),c=(0.819670217);
+	double t=a*pow(A,2)+b*A+c;//nearbyint()
+	if(t>=5) cout<<"Warning: Estimated generation-time is "<<t<<" seconds (Varies depending on processing power): (Press CTRL+C to abort): Increased generation-time implies increased solving-time: line: "<<__LINE__<<"\n";	
 }
 
 Maze maze_gen(const int X_LIM=10,const int Y_LIM=10){//Generates a random maze
@@ -430,53 +450,31 @@ Maze maze_gen(const int X_LIM=10,const int Y_LIM=10){//Generates a random maze
 	Maze a;
 	a.x_lim=X_LIM;
 	a.y_lim=Y_LIM;
-	bool found=0,again=1;
+	bool found=0;
 	srand(time(NULL));
-	vector<Location> stack={{0,0}};
-	vector<Location> walls;
-	while(again){
-		walls=wall_generator(a.x_lim,a.y_lim,found,again,stack,walls);
-	}
-	a.blocks=invert_blocks(walls,a.x_lim,a.y_lim);
-	if(!found){
-		cout<<"Error: Wall generation failed: line: "<<__LINE__<<"\n";
-		exit(44);
-	}
-	vector<Location> possible_locs;
-	for(int i=0; i<X_LIM; i++){
-		for(int j=0; j<Y_LIM; j++){
-			possible_locs.push_back(Location{i,j});
-		}
-	}
-	vector<int> to_remove;
-	for(unsigned int j=0; j<possible_locs.size(); j++){
-		for(unsigned int i=0; i<a.blocks.size(); i++){
-			if(possible_locs[j]==a.blocks[i])to_remove.push_back(j);
-		}
-	}
-	for(unsigned int i=to_remove.size(); i>0; i--){
-		possible_locs.erase(possible_locs.begin()+to_remove[i-1]);
-	}
-	if(possible_locs.size()<2){
+	vector<Location> stack={{0,0}},open;
+	while(!found)open=wall_generator(a.x_lim,a.y_lim,found,stack,open);
+	if(open.size()<2){
 		cout<<"Error: Not enough locations for the start and target to be set: line: "<<__LINE__<<"\n";
 		exit(44);
 	}
-	int random=get_random(possible_locs.size());
-	a.target=possible_locs[random];
-	possible_locs.erase(possible_locs.begin()+random);
-	a.solver.loc=possible_locs[get_random(possible_locs.size())];
-	cout<<"The generated maze is:\n"<<print_maze(a)<<"\n";
+	a.blocks=invert_blocks(open,a.x_lim,a.y_lim);
+	int random=get_random(open.size());
+	a.target=open[random];
+	open.erase(open.begin()+random);
+	a.solver.loc=open[get_random(open.size())];
+	cout<<"The generated maze is:\nStart: "<<a.solver.loc<<"   Target: "<<a.target<<"\n"<<print_maze(a,{},1,1)<<"\n";
 	return a;
 }
 
 void export_maze(const Maze a, const string filename){//Exports maze unsed in program to a text file
 	cout<<"File \""<<filename<<"\" will be overwritten. Are you sure you want to export the generated maze?(y/n) ";
 	char yn;
-	cin.get(yn);
+	cin>>yn;
 	if(tolower(yn)!='y')exit(44);
 	ofstream export_maze;
 	export_maze.open(filename);	
-	vector<vector<char>> maze=print_maze(a,{},0);
+	vector<vector<char>> maze=print_maze(a,{},0,0);
 	for(unsigned int i=0; i<maze.size(); i++){
 		for(unsigned int j=0; j<maze[i].size(); j++){
 			export_maze<<maze[i][j];
@@ -494,7 +492,13 @@ int main(int x,char *arg[]){
 	if(!args.import) maze=maze_gen(args.x_lim,args.y_lim);
 	else maze=args.import_other?import_maze(args.import_filename):import_maze();	
 	vector<Move> path=get_path(maze);
-	cout<<"The solution is:\n"<<print_maze(maze,path)<<"\nThe path used is:\n"<<path<<"\n\n";
+	cout<<"The solution is:\n"<<print_maze(maze,path,1,1);
+	char yn=path.size()>200?'n':'y';
+	if(yn!='y'){
+		cout<<"Display path?(y/n) ";
+		cin>>yn;
+	}
+	if(tolower(yn)=='y')cout<<"\nThe path used is:\n"<<path<<"\n\n";
 	if(args.export_maze)export_maze(maze,args.export_filename);
 	return 0;
 }

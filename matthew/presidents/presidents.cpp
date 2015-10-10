@@ -153,8 +153,8 @@ int main(int argc, char* argv[]) {
 						cout<<"Who was the "<<(random_president + 1)<<getSuffix(random_president + 1)<<" president?"<<endl;
 						getline(cin, placeholder);
 						if (placeholder != presidents[random_president].name.substr(0, (presidents[random_president].name.size() - 1))) {
-							cout<<"Incorrect answer.  Try again."<<endl;
 							guesses--;
+							if (guesses != 0) cout<<"Incorrect answer.  Try again."<<endl<<endl;
 							break;
 						} else {
 							correct_answer = true;
@@ -164,8 +164,8 @@ int main(int argc, char* argv[]) {
 						cout<<"During which years was he president?"<<endl;
 						getline(cin, placeholder);
 						if (placeholder != presidents[random_president].years.substr(0, (presidents[random_president].years.size() - 1))) {
-							cout<<"Incorrect answer.  Try again."<<endl;
 							guesses--;
+							if (guesses != 0) cout<<"Incorrect answer.  Try again."<<endl<<endl;
 							break;
 						} else {
 							correct_answer = true;
@@ -175,8 +175,8 @@ int main(int argc, char* argv[]) {
 						cout<<"What party was he affiliated with?"<<endl;
 						getline(cin, placeholder);
 						if (placeholder != presidents[random_president].party.substr(0, (presidents[random_president].party.size() - 1))) {
-							cout<<"Incorrect answer.  Try again."<<endl;
 							guesses--;
+							if (guesses != 0) cout<<"Incorrect answer.  Try again."<<endl<<endl;
 							break;
 						} else {
 							correct_answer = true;
