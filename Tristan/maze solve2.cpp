@@ -24,14 +24,14 @@ struct point{
 	int y;
 };
 struct mapstruct{
-int width;
-int length;
-bool walls[6][4];
+	int width;
+	int length;
+	bool walls[6][4];
 };
 struct list{
-point pt;
-point prev;
-bool v;
+	point pt;
+	point prev;
+	bool v;
 };
 //////////////////////////////////////////////////////////////////////////////
 
@@ -52,6 +52,24 @@ ostream&operator<<(ostream& o, point a){
 
 bool operator==(point a,point b){
 	return (a.x == b.x && a.y == b.y);
+}
+ostream&operator<<(ostream& o, mapstruct map){
+	
+	o<< map.width << "," << map.length << "." << endl;
+
+	return o;
+}
+ostream&operator<<(ostream& o, list l){
+	
+	o<< "prev:" << l.prev << "," << "point:"<< l.pt << "." << endl;
+	return o;
+}
+template<typename T >
+ostream&operator<<(ostream& o, vector<T> v){
+	for(T a:v) {
+		o<<a<<"\n";
+	}
+	return o;
 }
 /////////////////////////////////////////////////////////////////////////////
 
@@ -282,97 +300,89 @@ int main(){
 	bool endpoint;
 	int lastline;
 	vector<point> path;
-	string stringpx;
-	string stringpy;
-	string stringex;
-	string stringey;
 	int px = -15;
 	int py = -15;
 	int ex = -15;
 	int ey = -15;
-	int wtestx;
-	int wtesty;
-	int etestx;
-	int etesty;
 	mapstruct map;
 	
 	loadmap(map);
 
-endpoint = false;
+	endpoint = false;
 	/////////////////////////////////////////////////////////////////////////////
 	//getline
 	//
 	//request for ints and then input it into a string
 	////////////////////////////////////////////////////////////////////////////
-	cout << "Insert an int between 1 and 4 for the start postion ""x"" " << endl;
-	wtestx = getnum();
-	cout << "Insert an int between 1 and 3 for the start postion ""y"" " << endl;
-	wtesty = getnum();
+	cout << "Insert an int between 1 and 6 for the start postion ""x"" " << endl;
+	px = getnum();
+	cout << "Insert an int between 1 and 4 for the start postion ""y"" " << endl;
+	py = getnum();
+	
+	cout << px << "," << py << " and " << map.width << "," << map.length << endl;
+	while((map.walls[px][py]) || (px < 0 || px >= map.width) || (py < 0 || py >= map.length)) {
 
-	while((map.walls[wtestx][wtesty]) || (wtestx < 0 && wtestx >= map.width) || (wtesty < 0 && wtesty >= map.length)) {
-
-			cout << "You Values are invalid please try agian" << endl;
-			cout << "Insert an int between 1 and 4 for the start postion ""x"" " << endl;
-			wtestx = getnum();
-			cout << "Insert an int between 1 and 3 for the start postion ""y"" " << endl;
-			wtesty = getnum();
+			cout << "The given points are either not in the grid or on a wall please give new points" << endl;
+			cout << "Insert an int between 1 and 6 for the start postion ""x"" " << endl;
+			px = getnum();
+			cout << "Insert an int between 1 and 4 for the start postion ""y"" " << endl;
+			py = getnum();
 		
 	}
 
-	cout << "Insert an int between 1 and 4 for the end postion ""x"" " << endl;
-	etestx = getnum();
-	cout << "Insert an int between 1 and 3 for the end postion ""y"" " << endl;
-	etesty = getnum();
+	cout << "Insert an int between 1 and 6 for the end postion ""x"" " << endl;
+	ex = getnum();
+	cout << "Insert an int between 1 and 4 for the end postion ""y"" " << endl;
+	ey = getnum();
 
-       while((map.walls[etestx][etesty]) || (etestx < 0 && etestx >= map.width) || (etesty < 0 && etesty >= map.length)){
+       while((map.walls[ex][ey]) || (ex < 0 || ex >= map.width) || (ey < 0 || ey >= map.length)){
 	
-			cout << "You Values are invalid please try agian" << endl;
-			cout << "Insert an int between 1 and 4 for the start postion ""x"" " << endl;
-			etestx = getnum();
-			cout << "Insert an int between 1 and 3 for the start postion ""y"" " << endl;
-			etesty = getnum();
+			cout << "The given points are either not in the grid or on a wall please give new points" << endl;
+			cout << "Insert an int between 1 and 6 for the start postion ""x"" " << endl;
+			ex = getnum();
+			cout << "Insert an int between 1 and 4 for the start postion ""y"" " << endl;
+			ey = getnum();
 
 	}
 
-
-	//string to int conversions	
-	px = wtestx;
-	py = wtesty;
-	ex = etestx;
-	ey = etesty;
 	//printing out values before assigning them to points
-	cout << "getlined points:" << endl;
+	cout << "Start and end points:" << endl;
 	cout << px << "," << py << endl;
 	cout << ex << "," << ey << endl;
+	 
+	f.x = px - 1;//set
+	f.y = py - 1;//inital location for previus
+
+	p.x = px;//set
+	p.y = py;//location of start point
+
+	e.x = ex;//set
+	e.y = ey;//location of en/d point
+	cout <<"f:"<< f << "p:" << p << endl;
+	log.prev = f; //sets a prev point 
+	log.pt = p; //set the original point
+	log.v = false; // set the visited to not visited
+	info.push_back(log); //Push the info to the vector of structures 
+	cout << "info:" << info << endl;
+	cout << "info's size:" << info.size() << endl;
 	
-f.x = px - 1;//set
-f.y = py - 1;//inital location for previus
-
-p.x = px;//set
-p.y = py;//location of start point
-
-e.x = ex;//set
-e.y = ey;//location of en/d point
-
-log.prev = f; //sets a prev point 
-log.pt = p; //set the original point
-log.v = false; // set the visited to not visited
-info.push_back(log); //Push the info to the vector of structures 
-
-
 	while (!endpoint){
+		
 		lineofvector = nextp(info); //find the line of stored data that is next in line
-
+		cout << "line of vector:" << lineofvector << endl;
 		p = info[lineofvector].pt;//save that loacation that you want to go to going to
-
+		
 		nextpoint = getpoint(info,p,map); // set a vector to have all posable points that are legal
-		
-		
+		cout << "nextpoint:" << nextpoint << e
+		cout << " Before for loop" << endl;
 		for (unsigned int i = 0; i < nextpoint.size(); i++){//loop tell for the size of the vector nextpoint
+		cout << "in loop" << endl;
 			log.prev = p; //store prev point
+			cout << "logged prev:" << log.prev << endl;
 			log.v = false; //set the visisted to not visited
+			cout << "logged v" << endl;
 			log.pt = nextpoint[i]; // the point that you are storing
-			
+			cout << "logged point" << endl;
 			if(log.pt == e){
 				endpoint = true;
 			}
