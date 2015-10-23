@@ -13,8 +13,29 @@ float calcTPW(float fw, float ts){
 	return fw / ts;
 }
 
-int calcLPM_A(float gametime, float ts, float rs, float fl){
-	//calculate lengths traveled per match AVANCED VERSION
+int calcLPM(float gametime, float ts, float fl){
+	//calculate lengths traveled per match
+	//returns number of whole lengths
+	float lap = 0;
+	float y;
+	float z;
+	while(gametime != 0){
+		y = calcTPL(fl, ts);
+		lap++;
+		gametime = gametime - y;
+		if(gametime < 0){
+			gametime = 0;
+			lap = lap - 1;
+		}
+	}
+	return lap;
+}
+
+
+
+int calcLPM(float gametime, float ts, float rs, float fl){
+	//calculate lengths traveled per match ADVANCED VERSION
+		//ADVANCED: Includes the rotation time at the end of the field
 	//returns number of whole lengths
 	float lap = 0;
 	float x;
@@ -34,8 +55,21 @@ int calcLPM_A(float gametime, float ts, float rs, float fl){
 	return lap;
 }
 
-float calcPrTT_A(float fl, float fw, float ts, float rs){
+float calcPrTT(float fl, float fw, float ts){
+	//calculates time to travel the primeter
+	//returns time in seconds
+	
+	float y = calcTPL(fl, ts);
+	float z = calcTPW(fw, ts);
+
+	float prim = y + y + z + z;
+	return prim;
+}
+
+
+float calcPrTT(float fl, float fw, float ts, float rs){
 	//calculates time to travel the primeter ADVANCED VERSION
+		//ADVANCED: Includes the rotation time at end of field
 	//returns time in seconds
 	
 	float y = calcTPL(fl, ts);
@@ -45,13 +79,21 @@ float calcPrTT_A(float fl, float fw, float ts, float rs){
 	return prim;
 }
 
+void setVar(float& var, float input){
+	var = input;
+}
+
+void setVar(int& var, int input){
+	var = input;
+}
+
 int main(){
 	float gametime = 0; //0 seconds
 	float fl = 54; //field length = 54'
 	float fw = 0; //field width = 0'
 	float ts = 5; //travel speed = 5'/s
 	float rs = 0; //0 seconds per rotation
-	
+	int ngp = 0; //number of game pieces
 }
 
 //system("xterm -e **);
