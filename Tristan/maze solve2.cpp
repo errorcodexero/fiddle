@@ -74,22 +74,6 @@ ostream&operator<<(ostream& o, vector<T> v){
 /////////////////////////////////////////////////////////////////////////////
 
 
-/////////////////////////////////////////////////////////////////////////////
-// lastpointvalid
-//
-// returns true if the given point is not in the vector
-/////////////////////////////////////////////////////////////////////////////
-bool lastpointvalid(point p,vector<point> lp)
-{
-	bool valid = true;
-
-	for (int i=0; i< (int)lp.size(); i++){
-		if ( p == lp[i]){
-			valid = false;
-		}
-	}
-	return valid;
-}
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -98,9 +82,12 @@ bool lastpointvalid(point p,vector<point> lp)
 // returns true if p is in the grid
 /////////////////////////////////////////////////////////////////////////////
 bool bounderies(point p,mapstruct map){
+	cout << "bpoint:" << p << endl;
+	cout << "boundries: 0 and" << map.width << endl;
+	cout << "boundries: 0 and" << map.length << endl;
 	bool xvalid = p.x>=0 && p.x< map.width;
 	bool yvalid = p.y>=0 && p.y< map.length;
-
+	cout << "xvalid:" << xvalid << "yvalid:" << yvalid << endl;
 	return xvalid && yvalid;
 }
 
@@ -110,8 +97,9 @@ bool bounderies(point p,mapstruct map){
 // returns true if p is not a wall
 //////////////////////////////////////////////////////////////////////////////
 bool Walls(point p,mapstruct map){
-
-	return map.walls[p.x][p.y];	
+	cout << "p.x:" << p.x << " " << "p.y" << p.y << endl;
+	cout << "walls"  << map.walls[p.x][p.y] << endl;
+ 	return map.walls[p.x][p.y];	
 
 }
 
@@ -145,7 +133,6 @@ bool validpoint(vector<list> v,point q,mapstruct map){
 	}
 	return valid(q,map) && !p;
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 // [dir]p
@@ -338,9 +325,9 @@ int main(){
        while((map.walls[ex][ey]) || (ex < 0 || ex >= map.width) || (ey < 0 || ey >= map.length)){
 	
 			cout << "The given points are either not in the grid or on a wall please give new points" << endl;
-			cout << "Insert an int between 1 and 6 for the start postion ""x"" " << endl;
+			cout << "Insert an int between 1 and 6 for the end postion ""x"" " << endl;
 			ex = getnum();
-			cout << "Insert an int between 1 and 4 for the start postion ""y"" " << endl;
+			cout << "Insert an int between 1 and 4 for the end postion ""y"" " << endl;
 			ey = getnum();
 
 	}
@@ -373,7 +360,7 @@ int main(){
 		p = info[lineofvector].pt;//save that loacation that you want to go to going to
 		
 		nextpoint = getpoint(info,p,map); // set a vector to have all posable points that are legal
-		cout << "nextpoint:" << nextpoint << e
+		cout << "nextpoint:" << nextpoint << endl;
 		cout << " Before for loop" << endl;
 		for (unsigned int i = 0; i < nextpoint.size(); i++){//loop tell for the size of the vector nextpoint
 		cout << "in loop" << endl;
