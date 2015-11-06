@@ -4,22 +4,22 @@
 2 - OOOO
 3 - OOO
 4 - OOOOO
-5 - OOOOOOOO
-6 - OOO
-7 - OOOO
+5 - OOOOOOOOOO
+6 - OOOO
+7 - OOOOO
 8 - OOOO
 9 - OOO
 10 - OOO
-11 - OOX
-12 - X
+11 - OOXOOO
+12 - XXO
 13 - OOO
-14 - OO
-15 - OOO
-16 - O
-17 - XO
+14 - OOO
+15 - OOOO
+16 - OXOX
+17 - XOOO
 18 - OOOO
-19 - O
-20 - OOO
+19 - OOO
+20 - OOOOO
 21 - 
 22 - 
 23 - 
