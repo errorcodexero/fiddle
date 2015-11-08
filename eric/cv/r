@@ -1,0 +1,1 @@
+make ex 2>&1 && ./ex Gray_Image.jpg 2>&1
