@@ -37,61 +37,125 @@ std::ostream& operator<<(std::ostream& o, std::vector<T> v){
 
 std::string print(std::string w){
 	std::string s;
-	for(unsigned int i=0; i<w.size(); i++){
-		if(w[i]==' ')s+=" _ ";
-		else s+=' '+w[i]+' ';
+	for(char c:w){
+		if(c==' ')s.append(" _ ");
+		else{
+			s+=' ';
+			s+=c;
+			s+=' ';
+		}
 	}
 	return s;
 }
 
 template<typename T>
-void remove(std::vector<T>& v,std::vector<unsigned int> r){
-	if(r.size()==v.size())v={};
-	if(v.size()>0 && r.size()>0){
-		for(unsigned int i=r.size()-1; i>0; i--){
+void remove1(std::vector<T>& v,std::vector<unsigned int> r){
+	if(v.size()>0){
+		for(unsigned int i=r.size(); i>0; i--){
 			v.erase(v.begin()+r[i]);
 		}
 	}
 }
 
+template<typename T>
+void remove2(T& t,std::vector<unsigned int> r){
+	if(t.size()>0){
+		for(unsigned int i=r.size(); i>0; i--){
+			t.erase(t.begin()+r[i]);
+		}
+	}
+}
+
+std::string draw_gallows(const unsigned int remaining_attempts){//Draws the gallows with the appropriate amount of body parts. 
+	std::string gallows;
+	if(remaining_attempts==0){
+		gallows="      _______\n     |/       \n     |         \n     |          \n     |        \n     |          \n     |\n  ___|___\n";//Empty Gallows
+	}
+	else if(remaining_attempts==1){
+		gallows="      _______\n     |/      |\n     |      (_)\n     |          \n     |        \n     |          \n     |\n  ___|___\n";//Head
+	}
+	else if(remaining_attempts==2){
+		gallows="      _______\n     |/      |\n     |      (_)\n     |       |  \n     |       |\n     |          \n     |\n  ___|___\n";//Torso
+	}
+	else if(remaining_attempts==3){
+		gallows="      _______\n     |/      |\n     |      (_)\n     |      \\| \n     |       |\n     |          \n     |\n  ___|___\n";//Left arm
+	}
+	else if(remaining_attempts==4){
+		gallows="      _______\n     |/      |\n     |      (_)\n     |      \\|/\n     |       |\n     |          \n     |\n  ___|___\n";//Right arm 
+	}
+	else if(remaining_attempts==5){
+		gallows="      _______\n     |/      |\n     |      (_)\n     |      \\|/\n     |       |\n     |      / \n     |\n  ___|___\n";//Left leg
+	}
+	else if(remaining_attempts==6){
+		gallows="      _______\n     |/      |\n     |      (_)\n     |      \\|/\n     |       |\n     |      / \\\n     |\n  ___|___\n";//Right leg
+	}
+	return gallows;
+}
+
 std::vector<std::string> init_list(std::string w){
-	std::ifstream words("test.txt");
+	std::ifstream words("words.txt");
 	std::vector<std::string> possibles;
 	while(!words.eof()){
 		std::string s;
 		std::getline(words,s);
-		possibles.push_back(s);
-	}
-	std::vector<unsigned int> r;
-	for(unsigned int i=0; i<possibles.size(); i++){
-		if(find(possibles[i].begin(),possibles[i].end(),'\'')!=possibles[i].end())r.push_back(i);
-	}
-	remove(possibles,r);//Remove words that have apostrophes
-	r.clear();	
-	for(unsigned int i=0; i<possibles.size(); i++){
-		for(unsigned int j=0; j<possibles[i].size(); j++){
-			if(find(GEN_FREQ.begin(),GEN_FREQ.end(),tolower(possibles[i][j]))!=GEN_FREQ.end())break;
-			r.push_back(i);
+		bool r=1;
+		for(char c:s){
+			if(find(GEN_FREQ.begin(),GEN_FREQ.end(),tolower(c))==GEN_FREQ.end()){
+				r=0;
+				break;
+			}
+		}
+		if(find(s.begin(),s.end(),'\'')==s.end() && s.size()==w.size() && r){
+			possibles.push_back(s);
 		}
 	}
-	remove(possibles,r);//Remove words that have unaccepted characters
-	r.clear();
-	for(unsigned int i=0; i<possibles.size(); i++){
-		if(possibles[i].size()!=w.size())r.push_back(i);
-	}
-	remove(possibles,r);//Remove words that are too long
 	words.close();
 	return possibles;	
 }
 
-void update_possibles(std::string w,std::vector<char> wrong,std::vector<std::string>& possibles){
-	if(wrong.size()>0){
-		std::vector<unsigned int> r;
-		for(unsigned int i=0; i<possibles.size(); i++){
-			if(find(possibles[i].begin(),possibles[i].end(),wrong.back())!=possibles[i].end())r.push_back(i);
-		}
-		remove(possibles,r);//Remove words that have apostrophes
+void update_possibles(const std::string w,const std::vector<char> wrong,std::vector<std::string>& possibles){
+	/*for(char c:w){
+		std::cout<<"     '"<<c<<"'     ";
 	}
+	std::cout<<"    ";
+	std::cout<<wrong;
+	std::cout<<"    \n";*/
+	std::vector<unsigned int> r;
+	for(std::vector<std::string>::iterator i=possibles.begin(); i<possibles.end();){
+		bool b=wrong.size()>0?0:1;
+		for(char x:wrong){
+			for(char c:*i){
+				if(tolower(c)==tolower(x)){
+					b=0;
+					possibles.erase(i);
+					break;
+				} else b=1;
+			}
+		}
+		if(b)i++;
+	}
+	for(std::vector<std::string>::iterator i=possibles.begin(); i<possibles.end();){
+		bool b=0;
+		for(std::string::const_iterator it=w.begin(); it<w.end();){
+			if(*it==' '){
+				b=1;
+				it++;
+				continue;
+			}
+			for(std::string::iterator ite=(*i).begin(); ite<(*i).end();){
+				if(distance(w.begin(),it)==distance((*i).begin(),ite) && tolower(*it)!=tolower(*ite)){
+					b=0;
+					possibles.erase(i);
+					break;
+				} else b=1;
+				ite++;
+			}
+			if(!b)break;
+			it++;
+		}
+		if(b)i++;
+	}
+	//std::cout<<possibles<<"\n";
 }
 
 std::vector<std::pair<char, unsigned int>> count(std::string all){
@@ -162,9 +226,10 @@ std::vector<char> order_equal(std::vector<std::pair<char,unsigned int>> ordered,
 	return real_freq;
 }
 
-std::vector<char> set_freq(std::string w,std::vector<char> wrong,std::vector<std::string> possibles){
+std::vector<char> set_freq(std::string w,std::vector<char> wrong,std::vector<std::string>& possibles){
 	std::vector<char> real_freq;
 	update_possibles(w,wrong,possibles);
+	if(possibles.size()==0)return GEN_FREQ;
 	std::string all;
 	for(unsigned int i=0; i<possibles.size(); i++){
 		for(char c: possibles[i]){
@@ -172,6 +237,11 @@ std::vector<char> set_freq(std::string w,std::vector<char> wrong,std::vector<std
 		}
 	}
 	std::vector<std::pair<char,unsigned int>> ordered=count(all);
+	std::vector<unsigned int> r;
+	for(unsigned int i=0; i<ordered.size(); i++){
+		if(ordered[i].second==0)r.push_back(i);
+	}
+	remove1(ordered,r);//remove1 letters that aren't present in word base
 	order(ordered,ordered.size());
 	for(std::pair<char,unsigned int> p: ordered){
 		real_freq.push_back(p.first);
@@ -180,30 +250,68 @@ std::vector<char> set_freq(std::string w,std::vector<char> wrong,std::vector<std
 	return real_freq;
 }
 
-char get_guess(std::string w,std::vector<char> wrong,std::vector<std::string> possibles){
+char get_guess(const std::string w,std::vector<char> wrong,std::vector<std::string>& possibles){
 	std::vector<char> freq=set_freq(w,wrong,possibles);
+	for(unsigned int i=0; i<w.size(); i++){
+		if(w[i]!=' ' && find(freq.begin(),freq.end(),w[i])!=freq.end())freq.erase(find(freq.begin(),freq.end(),w[i]));
+	}
+	for(unsigned int i=0; i<wrong.size(); i++){
+		if(w[i]!=' ' && find(freq.begin(),freq.end(),wrong[i])!=freq.end())freq.erase(find(freq.begin(),freq.end(),wrong[i]));
+	}
+	std::cout<<"\n"<<freq<<"\n";
 	return freq.front();
 }
 
+bool finished(std::string w){
+	for(char c:w){
+		if(c==' ')return 0;
+	}
+	return 1;
+}
+
 int main(){
-	std::string w;
 	unsigned int length;
 	std::cout<<"Enter number of letters in the word: ";
 	std::cin>>length;
+	std::string w;
 	for(unsigned int i=0; i<length; i++)w+=' ';
 	std::vector<std::string> possibles=init_list(w);
 	std::vector<char> wrong;
 	while(true){
 		char guess=get_guess(w,wrong,possibles), yn='n';
-		std::cout<<"Known: "<<print(w)<<". Does it have the letter \'"<<guess<<"\'?(y/n) ";
+		std::cout<<draw_gallows(wrong.size())<<"\nKnown: "<<print(w)<<". Does it have the letter \'"<<guess<<"\'?(y/n) ";
 		std::cin>>yn;
 		if(yn=='y'){
-			
+			std::string locs;
+			std::cout<<"\nWhere is it in the word?(Please write the locaions separated by commas) ";
+			std::cin>>locs;
+			std::vector<unsigned int> r,num;
+			for(unsigned int i=0; i<locs.size(); i++){
+				if(locs[i]==' ')r.push_back(i);
+			}
+			remove2(locs,r);
+			unsigned int temp=0;
+			for(unsigned int i=0; i<locs.size()+1; i++){
+				if(locs[i]==','){
+					num.push_back(atoi((locs.substr(temp,(i-temp))).c_str())-1);
+					temp=i+1;
+				}
+			}
+			num.push_back(atoi((locs.substr(temp,(locs.size()-temp))).c_str())-1);
+			for(unsigned int i:num)w[i]=guess;
 		}
-		else{
-			wrong.push_back(guess);
+		else wrong.push_back(guess);
+		if(wrong.size()>=6){
+			std::cout<<"\n"<<draw_gallows(wrong.size())<<"\nI lose :'(\nWhat was the word? ";
+			std::string c;
+			std::cin>>c;
+			break;
 		}
-		break;
+		if(finished(w)){
+			std::cout<<"\n"<<draw_gallows(wrong.size())<<"\nI WIN! The word is \""<<w<<"\"\n";
+			break;
+		}
 	}
+	std::cout<<"\nThanks for playing!\n";
 	return 0;
 }
