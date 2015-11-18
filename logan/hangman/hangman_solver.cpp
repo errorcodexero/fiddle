@@ -1,6 +1,7 @@
 /*Author: Logan Traffas
 TODO:
-	- Added user's answer for guess
+	- Remove remove1()
+	- Bug fixes
 */
 #include <iostream>
 #include <string>
@@ -57,15 +58,6 @@ void remove1(std::vector<T>& v,std::vector<unsigned int> r){
 	}
 }
 
-template<typename T>
-void remove2(T& t,std::vector<unsigned int> r){
-	if(t.size()>0){
-		for(unsigned int i=r.size(); i>0; i--){
-			t.erase(t.begin()+r[i]);
-		}
-	}
-}
-
 std::string draw_gallows(const unsigned int remaining_attempts){//Draws the gallows with the appropriate amount of body parts. 
 	std::string gallows;
 	if(remaining_attempts==0){
@@ -114,13 +106,6 @@ std::vector<std::string> init_list(std::string w){
 }
 
 void update_possibles(const std::string w,const std::vector<char> wrong,std::vector<std::string>& possibles){
-	/*for(char c:w){
-		std::cout<<"     '"<<c<<"'     ";
-	}
-	std::cout<<"    ";
-	std::cout<<wrong;
-	std::cout<<"    \n";*/
-	std::vector<unsigned int> r;
 	for(std::vector<std::string>::iterator i=possibles.begin(); i<possibles.end();){
 		bool b=wrong.size()>0?0:1;
 		for(char x:wrong){
@@ -289,7 +274,9 @@ int main(){
 			for(unsigned int i=0; i<locs.size(); i++){
 				if(locs[i]==' ')r.push_back(i);
 			}
-			remove2(locs,r);
+			for(unsigned int i=r.size(); i>0; i--){
+				locs.erase(locs.begin()+r[i]);
+			}
 			unsigned int temp=0;
 			for(unsigned int i=0; i<locs.size()+1; i++){
 				if(locs[i]==','){
