@@ -183,7 +183,7 @@ std::vector<char> order_equal(std::vector<std::pair<char,unsigned int>> ordered,
 	for(unsigned int i=0; i<ordered.size(); i++){
 		for(unsigned int j=0; j<compare.size(); j++){
 			if(ordered[i].second==compare[j].second && i!=j){
-				unsigned int loc1=0,loc2=0,loc3=0;
+				unsigned int loc1=0,loc2=0;
 				for(unsigned int k=0; k<GEN_FREQ.size(); k++){
 					if(ordered[i].first==GEN_FREQ[k]){
 						loc1=k;
