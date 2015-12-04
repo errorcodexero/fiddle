@@ -130,7 +130,7 @@ static const vector<string> files=mapf(
 	[](pair<string,Dir> p){
 		stringstream ss;
 		//TODO: Change this.
-		ss<<"/home/eric/1425/halberd/doc/Pictures/"<<p.first;
+		ss<<"/home/frc1425/halberd/doc/Pictures/"<<p.first;
 		return ss.str();
 	},
 	CORRECT
