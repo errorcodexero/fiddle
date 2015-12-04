@@ -1,5 +1,6 @@
 #include <iostream> 
 #include <string>
+#include <cstdlib>
 using namespace std;
 int main(){
 	cout<<"Type something."<<endl;
@@ -12,6 +13,6 @@ int main(){
 	getline(cin,repeatNum);
 	while(x<atoi(repeatNum.c_str())){
 		cout<<input<<endl;
-		i++;
+		x++;
 	}
 }
