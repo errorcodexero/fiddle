@@ -3,7 +3,7 @@
 #include <string>
 using namespace std;
 enum class Board{UL,UC,UR,CL,CC,CR,LL,LC,LR};
-	
+
 string print(vector<Board> x, vector<Board> o){
 	string ul=" ",uc=" ",ur=" ",cl=" ",cc=" ",cr=" ",ll=" ",lc=" ",lr=" ";	
 	vector<Board> v={Board::UL,Board::UC,Board::UR,Board::CL,Board::CC,Board::CR,Board::LL,Board::LC,Board::LR};
@@ -76,6 +76,7 @@ bool fin(vector<Board> v){
 	return false;
 }
 int main(){
+	
 	vector<Board> x,o;
 	bool status=0;
 	while(1){
