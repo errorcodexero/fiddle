@@ -1,7 +1,7 @@
 /*
  • Project: A hangman game program.
  • Author(s): Logan Traffas.
- • Description: A program that will randomly select a word that you will try to guess be fore a man is hanged.
+ • Description: A program that will randomly select a word that you will try to guess before a man is hanged.
 */
 #include <iostream>
 #include <fstream>
@@ -9,6 +9,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <vector>
+//#include <windows.h>
 #include <sstream>
 #include <ctype.h>
 using namespace std;
@@ -114,21 +115,10 @@ Comparison_return guess_v_word_comparison(string guess, string word, string blan
 }
 
 void reset_saved_statistics(){//Resets win and loss statistics
-	//Sleep(750);
+	ofstream logger("log.txt");
 	cout<<endl<<endl<<"Resetting saved win and loss statistics to 0's."<<flush;
-	//Sleep(750);
-	cout<<" ."<<flush;
-	//Sleep(750);
-	cout<<" ."<<flush;
-	//Sleep(750);
-	cout<<" ."<<flush;
-	ofstream logger;
-	logger.open("hangman_log.txt");
 	logger<<"W:"<<0<<",L-"<<0<<",";
 	logger.close();
-	//Sleep(750);
-	cout<<" done!"<<endl<<endl;
-	//Sleep(100);
 }
 
 Wins_and_losses_return win_and_loss_saver(int won, int lost){
@@ -174,6 +164,17 @@ Wins_and_losses_return win_and_loss_saver(int won, int lost){
 	wins_and_losses_return.winnings=winnings;
 	wins_and_losses_return.loses=loses;
 	return wins_and_losses_return;
+}
+
+string get_blanks(string word){
+	string blanks;
+	for(unsigned int i=0; i<word.length(); i++){//Creates a string with the correct number of blanks for the user to try to guess the word
+		blanks+="_ ";
+	}
+	for(unsigned int i=0; i<word.length(); i++){//Inserts an apostrophe where it belongs
+		if(word[i]=='\'')blanks[i*2]='\'';
+	}
+	return blanks;	
 }
 
 void play_game(string word, string blanks){//Accepts user guesses and compares them with the word
@@ -226,7 +227,7 @@ void play_game(string word, string blanks){//Accepts user guesses and compares t
 			wins_and_losses_return=win_and_loss_saver(won, lost);
 			draw_gallows(remaining_attempts);
 			cout<<"=========================================================================="<<endl<<endl<<"Game over. You lose. The correct word ";
-			cout<<"was: \""<<word<<"\"! You have lost "<<wins_and_losses_return.loses<<" time"<<((wins_and_losses_return.loses==1)?"":"s")<<"."<<endl<<endl<<"=========================================================================="<<endl;
+			cout<<"was: \""<<word<<"\"! You have lost "<<wins_and_losses_return.loses<<" times."<<endl<<endl<<"=========================================================================="<<endl;
 			break;
 		}
 		for(unsigned int k=0; k<blanks.size(); k++){//Determines is the user has won
@@ -242,7 +243,7 @@ void play_game(string word, string blanks){//Accepts user guesses and compares t
 			wins_and_losses_return=win_and_loss_saver(won, lost);
 			draw_gallows(remaining_attempts);
 			cout<<"=========================================================================="<<endl<<endl<<"Congratulations! You win! the word";
-			cout<<" was \""<<word<<"!\" You have won "<<wins_and_losses_return.winnings<<" time"<<((wins_and_losses_return.winnings==1)?"":"s")<<"."<<endl<<endl<<"=========================================================================="<<endl;
+			cout<<" was \""<<word<<"!\" You have won "<<wins_and_losses_return.winnings<<" times!"<<endl<<endl<<"=========================================================================="<<endl;
 			break;
 		}
 	}
@@ -273,13 +274,7 @@ int main(){
 	while(play=='y'){
 		cout<<"Let's play!"<<endl;
 		string word=get_word();
-		string blanks;
-		for(unsigned int i=0; i<word.length(); i++){//Creates a string with the correct number of blanks for the user to try to guess the word
-			blanks+="_ ";
-		}
-		for(unsigned int i=0; i<word.length(); i++){//Inserts an apostrophe where it belongs
-			if(word[i]=='\'')blanks[i*2]='\'';
-		}
+		string blanks=get_blanks(word);
 		play_game(word, blanks);
 		cout<<endl<<"Would you like to play another game of hangman?(y/n): ";
 		cin>>play;
