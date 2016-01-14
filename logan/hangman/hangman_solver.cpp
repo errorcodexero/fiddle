@@ -240,14 +240,8 @@ char get_guess(const std::string w,std::vector<char> wrong,std::vector<std::stri
 	for(unsigned int i=0; i<w.size(); i++){
 		if(w[i]!=' ' && find(freq.begin(),freq.end(),w[i])!=freq.end())freq.erase(find(freq.begin(),freq.end(),w[i]));
 	}
-	for(char c:wrong){
-		for(unsigned int i=0; i<freq.size();){
-			if(c==freq[i]){
-				freq.erase(freq.begin()+i);
-				break;
-			}
-			else i++;
-		}
+	for(unsigned int i=0; i<wrong.size(); i++){
+		if(w[i]!=' ' && find(freq.begin(),freq.end(),wrong[i])!=freq.end())freq.erase(find(freq.begin(),freq.end(),wrong[i]));
 	}
 	std::cout<<"\n"<<freq<<"\n";
 	return freq.front();
@@ -261,7 +255,7 @@ bool finished(std::string w){
 }
 
 int main(){
-	unsigned int length;
+	unsigned int length=0;
 	std::cout<<"Enter number of letters in the word: ";
 	std::cin>>length;
 	std::string w;
@@ -273,8 +267,8 @@ int main(){
 		std::cout<<draw_gallows(wrong.size())<<"\nKnown: "<<print(w)<<". Does it have the letter \'"<<guess<<"\'?(y/n) ";
 		std::cin>>yn;
 		if(yn=='y'){
-			std::string locs;
 			std::cout<<"\nWhere is it in the word?(Please write the locaions separated by commas) ";
+			std::string locs;
 			std::cin>>locs;
 			std::vector<unsigned int> r,num;
 			for(unsigned int i=0; i<locs.size(); i++){
