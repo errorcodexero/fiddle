@@ -3,6 +3,7 @@
 #include <utility>
 #include <assert.h>
 #include <fstream>
+#include <stack>
 #include <cstdlib>
 #include <stdlib.h> 
 #include <cmath> 
@@ -337,11 +338,11 @@ void estimator(const int A){//Estimates maze generation time based on an area
 	if(t>=5) cout<<"Warning: Estimated generation-time is "<<t<<" seconds (Varies depending on processing power): (Press CTRL+C to abort): Increased generation-time implies increased solving-time: line: "<<__LINE__<<"\n";	
 }
 
-bool check_for_adjacent_wall(const vector<Location> visited,const vector<Location> stack,const Location test){//Checks a location to see if there are any walls in adjacent locations 
-	if(test==stack.back())return 0;
+bool check_for_adjacent_wall(const vector<Location> visited,const stack<Location> stack,const Location test){//Checks a location to see if there are any walls in adjacent locations 
+	if(test==stack.top())return 0;
 	for(unsigned int i=0; i<visited.size(); i++){
 		int first=test.first,second=test.second;
-		bool right=(stack.back()!=Location{first+1,second}),left=(stack.back()!=Location{first-1,second}),forward=(stack.back()!=Location{first,second+1}),backward=(stack.back()!=Location{first,second-1});
+		bool right=(stack.top()!=Location{first+1,second}),left=(stack.top()!=Location{first-1,second}),forward=(stack.top()!=Location{first,second+1}),backward=(stack.top()!=Location{first,second-1});
 		if( test==visited[i] ||
 			right*(visited[i]==Location{first+1,second}) ||
 			left*(visited[i]==Location{first-1,second}) ||
@@ -352,7 +353,7 @@ bool check_for_adjacent_wall(const vector<Location> visited,const vector<Locatio
 	return 1;
 }
 
-Location update_location(Location a,const Move b,const vector<Location> visited,const vector<Location> stack,const int first,const int second,const int Y_LIM,const int X_LIM){//Updates a location (used in wall generation)
+Location update_location(Location a,const Move b,const vector<Location> visited,const stack<Location> stack,const int first,const int second,const int Y_LIM,const int X_LIM){//Updates a location (used in wall generation)
 	switch(b){
 		case Move::FORWARD:
 			assert(second+1<Y_LIM && check_for_adjacent_wall(visited,stack,Location{first,second+1}));
@@ -396,20 +397,20 @@ vector<Location> invert_blocks(vector<Location> v,const int X_LIM,const int Y_LI
 	return v;
 }
 
-vector<Location> wall_generator(const int X_LIM,const int Y_LIM,bool& found,vector<Location>& stack,vector<Location> visited,int counter=0){//generates the walls for a maze
+vector<Location> wall_generator(const int X_LIM,const int Y_LIM,bool& found,stack<Location>& stack,vector<Location> visited,int counter=0){//generates the walls for a maze
 	counter++;
-	if(counter>=3000)return visited;
+	if(counter>=2000)return visited;
 	vector<Move> possible_moves;
-	int first=stack.back().first,second=stack.back().second;
+	int first=stack.top().first,second=stack.top().second;
 	if(first>0 && check_for_adjacent_wall(visited,stack,Location{first-1,second}))possible_moves.push_back(Move::LEFT);
 	if(first+1<X_LIM && check_for_adjacent_wall(visited,stack,Location{first+1,second}))possible_moves.push_back(Move::RIGHT);
 	if(second>0 && check_for_adjacent_wall(visited,stack,Location{first,second-1}))possible_moves.push_back(Move::BACKWARD);
 	if(second+1<Y_LIM && check_for_adjacent_wall(visited,stack,Location{first,second+1}))possible_moves.push_back(Move::FORWARD);
 	if(possible_moves.size()>0){
-		stack.push_back(update_location(stack.back(),possible_moves[get_random(possible_moves.size())],visited,stack,first,second,Y_LIM,X_LIM));
-		visited.push_back(stack.back());
+		stack.push(update_location(stack.top(),possible_moves[get_random(possible_moves.size())],visited,stack,first,second,Y_LIM,X_LIM));
+		visited.push_back(stack.top());
 	}
-	else stack.pop_back();
+	else stack.pop();
 	found=stack.size()==0;
 	if(found)return visited;
 	visited=wall_generator(X_LIM,Y_LIM,found,stack,visited,counter);
@@ -423,7 +424,9 @@ Maze maze_gen(const int X_LIM,const int Y_LIM){//Generates a random maze
 	a.y_lim=Y_LIM;
 	bool found=0;
 	srand(time(NULL));
-	vector<Location> stack={{0,0}},open={{0,0}};
+	stack<Location> stack;
+	stack.push({0,0});
+	vector<Location> open={{0,0}};
 	while(!found)open=wall_generator(a.x_lim,a.y_lim,found,stack,open);
 	if(open.size()<2){
 		cout<<"Error: Not enough locations for the start and target to be set: line: "<<__LINE__<<"\n";
