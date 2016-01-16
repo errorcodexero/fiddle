@@ -1,10 +1,9 @@
 #include <string>
-#include <stack>
 #include <vector>
 
 using namespace std;
 
-typedef pair<unsigned int,unsigned int> Location;
+typedef pair<int,int> Location;
 enum class Move{FORWARD, BACKWARD, RIGHT, LEFT};
 
 struct Maze{//Contains the necessary maze information
@@ -14,7 +13,7 @@ struct Maze{//Contains the necessary maze information
 		Solver():loc(Location{0,0}),fin(0){}
 	};
 	vector<Location> blocks;
-	unsigned int x_lim,y_lim;
+	int x_lim,y_lim;
 	Location target;
 	Solver solver;
 	Maze():blocks(vector<Location>{}),x_lim(0),y_lim(0),target(Location{0,0}){}
@@ -39,9 +38,9 @@ bool operator!=(Maze a, Maze b);
 template<typename T>
 bool operator==(vector<T> a, vector<T> b);
 
-vector<vector<char>> print_maze(Maze a, stack<Move> path=stack<Move>{},bool add_boundary=1,bool print_line=0);
+vector<vector<char>> print_maze(Maze a, vector<Move> path=vector<Move>{},bool add_boundary=1,bool print_line=0);
 
-stack<Move> get_path(Maze a);
+vector<Move> get_path(Maze a);
 
 Maze import_maze(const string filename="maze.txt");
 
