@@ -1,3 +1,7 @@
+//Create A representation of the maze
+//create an external file to be imported as the map for the robot to navigate
+//
+//
 #include <iostream>
 #include <math.h>
 #include <stdlib.h>
@@ -6,21 +10,21 @@
 #include <time.h> 
 #include <assert.h>
 #include <unistd.h>
-#include "maze.h"
 
 #define NYI {cout << "NYI " << __LINE__<<"\n"; exit(1);}
 
 #define WIDTH 27
 #define LENGTH 54
+#define WALLONE 3
 #define STARTONE 0
 #define STARTTWO 0
-#define ENDONE 3
-#define ENDTWO 250
+#define ENDONE 5
+#define ENDTWO 0
 
 
 using namespace std;
 
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////// //////////////////////
 // Structures
 //
 // All Structures
@@ -30,7 +34,12 @@ struct point{
 	int y;
 };
 
- 
+struct mapstruct{
+	int width;
+	int length;
+	bool walls[WIDTH][LENGTH];
+};
+
 struct list{
 	point pt;
 	point prev;
@@ -304,27 +313,15 @@ int  getnum(){
 //loads an array that is what the program navigates
 ////////////////////////////////////////////////////////////////////////////
 void loadmap(mapstruct & a){
-	a.width = MAPWIDTH;
-	a.length = MAPLENGTH;
+	a.width = WIDTH;
+	a.length = LENGTH;
 
 	for(int i=0; i < a.width; i++)
 		for(int j=0; j < a.length; j++)
 			a.walls[i][j] = false;
-	 
-	 // blocks off secret passage
-	for(int i=265; i < a.width; i++)
-		for(int j=0; j < 288; j++)
-			a.walls[i][j] = true;
-
-	// blocks of outerworks
-	for(int i=0; i < 267; i++)
-		for(int j=191; j < 241; j++)
-			a.walls[i][j] = true;
-
-	// blocks of tower 
-	for(int i=87; i < 232; i++)
-		for(int j=0; j < 69; j++)
-			a.walls[i][j] = true;
+	
+	//for(int i=0; i < a.length-1; i ++) 
+		//a.walls[WALLONE][i] = true;	
 	
 }
 /////////////////////////////////////////////////////////////////////////////////////////////
