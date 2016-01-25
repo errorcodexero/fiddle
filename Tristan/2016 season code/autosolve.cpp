@@ -8,14 +8,13 @@
 #include <unistd.h>
 #include "maze.h"
 
-#define NYI {cout << "NYI " << __LINE__<<"\n"; exit(1);}
 
 #define WIDTH 27
 #define LENGTH 54
 #define STARTONE 0
 #define STARTTWO 0
-#define ENDONE 3
-#define ENDTWO 250
+#define ENDONE 240
+#define ENDTWO 5
 
 
 using namespace std;
@@ -310,18 +309,18 @@ void loadmap(mapstruct & a){
 	for(int i=0; i < a.width; i++)
 		for(int j=0; j < a.length; j++)
 			a.walls[i][j] = false;
-	 
-	 // blocks off secret passage
+	 //Later I need to debug the fact the there is an assertion but its not a bug maybe it is just where I place the end point.
+	 //blocks off secret passage.
 	for(int i=265; i < a.width; i++)
 		for(int j=0; j < 288; j++)
 			a.walls[i][j] = true;
 
-	// blocks of outerworks
+	//blocks of outerworks.
 	for(int i=0; i < 267; i++)
 		for(int j=191; j < 241; j++)
 			a.walls[i][j] = true;
 
-	// blocks of tower 
+	// blocks of tower.
 	for(int i=87; i < 232; i++)
 		for(int j=0; j < 69; j++)
 			a.walls[i][j] = true;
