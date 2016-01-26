@@ -1,3 +1,4 @@
+//something that did not look right was that even though the start was at the far right and start orentation was right it when strait even thought there should be a wall there. set triar .amount to a float and fix every thing down the line.
 #include <iostream>
 #include <math.h>
 #include <stdlib.h>
@@ -9,15 +10,23 @@
 #include "maze.h"
 
 
-#define WIDTH 27
-#define LENGTH 54
+#define WIDTH 319
+#define LENGTH 325
 #define STARTONE 0
-#define STARTTWO 0
-#define ENDONE 240
-#define ENDTWO 5
+#define STARTTWO 319
+#define ENDONE 133
+#define ENDTWO 247
 
 
 using namespace std;
+
+///////////////////////////////////////////////////////////////////////////////
+//enums
+//
+//the enums for detremine the orentation 
+//////////////////////////////////////////////////////////////////////////////
+enum direction { LEFT=0, RIGHT=1, UP=2, DOWN=3};
+enum movedir { MFORWARD=0, MRIGHT=1, MLEFT=2, MBACK=3};
 
 //////////////////////////////////////////////////////////////////////////////
 // Structures
@@ -35,7 +44,12 @@ struct list{
 	point prev;
 	bool v;
 };
-
+struct triar{
+	movedir dir;
+	int amount;
+	bool usage;
+	int degrees;
+};
 /////////////////////////////////////////////////////////////////////////////
 // operatior
 //
@@ -52,26 +66,14 @@ ostream&operator<<(ostream& o, point a){
 	return o;
 }
 
-bool operator==(point a,point b){
-	return (a.x == b.x && a.y == b.y);
-}
-
-ostream&operator<<(ostream& o, mapstruct const& map){
+ostream&operator<<(ostream& o, triar a){
 	
-	return o<< map.width << "," << map.length << endl;
-}
+	o<< "dir " << a.dir << "," << "amount " << a.amount << "(ft)" << "," << "usage " << a.usage << "," << "degrees " << a.degrees << endl;
 
-ostream&operator<<(ostream& o, list const& l){
-	
-	o<< "List prev:" << l.prev << "," << "List point:"<< l.pt << endl;
 	return o;
 }
 
-template<typename T >
-ostream&operator<<(ostream& o, vector<T> const& v){
-	for(T a:v)
-		o<<a<<"\n";
-
+bool operator==(point a,point b){89i7z	1
 	return o;
 }
 
@@ -80,16 +82,6 @@ ostream&operator<<(ostream& o, pair<A,B> const& p){
 	o << "Pairs: " << p.first << "," << p.second << endl; 
 	return o;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-//enums
-//
-//the enums for detremine the orentation 
-//////////////////////////////////////////////////////////////////////////////
-enum direction { LEFT=0, RIGHT=1, UP=2, DOWN=3};
-enum movedir { MFORWARD=0, MRIGHT=1, MLEFT=2, MBACK=3};
-
 
 ostream&operator<<(ostream& o, movedir const& p){
 	if(p==MFORWARD)
@@ -455,6 +447,30 @@ vector<pair<int,movedir>> findlist2(direction crdir,vector<pair<int,direction>> 
 	
 	return pairs;
 }
+vector<triar> finnalcal(vector<pair<int,movedir>> v){
+	triar h;
+	vector<triar> vtwo;
+
+	for (unsigned int i=0;i < v.size();i++){
+		if(v[i].second == 1 or v[i].second == 2){
+			h.dir = v[i].second;
+			h.amount = v[i].first;
+			h.degrees = 90;
+			h.usage=true;
+			vtwo.push_back(h);
+		}
+		else{
+			h.dir = v[i].second;
+			h.amount = v[i].first / 12;
+			h.degrees = 0;
+			h.usage=false;
+			vtwo.push_back(h);
+		}
+	}
+
+	return vtwo;
+	
+}
 vector<pair<int,movedir>> solvemaze(point start,point end,direction startdir,direction enddir){
 	//declarations	
 	point p;
@@ -566,8 +582,10 @@ int main(){
 	point a;
 	point b;
 	direction c=RIGHT;
-	direction  d=RIGHT;
+	direction  d=LEFT;
 	vector<pair<int,movedir>> FinalInstructions;
+	
+
 	
 	a.x = STARTONE;
 	a.y = STARTTWO;
@@ -578,16 +596,7 @@ int main(){
 	FinalInstructions = solvemaze(a,b,c,d);
 
 	cout << "Final:" << endl << FinalInstructions << endl;
+
+
+	cout << "converted" << endl << finnalcal(FinalInstructions) << endl;
 }
-
-
-
-
-
-
-
-
-
-
-
-
