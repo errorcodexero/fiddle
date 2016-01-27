@@ -99,7 +99,7 @@ enum movedir { MFORWARD=0, MRIGHT=1, MLEFT=2, MBACK=3};
 
 
 ostream&operator<<(ostream& o, movedir const& p){
-	o<< "Hacking... " << p << endl; 
+	o<< "enum" << p << endl; 
 	 
 	return o;
 }

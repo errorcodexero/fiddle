@@ -44,12 +44,6 @@ struct list{
 	point prev;
 	bool v;
 };
-struct triar{
-	movedir dir;
-	int amount;
-	bool usage;
-	int degrees;
-};
 /////////////////////////////////////////////////////////////////////////////
 // operatior
 //
@@ -66,15 +60,14 @@ ostream&operator<<(ostream& o, point a){
 	return o;
 }
 
-ostream&operator<<(ostream& o, triar a){
+
+bool operator==(point a,point b){
+	if ((a.x == b.x) & (a.y == b.y))
+		return true;
+	else
+		return false;
 	
-	o<< "dir " << a.dir << "," << "amount " << a.amount << "(ft)" << "," << "usage " << a.usage << "," << "degrees " << a.degrees << endl;
-
-	return o;
-}
-
-bool operator==(point a,point b){89i7z	1
-	return o;
+	
 }
 
 template<typename A, typename B>
@@ -82,6 +75,16 @@ ostream&operator<<(ostream& o, pair<A,B> const& p){
 	o << "Pairs: " << p.first << "," << p.second << endl; 
 	return o;
 }
+template<typename A, typename B>
+ostream&operator<<(ostream& o, vector<A,B> const& p){
+	for (unsigned int i=0; i < p.size();i++)
+		o << "v: " << p[i] << endl; 
+
+	return o;
+}
+
+
+
 
 ostream&operator<<(ostream& o, movedir const& p){
 	if(p==MFORWARD)
@@ -447,30 +450,7 @@ vector<pair<int,movedir>> findlist2(direction crdir,vector<pair<int,direction>> 
 	
 	return pairs;
 }
-vector<triar> finnalcal(vector<pair<int,movedir>> v){
-	triar h;
-	vector<triar> vtwo;
 
-	for (unsigned int i=0;i < v.size();i++){
-		if(v[i].second == 1 or v[i].second == 2){
-			h.dir = v[i].second;
-			h.amount = v[i].first;
-			h.degrees = 90;
-			h.usage=true;
-			vtwo.push_back(h);
-		}
-		else{
-			h.dir = v[i].second;
-			h.amount = v[i].first / 12;
-			h.degrees = 0;
-			h.usage=false;
-			vtwo.push_back(h);
-		}
-	}
-
-	return vtwo;
-	
-}
 vector<pair<int,movedir>> solvemaze(point start,point end,direction startdir,direction enddir){
 	//declarations	
 	point p;
@@ -598,5 +578,5 @@ int main(){
 	cout << "Final:" << endl << FinalInstructions << endl;
 
 
-	cout << "converted" << endl << finnalcal(FinalInstructions) << endl;
+
 }
