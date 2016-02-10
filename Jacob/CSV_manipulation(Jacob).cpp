@@ -74,6 +74,7 @@ int main(){
 		v.push_back(temp);
 	}
 	cout<<v;
+	//cout<<v[0][1];
 	
 }
 
