@@ -4,11 +4,10 @@ all: test log_reader
 test: test.cpp logger.cpp
 	g++ test.cpp logger.cpp -o "logger"
 
-log_reader: Log_reader.cpp
-	g++ Log_reader.cpp -o "reader"
+log_reader: reader.cpp
+	g++ reader.cpp -o "reader"
 
 .PHONY: clean
 clean:
 	rm -rf logger;
 	rm -rf reader;
-	rm deadTree.csv;

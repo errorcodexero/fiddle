@@ -7,7 +7,7 @@
 using namespace std;
 
 void tagThis(string str, string str2){
-	fstream myfile("deadTree.csv", ofstream::out | ofstream::app);
+	fstream myfile("log.csv", ofstream::out | ofstream::app);
 	myfile << "---------------------,";
 	str2.erase(str2.size());
 	str2.append(",");
@@ -17,7 +17,7 @@ void tagThis(string str, string str2){
 }
 
 /*void tagThis(string str){
-	ofstream myfile("deadTree.csv");
+	ofstream myfile("log.csv");
 	
 	myfile << str;
 	myfile.close();
