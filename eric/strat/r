@@ -1,0 +1,1 @@
+make strat 2>&1 && ./strat 2>&1
