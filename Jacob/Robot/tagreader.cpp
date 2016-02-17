@@ -6,7 +6,7 @@
 using namespace std;
 
 int main(){
-	fstream f("log.csv");
+	fstream f("taglog.csv");
 	if(f.good() == false){
 		cout<<"No file available.";
 		exit(1);

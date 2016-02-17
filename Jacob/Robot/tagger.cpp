@@ -3,11 +3,11 @@
 */
 #include <iostream>
 #include <fstream>
-#include "logger.h"
+#include "tagger.h"
 using namespace std;
 
 void tagThis(string str, string str2){
-	fstream myfile("log.csv", ofstream::out | ofstream::app);
+	fstream myfile("../doc/tagger/taglog.csv", ofstream::out | ofstream::app);
 	myfile << "---------------------,";
 	str2.erase(str2.size());
 	str2.append(",");
