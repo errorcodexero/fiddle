@@ -171,18 +171,37 @@ std::set<Freq> get_order(unsigned int len, Game game){
 	for(Freq a: freq){
 		s.insert(a);
 	}
+	std::cout<<"\n"<<s<<"\n";
 	return s;
-}
-
-char to_guess(std::set<Freq> freq){
-	std::set<Freq>::iterator it=std::next(freq.begin(),Letter::LETTER-1);
-	Freq f=*it;
-	return f.letter();
 }
 
 char get_guess(unsigned int len,Game game){
 	std::set<Freq> freq=get_order(len,game);
-	char guess=to_guess(freq);	
+	unsigned int num=1;
+	char guess='1';
+	while(true){
+		std::set<Freq>::iterator it=std::next(freq.begin(),Letter::LETTER-num);
+		Freq f=*it;
+		char n=f.letter();
+		bool skip=0;
+		for(unsigned int i=0;i<game.correct.size(); i++){
+			if(n==game.correct[i]){
+				num++;
+				skip=1;
+				break;
+			}
+		}
+		for(unsigned int i=0;i<game.incorrect.size(); i++){
+			if(n==game.incorrect[i]){
+				num++;
+				skip=1;
+				break;
+			}
+		}
+		if(skip)continue;
+		guess=n;
+		break;
+	}
 	return guess;
 }
 
@@ -250,6 +269,5 @@ int main(){
 			break;
 		}
 	}
-	NYI
 	return 0;
 }

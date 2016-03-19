@@ -12,7 +12,7 @@
 	exit(44); \
 }
 
-#define FILENAME "test.txt"
+#define FILENAME "words.txt"
 #define ATTEMPTS 6
 
 typedef std::string Word;
