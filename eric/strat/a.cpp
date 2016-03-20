@@ -298,6 +298,169 @@ void make_plot(vector<Scoring> v){
 	assert(r==0);
 }
 
+auto balls(vector<Scoring> v){
+	return mapf([](auto a){ return a.balls; },v);
+}
+
+auto defenses(vector<Scoring> v){
+	return mapf([](auto a){ return a.defenses; },v);
+}
+
+Maybe<Scoring> left(Scoring a){
+	if(!a.balls) return Maybe<Scoring>();
+	return Maybe<Scoring>{Scoring{a.balls-1,a.defenses}};
+}
+
+Maybe<Scoring> right(Scoring a){
+	return Maybe<Scoring>{Scoring{a.balls+1,a.defenses}};
+}
+
+Maybe<Scoring> up(Scoring a){
+	if(a.defenses) return Maybe<Scoring>{Scoring{a.balls,a.defenses-1}};
+	return Maybe<Scoring>{};
+}
+
+Maybe<Scoring> down(Scoring a){
+	return Maybe<Scoring>{Scoring{a.balls,a.defenses+1}};
+}
+
+typedef Maybe<Scoring> (*Dir)(Scoring);
+using Path=vector<Dir>;
+Path DIRS={left,right,up,down};
+
+template<typename T>
+vector<T> operator|(vector<T> v,T t){
+	v|=t;
+	return v;
+}
+
+vector<Path> paths(size_t max_len){
+	if(max_len==0) return {{}};
+	auto prev=paths(max_len-1);
+	vector<Path> r;
+	for(auto p:prev){
+		for(auto f:DIRS){
+			r|=(p|f);
+		}
+	}
+	return r;
+}
+
+Maybe<Scoring> follow_path(Scoring start,Path path){
+	for(auto item:path){
+		auto a=item(start);
+		if(!a) return Maybe<Scoring>();
+		start=*a;
+	}
+	return Maybe<Scoring>(start);
+}
+
+map<Scoring,double> nearby(Scoring center,int distance){
+	map<Scoring,double> out;
+	set<Scoring> r;
+	for(auto i:range(distance)){
+		for(auto p:paths(distance)){
+			auto after=follow_path(center,p);
+			if(after){
+				r|=*after;
+				auto f=out.find(*after);
+				if(f==out.end()){
+					out[*after]=1/(1.0+p.size());
+				}
+			}
+		}
+	}
+	return out;
+}
+
+void make_plot2(vector<Scoring> v){
+	auto b=max(balls(v));
+	auto d=max(defenses(v));
+	auto c=count(v);
+
+	auto get_pt=[&](Scoring a){
+		auto f=c.find(a);
+		if(f==c.end()) return 0ul;
+		return f->second;
+	};
+
+	auto get_pt2=[&](Scoring a){
+		float weight=0;
+		float total=0;
+		/*
+		if(a.balls>0){
+			weight+=1;
+			total+=get_pt({a.balls-1,a.defenses});
+		}
+		if(a.defenses>0){
+			weight+=1;
+			total+=get_pt({a.balls,a.defenses-1});
+		}
+
+		weight+=1;
+		total+=get_pt({a.balls+1,a.defenses});
+
+		weight+=1;
+		total+=get_pt({a.balls,a.defenses});
+
+		weight+=1;
+		total+=get_pt(a);*/
+		auto n=nearby(a,4);
+		for(auto b:n){
+			weight+=b.second;
+			total+=get_pt(b.first);
+		}
+
+		return total/weight;
+	};
+
+	auto points=mapf(
+		[](auto p){
+			return Scoring{p.first,p.second};
+		},
+		cross(range_inclusive(b),range_inclusive(d))
+	);
+	auto total_area=sum(mapf(get_pt2,points));
+
+	auto get_pt3=[&](auto a){
+		return 100*get_pt2(a)/total_area;
+	};
+
+	{
+		ofstream cmd("data.txt");
+		for(auto y:range_inclusive(b)){
+			for(auto x:range_inclusive(d)){
+				Scoring here{(unsigned)y,(unsigned)x};
+				cmd<<get_pt3(here)<<" ";
+			}
+			cmd<<"\n";
+		}
+	}
+
+	auto CMD="cmd2.txt";
+	{
+		ofstream cmd(CMD);
+		cmd<<"set title \"3D surface from a grid (matrix) of Z values\"\n";
+		cmd<<"set xrange [0:"<<d<<"]\n";
+		cmd<<"set yrange [0:"<<b<<"]\n";
+
+		cmd<<"set grid\n";
+		cmd<<"set hidden3d\n";
+		cmd<<"set terminal png size 700,700 enhanced font \"Helvetica,20\"\n";
+		cmd<<"set output 'output.png'\n";
+		//cmd<<"plot \"data.txt\"\n";
+/*5 4 3 1 0
+2 2 0 0 1
+0 0 0 1 0
+0 0 0 2 3
+0 1 2 4 3*/
+		cmd<<"splot 'data.txt' matrix with lines notitle\n";
+	}
+
+	auto r=system((string{"gnuplot "}+CMD).c_str());
+	assert(!r);
+}
+
 int main(){
 	Scoring a{2,1};
 	/*cout<<a<<"\n";
@@ -310,13 +473,13 @@ int main(){
 	//show_pts(map_all_to(all_pts,0));
 
 	auto f=flatten(MAP(below_eq,rands));
-	show_pts(count(f)/rands.size());
+	//show_pts(count(f)/rands.size());
 
 	auto a1=alliance_example_data();
 	PRINT(a1)
 	auto whole=added(a1);
-	PRINT(whole)
+	//PRINT(whole)
 	show_pts(map_all_to(whole,0));
 	show_pts(odds(a1));
-	make_plot(whole);
+	make_plot2(whole);
 }
