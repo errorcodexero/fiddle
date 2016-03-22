@@ -1,5 +1,4 @@
-all: 
-	make hangman_solver; make hangman;
+all: hangman_solver hangman
 
 hangman_solver: hangman_solver.cpp
 	g++ hangman_solver.cpp -std=c++11 -Wall -Wextra -Werror -o "hangman_solver"
