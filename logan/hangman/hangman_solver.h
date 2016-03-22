@@ -28,21 +28,29 @@ class Freq{
 	void add();
 	char letter();
 	int count();
+	
 	Freq();
 	Freq(char);
 	Freq(char,int);
 };
 
 struct Game{
-	Word word;
+	private:
 	std::vector<char> incorrect;
 	std::vector<char> correct;
+	std::vector<Word> possibles;
+	char get_guess();
+	void update_possibles();
+	
+	public:
+	Word word;
 	std::string draw_gallows();
 	bool found();
 	bool failed();
+	void operator()();
+	
 	Game();
 	Game(unsigned int);
-	void operator()();
 };
 
 bool operator<(Freq, Freq);
@@ -58,7 +66,6 @@ template<typename T>
 std::ostream& operator<<(std::ostream&, std::set<T>);
 
 const std::array<char,Letter::LETTER> GEN_ORDER{'e','t','a','o','i','n','s','h','r','d','l','c','u','m','w','f','g','y','p','b','v','k','j','x','q','z'};//general frequency of letter occurences
-
 const std::array<char,Letter::LETTER> LETTERS{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};//all letters in alphabetical order
 
 const std::vector<Freq> GEN_FREQ=[&]{//general order of letters as type Freq
