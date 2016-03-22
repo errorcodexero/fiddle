@@ -18,7 +18,6 @@
 typedef std::string Word;
 
 enum Letter{A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,LETTER};//enum of all letters in their place
-const std::array<char,Letter::LETTER> LETTERS{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};//all letters in order
 
 class Freq{
 	private:
@@ -38,8 +37,12 @@ struct Game{
 	Word word;
 	std::vector<char> incorrect;
 	std::vector<char> correct;
+	std::string draw_gallows();
+	bool found();
+	bool failed();
 	Game();
 	Game(unsigned int);
+	void operator()();
 };
 
 bool operator<(Freq, Freq);
@@ -54,7 +57,9 @@ std::ostream& operator<<(std::ostream&,std::array<Type,Len>);
 template<typename T>
 std::ostream& operator<<(std::ostream&, std::set<T>);
 
-const std::array<char,Letter::LETTER> GEN_ORDER{'e','t','a','o','i','n','s','h','r','d','l','c','u','m','w','f','g','y','p','b','v','k','j','x','q','z'};//general order of letters in characters
+const std::array<char,Letter::LETTER> GEN_ORDER{'e','t','a','o','i','n','s','h','r','d','l','c','u','m','w','f','g','y','p','b','v','k','j','x','q','z'};//general frequency of letter occurences
+
+const std::array<char,Letter::LETTER> LETTERS{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};//all letters in alphabetical order
 
 const std::vector<Freq> GEN_FREQ=[&]{//general order of letters as type Freq
 	std::vector<Freq> freq;

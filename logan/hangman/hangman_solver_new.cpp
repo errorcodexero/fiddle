@@ -1,3 +1,5 @@
+//TODO: get it working 100%. Consider reading in words from words.txt once and shortening the list rather than reading it every time
+
 #include "hangman_solver_new.h"
 #include <fstream>
 #include <assert.h>
@@ -26,6 +28,7 @@ int Freq::count(){
 }
 
 Game::Game():word(""),incorrect({}),correct(){}
+
 Game::Game(unsigned int a):incorrect({}),correct({}){
 	word=[&]{
 		Word n;
@@ -81,102 +84,104 @@ std::ostream& operator<<(std::ostream& o, std::set<T> s){
 	return o<<")";
 }
 
-std::string draw_gallows(const unsigned int remaining_attempts){//Draws the gallows with the appropriate amount of body parts. 
-	std::string gallows;
-	if(remaining_attempts==0){
-		gallows="      _______\n     |/       \n     |         \n     |          \n     |        \n     |          \n     |\n  ___|___\n";//Empty Gallows
+template<typename T>
+std::ostream& operator<<(std::ostream& o,std::vector<T> v){
+	o<<"(";
+	for(unsigned int i=0; i<v.size(); i++){
+		o<<v[i];
+		if(i<v.size()-1) o<<",";
 	}
-	else if(remaining_attempts==1){
-		gallows="      _______\n     |/      |\n     |      (_)\n     |          \n     |        \n     |          \n     |\n  ___|___\n";//Head
-	}
-	else if(remaining_attempts==2){
-		gallows="      _______\n     |/      |\n     |      (_)\n     |       |  \n     |       |\n     |          \n     |\n  ___|___\n";//Torso
-	}
-	else if(remaining_attempts==3){
-		gallows="      _______\n     |/      |\n     |      (_)\n     |      \\| \n     |       |\n     |          \n     |\n  ___|___\n";//Left arm
-	}
-	else if(remaining_attempts==4){
-		gallows="      _______\n     |/      |\n     |      (_)\n     |      \\|/\n     |       |\n     |          \n     |\n  ___|___\n";//Right arm 
-	}
-	else if(remaining_attempts==5){
-		gallows="      _______\n     |/      |\n     |      (_)\n     |      \\|/\n     |       |\n     |      / \n     |\n  ___|___\n";//Left leg
-	}
-	else if(remaining_attempts==6){
-		gallows="      _______\n     |/      |\n     |      (_)\n     |      \\|/\n     |       |\n     |      / \\\n     |\n  ___|___\n";//Right leg
+	return o<<")";
+}
+
+std::string Game::draw_gallows(){//Draws the gallows with the appropriate amount of body parts. 
+	std::string gallows="      _______\n     |/       \n     |         \n     |          \n     |        \n     |          \n     |\n  ___|___\n";//Empty Gallows
+	switch(incorrect.size()){
+		case 1:
+			gallows="      _______\n     |/      |\n     |      (_)\n     |          \n     |        \n     |          \n     |\n  ___|___\n";//Head
+			break;
+		case 2:
+			gallows="      _______\n     |/      |\n     |      (_)\n     |       |  \n     |       |\n     |          \n     |\n  ___|___\n";//Torso
+			break;
+		case 3:
+			gallows="      _______\n     |/      |\n     |      (_)\n     |      \\| \n     |       |\n     |          \n     |\n  ___|___\n";//Left arm
+			break;
+		case 4:
+			gallows="      _______\n     |/      |\n     |      (_)\n     |      \\|/\n     |       |\n     |          \n     |\n  ___|___\n";//Right arm 
+			break;
+		case 5:
+			gallows="      _______\n     |/      |\n     |      (_)\n     |      \\|/\n     |       |\n     |      / \n     |\n  ___|___\n";//Left leg
+			break;
+		default:
+			gallows="      _______\n     |/      |\n     |      (_)\n     |      \\|/\n     |       |\n     |      / \\\n     |\n  ___|___\n";//Right leg
+			break;
 	}
 	return gallows;
 }
 
-std::vector<Word> get_list(unsigned int len,Game game){
+std::vector<Word> get_list(Word word,std::vector<char> incorrect){
 	std::ifstream in(FILENAME);
 	std::vector<Word> words;
 	while(!in.eof()){
-		Word word;
-		std::getline(in,word);
-		if(word.length()!=len)continue;
-		bool skip=0;
-		for(char c:word){
-			for(char cc:game.incorrect){
+		Word new_word;
+		std::getline(in,new_word);
+		if(new_word.length()!=word.length()){
+			std::cout.flush();
+			std::cout<<"\nhere "<<new_word.length()<<"  "<<word.length()<<"\nhere"<<new_word<<"   "<<word<<"\n";
+			continue;
+		}
+		bool skip=false;
+		for(char c:new_word){
+			for(char cc:incorrect){
 				if(c==cc){
-					skip=1;
+					skip=true;
 					break;
 				}
 			}
+			if(skip)break;
 		}
 		if(skip)continue;
-		skip=0;
-		for(unsigned int i=0; i<len; i++){
-			if(game.word[i]!=' ' && word[i]!=game.word[i]){
-				skip=1;
+		for(unsigned int i=0; i<word.length(); i++){
+			if(word[i]!=' ' && new_word[i]!=word[i]){
+				skip=true;
 				break;
 			}
 		}
 		if(skip)continue;
-		words.push_back(word);
+		words.push_back(new_word);
 	}
 	in.close();
+	std::cout<<"\nwords:"<<words<<"\n";
 	return words;
 }
 
-void init(std::array<Freq,Letter::LETTER>& freq){
-	for(unsigned int i=0;i<Letter::LETTER; i++){
-		freq[i]={LETTERS[i],0};
-	}
-}
-
-void add(const char c,std::array<Freq,Letter::LETTER>& freq){
-	for(int i=0; i<Letter::LETTER; i++){
-		if(c==freq[i].letter()){
-			freq[i].add();
-			break;
-		}
-	}
-}
-
-std::array<Freq,Letter::LETTER> get_freq(unsigned int len,Game game){
-	std::vector<Word> words=get_list(len,game);
-	std::array<Freq,Letter::LETTER> freq;
-	init(freq);
-	for(Word w: words){
-		for(char c: w){
-			add(c,freq);
-		}
-	}
-	return freq;
-}
-
-std::set<Freq> get_order(unsigned int len, Game game){
-	std::array<Freq,Letter::LETTER> freq=get_freq(len,game);
+std::set<Freq> get_freq(Word word,std::vector<char> incorrect){
 	std::set<Freq> s;
-	for(Freq a: freq){
-		s.insert(a);
+	{
+		std::array<Freq,Letter::LETTER> freq=[&]{
+			std::array<Freq,Letter::LETTER> frequency;
+			for(unsigned int i=0;i<Letter::LETTER; i++) frequency[i]={LETTERS[i],0};
+			std::vector<Word> words=get_list(word,incorrect);
+			for(Word w: words){
+				for(char c: w){
+					for(int i=0; i<Letter::LETTER; i++){
+						if(tolower(c)==frequency[i].letter()){
+							frequency[i].add();
+							break;
+						}
+					}
+				}
+			}
+			return frequency;
+		}();
+		for(Freq a: freq) s.insert(a);
 	}
-	std::cout<<"\n"<<s<<"\n";
+	std::cout<<"\nget_order():"<<s<<"\n";
 	return s;
 }
 
-char get_guess(unsigned int len,Game game){
-	std::set<Freq> freq=get_order(len,game);
+char get_guess(Word word,std::vector<char> correct,std::vector<char> incorrect){
+	std::set<Freq> freq=get_freq(word,incorrect);
 	unsigned int num=1;
 	char guess='1';
 	while(true){
@@ -184,15 +189,15 @@ char get_guess(unsigned int len,Game game){
 		Freq f=*it;
 		char n=f.letter();
 		bool skip=0;
-		for(unsigned int i=0;i<game.correct.size(); i++){
-			if(n==game.correct[i]){
+		for(unsigned int i=0;i<correct.size(); i++){
+			if(n==correct[i]){
 				num++;
 				skip=1;
 				break;
 			}
 		}
-		for(unsigned int i=0;i<game.incorrect.size(); i++){
-			if(n==game.incorrect[i]){
+		for(unsigned int i=0;i<incorrect.size(); i++){
+			if(n==incorrect[i]){
 				num++;
 				skip=1;
 				break;
@@ -218,11 +223,42 @@ std::string print_word(Word w){
 	return s;
 }
 
-bool finished(Word w){
-	for(char c:w){
-		if(c==' ')return 0;
+void Game::operator()(){
+	char guess=get_guess(word,correct,incorrect), yn='n';
+	std::cout<<draw_gallows()<<"\nKnown: "<<print_word(word)<<". Does it have the letter \'"<<guess<<"\'?(y/n) ";
+	std::cin>>yn;
+	if(yn=='y'){
+		correct.push_back(guess);
+		std::string locs;
+		std::cout<<"\nWhere is it in the word?(Please write the locaions separated by commas) ";
+		std::cin>>locs;
+		std::vector<unsigned int> r,num;
+		for(unsigned int i=0; i<locs.size(); i++){
+			if(locs[i]==' ')r.push_back(i);
+		}
+		for(unsigned int i=r.size(); i>0; i--){
+			locs.erase(locs.begin()+r[i]);
+		}
+		unsigned int temp=0;
+		for(unsigned int i=0; i<locs.size()+1; i++){
+			if(locs[i]==','){
+				num.push_back(atoi((locs.substr(temp,(i-temp))).c_str())-1);
+				temp=i+1;
+			}
+		}
+		num.push_back(atoi((locs.substr(temp,(locs.size()-temp))).c_str())-1);
+		for(unsigned int i:num)word[i]=guess;			
 	}
-	return 1;
+	else incorrect.push_back(guess);
+}
+
+bool Game::failed(){ return incorrect.size()>=ATTEMPTS; }
+
+bool Game::found(){
+	for(char c:word){
+		if(c==' ') return false;
+	}
+	return true;
 }
 
 int main(){
@@ -231,41 +267,14 @@ int main(){
 	std::cin>>len;
 	Game game(len);
 	while(true){
-		char guess=get_guess(game.word.length(),game), yn='n';
-		std::cout<<draw_gallows(game.incorrect.size())<<"\nKnown: "<<print_word(game.word)<<". Does it have the letter \'"<<guess<<"\'?(y/n) ";
-		std::cin>>yn;
-		if(yn=='y'){
-			game.correct.push_back(guess);
-			std::string locs;
-			std::cout<<"\nWhere is it in the word?(Please write the locaions separated by commas) ";
-			std::cin>>locs;
-			std::vector<unsigned int> r,num;
-			for(unsigned int i=0; i<locs.size(); i++){
-				if(locs[i]==' ')r.push_back(i);
-			}
-			for(unsigned int i=r.size(); i>0; i--){
-				locs.erase(locs.begin()+r[i]);
-			}
-			unsigned int temp=0;
-			for(unsigned int i=0; i<locs.size()+1; i++){
-				if(locs[i]==','){
-					num.push_back(atoi((locs.substr(temp,(i-temp))).c_str())-1);
-					temp=i+1;
-				}
-			}
-			num.push_back(atoi((locs.substr(temp,(locs.size()-temp))).c_str())-1);
-			for(unsigned int i:num)game.word[i]=guess;			
-		} else{
-			game.incorrect.push_back(guess);
-		}
-		if(finished(game.word)){
-			std::cout<<"\n"<<draw_gallows(game.incorrect.size())<<"\nI WIN! The word is \""<<game.word<<"\"\n";
+		game();
+		if(game.found()){
+			std::cout<<"\n"<<game.draw_gallows()<<"\nI WIN! The word is \""<<game.word<<"\"\n";
 			break;
 		}
-		else if(game.incorrect.size()>=ATTEMPTS){
-			std::cout<<"\n"<<draw_gallows(game.incorrect.size())<<"\nI lose :'(\nWhat was the word? ";
-			std::string c;
-			std::cin>>c;
+		else if(game.failed()){
+			std::cout<<"\n"<<game.draw_gallows()<<"\nI lose :'(\nWhat was the word? ";
+			std::cin>>game.word;
 			break;
 		}
 	}
