@@ -1,4 +1,4 @@
-#include "hangman_solver.h"
+#include "hangman.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <algorithm>
@@ -70,31 +70,6 @@ std::ostream& operator<<(std::ostream& o,std::vector<T> v){
 	return o<<")";
 }
 
-std::string Game::draw_gallows(){//Draws the gallows with the appropriate amount of body parts. 
-	std::string gallows="      _______\n     |/       \n     |         \n     |          \n     |        \n     |          \n     |\n  ___|___\n";//Empty Gallows
-	switch(incorrect.size()){
-		case 1:
-			gallows="      _______\n     |/      |\n     |      (_)\n     |          \n     |        \n     |          \n     |\n  ___|___\n";//Head
-			break;
-		case 2:
-			gallows="      _______\n     |/      |\n     |      (_)\n     |       |  \n     |       |\n     |          \n     |\n  ___|___\n";//Torso
-			break;
-		case 3:
-			gallows="      _______\n     |/      |\n     |      (_)\n     |      \\| \n     |       |\n     |          \n     |\n  ___|___\n";//Left arm
-			break;
-		case 4:
-			gallows="      _______\n     |/      |\n     |      (_)\n     |      \\|/\n     |       |\n     |          \n     |\n  ___|___\n";//Right arm 
-			break;
-		case 5:
-			gallows="      _______\n     |/      |\n     |      (_)\n     |      \\|/\n     |       |\n     |      / \n     |\n  ___|___\n";//Left leg
-			break;
-		default:
-			gallows="      _______\n     |/      |\n     |      (_)\n     |      \\|/\n     |       |\n     |      / \\\n     |\n  ___|___\n";//Right leg
-			break;
-	}
-	return gallows;
-}
-
 std::vector<Word> get_list(const unsigned int len){
 	std::ifstream in(FILENAME);
 	std::vector<Word> words;
@@ -108,20 +83,24 @@ std::vector<Word> get_list(const unsigned int len){
 	return words;
 }
 
-Game::Game():incorrect({}),correct(),word(""){
-	possibles=get_list(word.length());
+Solver::Solver():incorrect({}),correct(),known(""){
+	possibles=get_list(known.length());
 }
 
-Game::Game(unsigned int a):incorrect({}),correct({}){
-	word=[&]{
+Solver::Solver(unsigned int a):incorrect({}),correct({}){
+	known=[&]{
 		Word n;
 		for(unsigned int i=0;i<a; i++)n.append(" ");
 		return n;
 	}();
-	possibles=get_list(word.length());
+	possibles=get_list(known.length());
 }
 
-void Game::update_possibles(){
+unsigned int Solver::remaining(){
+	return incorrect.size();
+}
+
+void Solver::update_possibles(){
 	std::vector<unsigned int> to_remove;
 	for(unsigned int i=0;i<possibles.size();i++){
 		bool remove=false;
@@ -138,8 +117,8 @@ void Game::update_possibles(){
 			to_remove.push_back(i); 
 			continue;
 		}
-		for(unsigned int j=0; j<word.length(); j++){
-			if(word[j]!=' ' && possibles[i][j]!=word[j]){
+		for(unsigned int j=0; j<known.length(); j++){
+			if(known[j]!=' ' && possibles[i][j]!=known[j]){
 				remove=true;
 				break;
 			}
@@ -172,7 +151,7 @@ std::set<Freq> get_freq(std::vector<Word> words){
 	return s;
 }
 
-char Game::get_guess(){
+char Solver::get_guess(){
 	std::set<Freq> freq=get_freq(possibles);
 	unsigned int num=1;
 	char guess='1';
@@ -215,10 +194,10 @@ std::string print_word(Word w){
 	return s;
 }
 
-void Game::operator()(){
+void Solver::operator()(){
 	update_possibles();
 	char guess=get_guess(), yn='n';
-	std::cout<<draw_gallows()<<"\nKnown: "<<print_word(word)<<". Does it have the letter \'"<<guess<<"\'?(y/n) ";
+	std::cout<<draw_gallows(incorrect.size())<<"\nKnown: "<<print_word(known)<<". Does it have the letter \'"<<guess<<"\'?(y/n) ";
 	std::cin>>yn;
 	if(yn=='y'){
 		correct.push_back(guess);
@@ -240,15 +219,15 @@ void Game::operator()(){
 			}
 		}
 		num.push_back(atoi((locs.substr(temp,(locs.size()-temp))).c_str())-1);
-		for(unsigned int i:num)word[i]=guess;			
+		for(unsigned int i:num) known[i]=guess;			
 	}
 	else incorrect.push_back(guess);
 }
 
-bool Game::failed(){ return incorrect.size()>=ATTEMPTS; }
+bool Solver::failed(){ return incorrect.size()>=ATTEMPTS; }
 
-bool Game::found(){
-	for(char c:word){
+bool Solver::found(){
+	for(char c:known){
 		if(c==' ') return false;
 	}
 	return true;
@@ -260,13 +239,13 @@ int main(){
 	unsigned int len=0;
 	std::cout<<"How long is the word? ";
 	std::cin>>len;
-	Game game(len);
-	while(!game.found() && !game.failed()){
-		game();
-		if(game.found()) std::cout<<"\n"<<game.draw_gallows()<<"\nI WIN! The word is \""<<game.word<<"\"\n";
-		else if(game.failed()){
-			std::cout<<"\n"<<game.draw_gallows()<<"\nI lose :'(\nWhat was the word? ";
-			std::cin>>game.word;
+	Solver solver(len);
+	while(!solver.found() && !solver.failed()){
+		solver();
+		if(solver.found()) std::cout<<"\n"<<draw_gallows(solver.remaining())<<"\nI WIN! The word is \""<<solver.known<<"\"\n";
+		else if(solver.failed()){
+			std::cout<<"\n"<<draw_gallows(solver.remaining())<<"\nI lose :'(\nWhat was the word? ";
+			std::cin>>solver.known;
 		}
 	}
 	return 0;

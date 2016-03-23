@@ -1,5 +1,5 @@
-#ifndef HANGMAN_SOLVER_H
-#define HANGMAN_SOLVER_H
+#ifndef HANGMAN_H
+#define HANGMAN_H
 
 #include <iostream>
 #include <string>
@@ -38,7 +38,7 @@ class Freq{
 	Freq(char,int);
 };
 
-struct Game{
+struct Solver{
 	private:
 	std::vector<char> incorrect;
 	std::vector<char> correct;
@@ -47,14 +47,23 @@ struct Game{
 	void update_possibles();
 	
 	public:
-	Word word;
-	std::string draw_gallows();
+	Word known;
 	bool found();
 	bool failed();
+	unsigned int remaining();
 	void operator()();
 	
+	Solver();
+	Solver(unsigned int);
+};
+
+struct Game{
+	Word word;
+	std::vector<char> incorrect;
+	std::vector<char> correct;
+	
 	Game();
-	Game(unsigned int);
+	Game(Word);
 };
 
 bool operator<(Freq, Freq);
@@ -82,6 +91,7 @@ const std::vector<Freq> GEN_FREQ=[&]{//general order of letters as type Freq
 	return freq;
 }();
 
+std::string draw_gallows(unsigned int);
 std::string get_word();
 std::string get_blanks(Word);
 void play_game(Word,Word);

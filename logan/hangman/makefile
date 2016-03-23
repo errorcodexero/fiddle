@@ -1,7 +1,7 @@
 all: hangman_solver hangman hangman_test
 
 hangman_solver: hangman_solver.cpp
-	g++ hangman_solver.cpp -std=c++11 -DHANGMAN_SOLVER -Wall -Wextra -Werror -o "hangman_solver"
+	g++ hangman_solver.cpp hangman.cpp -std=c++11 -DHANGMAN_SOLVER -Wall -Wextra -Werror -o "hangman_solver"
 
 hangman: hangman.cpp
 	g++ hangman.cpp hangman_solver.cpp -std=c++11 -DHANGMAN_GAME -Wall -Wextra -Werror -o "hangman"
