@@ -58,12 +58,15 @@ struct Solver{
 };
 
 struct Game{
+	unsigned int remaining;
 	Word word;
 	std::vector<char> incorrect;
 	std::vector<char> correct;
-	
+	bool done();
+	void guess(char);
+	std::string print_known(bool);
 	Game();
-	Game(Word);
+	void operator()();
 };
 
 bool operator<(Freq, Freq);
