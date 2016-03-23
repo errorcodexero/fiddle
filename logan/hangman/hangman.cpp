@@ -1,20 +1,35 @@
 #include "hangman.h"
 
-Game::Game():remaining(ATTEMPTS),incorrect({}),correct({'\''}){
+Game::Game():incorrect({}),correct({'\''}){
 	word=get_word();
 	print=[&]{
 		std::string s;
 		for(char c:word){
+			if(c=='\'') s+="'";
+			else s+=" ";
+		}
+		return s;
+	}();
+}
+
+Game::Game(Word w):incorrect({}),correct({'\''}){
+	word=w;
+	print=[&]{
+		std::string s;
+		for(char c:word){
 			if(c=='\'') s+="' ";
-			else s+="_ ";
+			else s+=" ";
 		}
 		return s;
 	}();
 }
 
 std::string draw_gallows(unsigned int incorrect){//Draws the gallows with the appropriate amount of body parts. 
-	std::string gallows="      _______\n     |/       \n     |         \n     |          \n     |        \n     |          \n     |\n  ___|___\n";//Empty Gallows
+	std::string gallows;
 	switch(incorrect){
+		case 0:
+			gallows="      _______\n     |/       \n     |         \n     |          \n     |        \n     |          \n     |\n  ___|___\n";//Empty Gallows
+			break;
 		case 1:
 			gallows="      _______\n     |/      |\n     |      (_)\n     |          \n     |        \n     |          \n     |\n  ___|___\n";//Head
 			break;
@@ -30,9 +45,11 @@ std::string draw_gallows(unsigned int incorrect){//Draws the gallows with the ap
 		case 5:
 			gallows="      _______\n     |/      |\n     |      (_)\n     |      \\|/\n     |       |\n     |      / \n     |\n  ___|___\n";//Left leg
 			break;
-		default:
+		case 6:
 			gallows="      _______\n     |/      |\n     |      (_)\n     |      \\|/\n     |       |\n     |      / \\\n     |\n  ___|___\n";//Right leg
 			break;
+		default:
+			assert(incorrect<=ATTEMPTS);
 	}
 	return gallows;
 }
@@ -65,38 +82,59 @@ std::string get_word(){//Chooses the word
 	return word;
 }
 
-bool Game::check(char guess){
-	bool right=false;
-	for(char c:word){
-		if(guess==c){
-			correct.push_back(guess);
-			right=true;
-			print=[&]{
-				std::string n;
-				for(unsigned int i=0;i<word.length();i++){
-					bool known=false;
-					for(char c:correct){
-						if(c==word[i]){
-							known=true;
-							break;
-						}
-					}
-					if(!known) n+="_ ";
-					else{
-						n+=word[i];
-						n+=' ';
-					}
+void Game::wrong(char c){
+	incorrect.push_back(c);
+}
+
+void Game::right(char c){
+	correct.push_back(c);
+	print=[&]{
+		std::string n;
+		for(unsigned int i=0;i<word.length();i++){
+			bool known=false;
+			for(char d:correct){
+				if(d==word[i]){
+					known=true;
+					break;
 				}
-				return n;
-			}();
+			}
+			if(known) n+=word[i];
+			else n+=' ';
+		}
+		return n;
+	}();
+}
+
+bool Game::check(char guess){
+	bool in_word=false;
+	for(char c:word){
+		if(std::tolower(guess)==std::tolower(c)){
+			right(guess);
+			in_word=true;
 			break;
 		}
 	}
-	if(!right){
-		incorrect.push_back(guess);
-		remaining--;
+	if(!in_word) wrong(guess);
+	return in_word;
+}
+
+std::string Game::print_word(){
+	if(done()) return word;
+	std::string to_print;
+	for(char c:print){
+		if(c==' ')c='_';
+		to_print+=c;
+		to_print+=' ';
 	}
-	return right;
+	return to_print;
+}
+
+unsigned int Game::length(){
+	return word.length();
+}
+
+unsigned int Game::remaining(){
+	return (ATTEMPTS-incorrect.size());
 }
 
 void Game::operator()(){
@@ -106,7 +144,7 @@ void Game::operator()(){
 		for(char c: correct){
 			if(c!='\'') guessed.push_back(c);
 		}
-		std::cout<<draw_gallows(incorrect.size())<<"\nKnown: "<<print<<" You have already guessed: "<<"PRINT OUT GUESSED HERE"<<" What is your guess? ";
+		std::cout<<draw_gallows(ATTEMPTS-remaining())<<"\nKnown: "<<print_word()<<" You have already guessed: "<<guessed<<" What is your guess? ";
 		std::cin>>guess;
 		bool again=true;
 		while(again){
@@ -122,22 +160,17 @@ void Game::operator()(){
 		}
 	}
 	bool right=check(guess);
-	std::cout<<remaining<<"\n";
 	if(done()){
-		std::cout<<draw_gallows(incorrect.size())<<"\n";
-		if(right) std::cout<<"\nI win! The word was \""<<print<<"\"!\n";
-		else{
-			std::string t;
-			std::cout<<"\nI lost. What was the word? ";
-			std::cin>>t;
-		}
+		std::cout<<draw_gallows(ATTEMPTS-remaining())<<"\n";
+		if(right) std::cout<<"\nYou win! The word was \""<<print_word()<<"\"!\n";
+		else std::cout<<"\nYou lost. The word was "<<print_word()<<"\n";
 	}
 }
 
 bool Game::done(){
-	if(remaining==0) return true;
+	if(remaining()==0) return true;
 	for(char c:print){
-		if(c=='_')return false;
+		if(c==' ')return false;
 	}
 	return true;
 }
@@ -163,7 +196,7 @@ int main(){
 		std::cin>>instructions;
 		if(instructions=='y') std::cout<<print_instructions(); 
 	}
-	Game game;
+	Game game("logan");
 	while(!game.done()){
 		game();
 	}

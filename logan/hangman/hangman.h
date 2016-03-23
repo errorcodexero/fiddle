@@ -11,20 +11,44 @@
 
 #define NYI { \
 	std::cout<<"\nnyi "<<__LINE__<<"\n"; \
-	exit(44); \
+	assert(0); \
 }
 
 #define FILENAME "words.txt"
 #define ATTEMPTS 6
 
 template<class Type, long unsigned int Len>
-std::ostream& operator<<(std::ostream&,std::array<Type,Len>);
+std::ostream& operator<<(std::ostream& o,std::array<Type,Len> a){
+	o<<"(";
+	for(unsigned int i=0; i<a.size(); i++){
+		o<<a[i];
+		if(i<a.size()-1)o<<",";
+		o<<"\n";
+	}
+	return o<<")";
+}
 
 template<typename T>
-std::ostream& operator<<(std::ostream&,std::set<T>);
+std::ostream& operator<<(std::ostream& o, std::set<T> s){
+	o<<"(";
+	unsigned int j=0;
+	for(auto i=s.begin(); i!=s.end(); i++){
+		o<<*i;
+		if(j<s.size()-1)o<<",";
+		j++;
+	}
+	return o<<")";
+}
 
 template<typename T>
-std::ostream& operator<<(std::ostream&,std::vector<T>);
+std::ostream& operator<<(std::ostream& o,std::vector<T> v){
+	o<<"(";
+	for(unsigned int i=0; i<v.size(); i++){
+		o<<v[i];
+		if(i<v.size()-1) o<<",";
+	}
+	return o<<")";
+}
 
 typedef std::string Word;
 
@@ -49,36 +73,47 @@ struct Solver{
 	private:
 	std::vector<char> incorrect;
 	std::vector<char> correct;
+	
 	std::vector<Word> possibles;
 	void update_possibles();
 	
 	public:
-	Word known;
 	bool found();
 	bool failed();
+			
+	void right(char);
+	void wrong(char);
+	
+	Word known;
 	char get_guess();
+	void fill(std::vector<unsigned int>,char);
+	std::string print_word();
 	unsigned int remaining();
 	void operator()();
 	
-	Solver();
-	Solver(unsigned int);
+	explicit Solver(unsigned int);
 };
 
 struct Game{
 	private:
 	Word word;
-	
-	public:
-	
-	Word print;
-	unsigned int remaining;
 	std::vector<char> incorrect;
 	std::vector<char> correct;
+	
+	public:
+	void wrong(char);
+	void right(char);
+	
+	Word print;
+	unsigned int length();
 	bool done();
+	unsigned int remaining();
+	std::string print_word();
 	bool check(char);
-	void guess(char);
-	Game();
 	void operator()();
+	
+	Game();
+	Game(Word);
 };
 
 bool operator<(Freq, Freq);
