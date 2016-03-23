@@ -1,5 +1,4 @@
 #include "hangman_solver.h"
-#include <fstream>
 #include <assert.h>
 #include <stdlib.h>
 #include <algorithm>
@@ -255,22 +254,22 @@ bool Game::found(){
 	return true;
 }
 
+#ifdef HANGMAN_SOLVER
+
 int main(){
 	unsigned int len=0;
 	std::cout<<"How long is the word? ";
 	std::cin>>len;
 	Game game(len);
-	while(true){
+	while(!game.found() && !game.failed()){
 		game();
-		if(game.found()){
-			std::cout<<"\n"<<game.draw_gallows()<<"\nI WIN! The word is \""<<game.word<<"\"\n";
-			break;
-		}
+		if(game.found()) std::cout<<"\n"<<game.draw_gallows()<<"\nI WIN! The word is \""<<game.word<<"\"\n";
 		else if(game.failed()){
 			std::cout<<"\n"<<game.draw_gallows()<<"\nI lose :'(\nWhat was the word? ";
 			std::cin>>game.word;
-			break;
 		}
 	}
 	return 0;
 }
+
+#endif

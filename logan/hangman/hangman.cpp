@@ -1,17 +1,10 @@
-/*
- • Project: A hangman game program.
- • Author(s): Logan Traffas.
- • Description: A program that will randomly select a word that you will try to guess before a man is hanged.
-*/
-#include <iostream>
-#include <fstream>
-#include <string>
+#include "hangman_solver.h"
+
 #include <ctime>
 #include <cstdlib>
-#include <vector>
-#include <windows.h>
 #include <sstream>
 #include <ctype.h>
+
 using namespace std;
 
 unsigned int remaining_attempts=6;//Variable for how many guesses the user is allowed (see line 113, this must be equal to the number at left-- however, if you change this you will
@@ -51,7 +44,7 @@ string get_word(){//Chooses the word
 	int random=(rand() % 99171)+1;
 	if(random==1)random=2;
 	int f=0;
-	chooseword.open("words.txt");
+	chooseword.open(FILENAME);
 	while(!chooseword.eof()){
 		if(f==random){
 			break;
@@ -115,28 +108,16 @@ Comparison_return guess_v_word_comparison(string guess, string word, string blan
 }
 
 void reset_saved_statistics(){//Resets win and loss statistics
-	Sleep(750);
 	cout<<endl<<endl<<"Resetting saved win and loss statistics to 0's."<<flush;
-	Sleep(750);
-	cout<<" ."<<flush;
-	Sleep(750);
-	cout<<" ."<<flush;
-	Sleep(750);
-	cout<<" ."<<flush;
-	ofstream logger;
-	logger.open("hangman_log.txt");
+	ofstream logger(HANGMAN_LOG);
 	logger<<"W:"<<0<<",L-"<<0<<",";
 	logger.close();
-	Sleep(750);
-	cout<<" done!"<<endl<<endl;
-	Sleep(100);
 }
 
 Wins_and_losses_return win_and_loss_saver(int won, int lost){
 	string wins, losses, line;
 	int winnings, loses;
-	ifstream log;
-	log.open("hangman_log.txt");
+	ifstream log(HANGMAN_LOG);
 	getline(log, line);
 	stringstream input;
 	input.str("");
@@ -167,8 +148,7 @@ Wins_and_losses_return win_and_loss_saver(int won, int lost){
 	winnings+=won;
 	loses+=lost;
 	log.close();
-	ofstream logger;
-	logger.open("hangman_log.txt");
+	ofstream logger(HANGMAN_LOG);
 	logger<<"W:"<<winnings<<",L-"<<loses<<",";
 	logger.close();
 	Wins_and_losses_return wins_and_losses_return;
@@ -260,6 +240,8 @@ void play_game(string word, string blanks){//Accepts user guesses and compares t
 	}
 }
 
+#ifdef HANGMAN_GAME
+
 int main(){
 	char play='n';
 	cout<<"Would you like to play a game of hangman?(y/n): ";
@@ -289,10 +271,10 @@ int main(){
 		play_game(word, blanks);
 		cout<<endl<<"Would you like to play another game of hangman?(y/n): ";
 		cin>>play;
-		if(play=='r'){
-			reset_saved_statistics();		
-		}
+		if(play=='r') reset_saved_statistics();		
 	}
 	cout<<endl<<"Thanks for playing!"<<endl;
 	return 0;
 }
+
+#endif

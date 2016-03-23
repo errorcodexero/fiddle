@@ -1,3 +1,6 @@
+#ifndef HANGMAN_SOLVER_H
+#define HANGMAN_SOLVER_H
+
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -13,6 +16,7 @@
 }
 
 #define FILENAME "words.txt"
+#define HANGMAN_LOG "hangman_log.txt"
 #define ATTEMPTS 6
 
 typedef std::string Word;
@@ -77,3 +81,9 @@ const std::vector<Freq> GEN_FREQ=[&]{//general order of letters as type Freq
 	}
 	return freq;
 }();
+
+std::string get_word();
+std::string get_blanks(Word);
+void play_game(Word,Word);
+
+#endif
