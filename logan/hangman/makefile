@@ -1,13 +1,13 @@
 all: hangman_solver hangman hangman_test
 
-hangman_solver: hangman_solver.cpp
-	g++ hangman_solver.cpp hangman.cpp -std=c++11 -DHANGMAN_SOLVER -Wall -Wextra -Werror -o "hangman_solver"
+hangman_solver: hangman_solver.cpp hangman.cpp
+	g++ -std=c++11 -DHANGMAN_SOLVER -Wall -Wextra -Werror hangman_solver.cpp hangman.cpp -o "hangman_solver"
 
-hangman: hangman.cpp
-	g++ hangman.cpp hangman_solver.cpp -std=c++11 -DHANGMAN_GAME -Wall -Wextra -Werror -o "hangman"
+hangman: hangman.cpp hangman_solver.cpp
+	g++ -std=c++11 -DHANGMAN_GAME -Wall -Wextra -Werror hangman.cpp hangman_solver.cpp -o "hangman"
 
-hangman_test: hangman_test.cpp
-	g++ hangman_test.cpp hangman.cpp hangman_solver.cpp -std=c++11 -DHANGMAN_TEST -Wall -Wextra -Werror -o "hangman_test"
+hangman_test: hangman_test.cpp hangman.cpp hangman_solver.cpp
+	g++ -std=c++11 -DHANGMAN_TEST -Wall -Wextra -Werror hangman_test.cpp hangman.cpp hangman_solver.cpp -o "hangman_test"
 
 .PHONY: clean
 clean: 

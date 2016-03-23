@@ -4,6 +4,7 @@
 
 int main(){
 	std::cout<<"Playing hangman:";
+	NYI
 	return 0;
 }
 

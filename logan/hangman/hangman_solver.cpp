@@ -1,7 +1,38 @@
 #include "hangman.h"
-#include <assert.h>
 #include <stdlib.h>
-#include <algorithm>
+
+template<class Type, long unsigned int Len>
+std::ostream& operator<<(std::ostream& o,std::array<Type,Len> a){
+	o<<"(";
+	for(unsigned int i=0; i<a.size(); i++){
+		o<<a[i];
+		if(i<a.size()-1)o<<",";
+		o<<"\n";
+	}
+	return o<<")";
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& o, std::set<T> s){
+	o<<"(";
+	unsigned int j=0;
+	for(auto i=s.begin(); i!=s.end(); i++){
+		o<<*i;
+		if(j<s.size()-1)o<<",";
+		j++;
+	}
+	return o<<")";
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& o,std::vector<T> v){
+	o<<"(";
+	for(unsigned int i=0; i<v.size(); i++){
+		o<<v[i];
+		if(i<v.size()-1) o<<",";
+	}
+	return o<<")";
+}
 
 Freq::Freq():letter_('a'),count_(0){}
 Freq::Freq(char a):letter_(a),count_(0){}
@@ -35,39 +66,6 @@ bool operator!=(Freq a,Freq b){
 
 std::ostream& operator<<(std::ostream& o, Freq a){
 	return o<<"Freq("<<a.letter()<<","<<a.count()<<")";
-}
-
-template<class Type, long unsigned int Len>
-std::ostream& operator<<(std::ostream& o,std::array<Type,Len> a){
-	o<<"(";
-	for(unsigned int i=0; i<a.size(); i++){
-		o<<a[i];
-		if(i<a.size()-1)o<<",";
-		o<<"\n";
-	}
-	return o<<")";
-}
-
-template<typename T>
-std::ostream& operator<<(std::ostream& o, std::set<T> s){
-	o<<"(";
-	unsigned int j=0;
-	for(auto i=s.begin(); i!=s.end(); i++){
-		o<<*i;
-		if(j<s.size()-1)o<<",";
-		j++;
-	}
-	return o<<")";
-}
-
-template<typename T>
-std::ostream& operator<<(std::ostream& o,std::vector<T> v){
-	o<<"(";
-	for(unsigned int i=0; i<v.size(); i++){
-		o<<v[i];
-		if(i<v.size()-1) o<<",";
-	}
-	return o<<")";
 }
 
 std::vector<Word> get_list(const unsigned int len){

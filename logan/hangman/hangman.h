@@ -7,8 +7,7 @@
 #include <assert.h>
 #include <array>
 #include <set>
-#include <stdlib.h>
-#include <algorithm>
+#include <vector>
 
 #define NYI { \
 	std::cout<<"\nnyi "<<__LINE__<<"\n"; \
@@ -16,8 +15,16 @@
 }
 
 #define FILENAME "words.txt"
-#define HANGMAN_LOG "hangman_log.txt"
 #define ATTEMPTS 6
+
+template<class Type, long unsigned int Len>
+std::ostream& operator<<(std::ostream&,std::array<Type,Len>);
+
+template<typename T>
+std::ostream& operator<<(std::ostream&,std::set<T>);
+
+template<typename T>
+std::ostream& operator<<(std::ostream&,std::vector<T>);
 
 typedef std::string Word;
 
@@ -43,13 +50,13 @@ struct Solver{
 	std::vector<char> incorrect;
 	std::vector<char> correct;
 	std::vector<Word> possibles;
-	char get_guess();
 	void update_possibles();
 	
 	public:
 	Word known;
 	bool found();
 	bool failed();
+	char get_guess();
 	unsigned int remaining();
 	void operator()();
 	
@@ -58,13 +65,18 @@ struct Solver{
 };
 
 struct Game{
-	unsigned int remaining;
+	private:
 	Word word;
+	
+	public:
+	
+	Word print;
+	unsigned int remaining;
 	std::vector<char> incorrect;
 	std::vector<char> correct;
 	bool done();
+	bool check(char);
 	void guess(char);
-	std::string print_known(bool);
 	Game();
 	void operator()();
 };
@@ -74,12 +86,6 @@ bool operator==(Freq,Freq);
 bool operator!=(Freq,Freq);
 
 std::ostream& operator<<(std::ostream&, Freq);
-
-template<class Type, long unsigned int Len>
-std::ostream& operator<<(std::ostream&,std::array<Type,Len>);
-
-template<typename T>
-std::ostream& operator<<(std::ostream&, std::set<T>);
 
 const std::array<char,Letter::LETTER> GEN_ORDER{'e','t','a','o','i','n','s','h','r','d','l','c','u','m','w','f','g','y','p','b','v','k','j','x','q','z'};//general frequency of letter occurences
 const std::array<char,Letter::LETTER> LETTERS{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};//all letters in alphabetical order
@@ -96,7 +102,5 @@ const std::vector<Freq> GEN_FREQ=[&]{//general order of letters as type Freq
 
 std::string draw_gallows(unsigned int);
 std::string get_word();
-std::string get_blanks(Word);
-void play_game(Word,Word);
 
 #endif

@@ -1,12 +1,15 @@
 #include "hangman.h"
 
-#include <ctime>
-#include <cstdlib>
-#include <sstream>
-#include <ctype.h>
-
-Game::Game():remaining(ATTEMPTS),incorrect({}),correct({}){
+Game::Game():remaining(ATTEMPTS),incorrect({}),correct({'\''}){
 	word=get_word();
+	print=[&]{
+		std::string s;
+		for(char c:word){
+			if(c=='\'') s+="' ";
+			else s+="_ ";
+		}
+		return s;
+	}();
 }
 
 std::string draw_gallows(unsigned int incorrect){//Draws the gallows with the appropriate amount of body parts. 
@@ -34,66 +37,109 @@ std::string draw_gallows(unsigned int incorrect){//Draws the gallows with the ap
 	return gallows;
 }
 
-std::string Game::print_known(bool spaces=true){
-	std::string s;
-	for(unsigned int i=0; i<word.length(); i++) s+='_';
-	for(char c:correct){
-		for(unsigned int i=0; i<word.length(); i++){
-			if(c==word[i]) s[i]=c;
-		}	
-	}
-	if(spaces){
-		std::string n;
-		for(char c:s){
-			n+=c;
-			n+=' ';	
-		}
-		s=n;
-	}
-	return s;
-}
-
 std::string get_word(){//Chooses the word
-	std::ifstream chooseword(FILENAME);
-	std::string word;
-	srand(time(NULL));
-	int random=(rand() % 99171)+1;
-	if(random==1)random=2;
-	int f=0;
-	while(!chooseword.eof()){
-		if(f==random) break;
-		chooseword >> word;
-		f++;
+	unsigned int len=0;
+	{
+		std::ifstream get_len(FILENAME);
+		while(!get_len.eof()){
+			std::string temp;
+			len++;
+			get_len>>temp;
+		}
+		get_len.close();
 	}
-	chooseword.close();
+	std::string word;
+	{
+		std::ifstream chooseword(FILENAME);
+		srand(time(NULL));
+		int random=(rand() % len)+1;
+		if(random==1)random=2;
+		int f=0;
+		while(!chooseword.eof()){
+			if(f==random) break;
+			chooseword >> word;
+			f++;
+		}
+		chooseword.close();
+	}
 	return word;
 }
 
-void Game::operator()(){
-	char guess;
-	std::cout<<draw_gallows(incorrect.size())<<"\nKnown: "<<print_known()<<" What is your guess? ";
-	std::cin>>guess;
-	std::vector<char> guessed=correct;
-	for(char c: incorrect) guessed.push_back(c);
-	for(char c:guessed){ 
-		if(guess==c){
-			std::cout<<"\nYou have already guessed the letter "<<guess<<"\n";
-			break;
-		}
-	}
+bool Game::check(char guess){
 	bool right=false;
 	for(char c:word){
 		if(guess==c){
 			correct.push_back(guess);
 			right=true;
+			print=[&]{
+				std::string n;
+				for(unsigned int i=0;i<word.length();i++){
+					bool known=false;
+					for(char c:correct){
+						if(c==word[i]){
+							known=true;
+							break;
+						}
+					}
+					if(!known) n+="_ ";
+					else{
+						n+=word[i];
+						n+=' ';
+					}
+				}
+				return n;
+			}();
+			break;
 		}
 	}
-	if(!right) incorrect.push_back(guess);
+	if(!right){
+		incorrect.push_back(guess);
+		remaining--;
+	}
+	return right;
+}
+
+void Game::operator()(){
+	char guess;
+	{
+		std::vector<char> guessed=incorrect;
+		for(char c: correct){
+			if(c!='\'') guessed.push_back(c);
+		}
+		std::cout<<draw_gallows(incorrect.size())<<"\nKnown: "<<print<<" You have already guessed: "<<"PRINT OUT GUESSED HERE"<<" What is your guess? ";
+		std::cin>>guess;
+		bool again=true;
+		while(again){
+			again=false;
+			for(char c:guessed){ 
+				if(guess==c){
+					std::cout<<"\nYou have already guessed the letter \""<<guess<<"\". Guess again: ";
+					std::cin>>guess;
+					again=true;
+					break;
+				}
+			}
+		}
+	}
+	bool right=check(guess);
+	std::cout<<remaining<<"\n";
+	if(done()){
+		std::cout<<draw_gallows(incorrect.size())<<"\n";
+		if(right) std::cout<<"\nI win! The word was \""<<print<<"\"!\n";
+		else{
+			std::string t;
+			std::cout<<"\nI lost. What was the word? ";
+			std::cin>>t;
+		}
+	}
 }
 
 bool Game::done(){
-	if(print_known(true)==word) return true;
-	return remaining==0;
+	if(remaining==0) return true;
+	for(char c:print){
+		if(c=='_')return false;
+	}
+	return true;
 }
 
 std::string print_instructions(){
@@ -110,11 +156,13 @@ std::string print_instructions(){
 #ifdef HANGMAN_GAME
 
 int main(){
-	std::cout<<"Let's play a game of hangman!\n";
-	char instructions;
-	std::cout<<"\nWould you like to read the instructions?(y/n): ";
-	std::cin>>instructions;
-	if(instructions=='y') std::cout<<print_instructions(); 
+	{
+		std::cout<<"Let's play a game of hangman!\n";
+		char instructions;
+		std::cout<<"\nWould you like to read the instructions?(y/n): ";
+		std::cin>>instructions;
+		if(instructions=='y') std::cout<<print_instructions(); 
+	}
 	Game game;
 	while(!game.done()){
 		game();
