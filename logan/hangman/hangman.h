@@ -15,6 +15,7 @@
 }
 
 #define FILENAME "words.txt"
+#define LOG_FILE "hangman_log.txt"
 #define ATTEMPTS 6
 
 template<class Type, long unsigned int Len>
@@ -137,5 +138,13 @@ const std::vector<Freq> GEN_FREQ=[&]{//general order of letters as type Freq
 
 std::string draw_gallows(unsigned int);
 std::string get_word();
+
+inline void log(bool result_status, std::string word, std::string source){
+	std::string result="Loss ";
+	if(result_status) result="Win  ";
+	std::ofstream logger(LOG_FILE,std::ios::app);
+	logger<<source<<"  "<<result<<" - "<<word<<"\n";
+	logger.close();
+}
 
 #endif

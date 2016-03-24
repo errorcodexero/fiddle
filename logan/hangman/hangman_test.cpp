@@ -31,6 +31,9 @@ int main(){
 			else std::cout<<"\nYou lost. The word was "<<game.print_word()<<"\n";
 		}
 	}
+	std::cout<<game.remaining()<<"\n";
+	if(game.remaining()==0) log(false,game.print_word(),__FILE__);
+	else log(true,game.print_word(),__FILE__);
 	return 0;
 }
 

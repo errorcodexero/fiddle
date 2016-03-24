@@ -218,6 +218,8 @@ int main(){
 			std::cin>>solver.known;
 		}
 	}
+	if(solver.failed()) log(false,solver.known,__FILE__);
+	else log(true,solver.known,__FILE__);
 	return 0;
 }
 

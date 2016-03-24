@@ -196,10 +196,12 @@ int main(){
 		std::cin>>instructions;
 		if(instructions=='y') std::cout<<print_instructions(); 
 	}
-	Game game("logan");
+	Game game;
 	while(!game.done()){
 		game();
 	}
+	if(game.remaining()==0) log(false,game.print_word(),__FILE__);
+	else log(true,game.print_word(),__FILE__);
 	std::cout<<"\nThanks for playing!\n";
 	return 0;
 }
