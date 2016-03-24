@@ -26,28 +26,27 @@ struct Args_return{//A type used to store arguments
 	Args_return():import(0),change_max(0),import_other(0),export_maze(0),x_lim(10),y_lim(10),import_filename("maze.txt"),export_filename("maze.txt"){}	
 };
 
-ostream& operator<<(ostream& o, Move a);
-ostream& operator<<(ostream& o, Location a);
-ostream& operator<<(ostream& o, Maze a);
-ostream& operator<<(ostream& o,vector<vector<char>> in);
+ostream& operator<<(ostream&, Move);
+ostream& operator<<(ostream&, Location);
+ostream& operator<<(ostream&, Maze);
+ostream& operator<<(ostream& ,vector<vector<char>> );
 template<typename T>
-ostream& operator<<(ostream& o,vector<T> in);
+ostream& operator<<(ostream&,vector<T>);
 
-bool operator==(Maze a, Maze b);
-bool operator!=(Maze a, Maze b);
+bool operator==(Maze, Maze);
+bool operator!=(Maze, Maze);
 template<typename T>
-bool operator==(vector<T> a, vector<T> b);
+bool operator==(vector<T>, vector<T>);
 
-vector<vector<char>> print_maze(Maze a, vector<Move> path=vector<Move>{},bool add_boundary=1,bool print_line=0);
+vector<vector<char>> print_maze(Maze, vector<Move> path=vector<Move>{},bool add_boundary=1,bool print_line=0);
 
-vector<Move> get_path(Maze a);
+vector<Move> get_path(Maze);
 
 Maze import_maze(const string filename="maze.txt");
 
-void estimator(const int A);
+void estimator(const int);
 
 Maze maze_gen(const int X_LIM=10,const int Y_LIM=10);
 
-void export_maze(const Maze a, const string filename);
+void export_maze(const Maze, const string);
 
-int main(int x,char *arg[]);
