@@ -38,16 +38,15 @@ bool operator!=(Maze, Maze);
 template<typename T>
 bool operator==(vector<T>, vector<T>);
 
-vector<vector<char>> print_maze(Maze a, vector<Move> path=vector<Move>{},bool add_boundary=1,bool print_line=0);
+vector<vector<char>> print_maze(Maze, vector<Move> path=vector<Move>{},bool add_boundary=1,bool print_line=0);
 
 vector<Move> get_path(Maze);
 
 Maze import_maze(const string filename="maze.txt");
 
-void estimator(const int A);
+void estimator(const int);
 
 Maze maze_gen(const int X_LIM=10,const int Y_LIM=10);
 
 void export_maze(const Maze, const string);
 
-int main(int x,char *arg[]);
