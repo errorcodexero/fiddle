@@ -236,7 +236,7 @@ map <string, int> vecToMap(vector <string> vsVec) {
 	map <string, int> m;
 	for (unsigned int i = 0; i < vsVec.size(); i++) {
 		m[vsVec[i]] = i+1;
-		cout << i << " = " << vsVec[i] << "\n";
+		//cout << i << " = " << vsVec[i] << "\n";
 	}
 	return m;
 
@@ -244,15 +244,30 @@ map <string, int> vecToMap(vector <string> vsVec) {
 
 int main (int argc, char*argv[] ) {
     string sTestString = "--TEST";
-	if ( argc > 1 && argv[1] == sTestString) {
-			cout << "Yay Test\n";
-			exit(1);
-		}
 
     int iOption;
 #ifdef TEST
     int iCurrentItr = -1;
 #endif
+    if (argc > 1 && argv[1] == sTestString)
+    	cout << "Not Supported Yet\n";
+    else if (argc > 1 && (string) argv[1] == "--help"){
+        	cout << "Options:"
+        			""
+        			"\n\n1) Get Stats (1 or getstats)"
+        			"\n2) Get Average (2 or getavg)"
+					"\n3) Get CSV Header (3 or getheader)"
+        			"\n4) Get Maximum (4 or getmax)"
+					"\n5) Get Minimum (5 or getmin)"
+					"\n6) Get Data Element (6 or getdat)"
+					"\n7) About The Reader (7 or about)"
+					"\n8) Display File (8 or dispfile)"
+					"\n9) When Did... (9 or when)"
+					"\n10) Get Time Stats (10 or deltatime)"
+    				"\n11) Quit (11 or quit)\n";
+        	exit(1);
+    }
+    int iTmp = 0;
     bool bFirstRun = true;
     bool bFileOpen = false;
     
@@ -272,8 +287,24 @@ int main (int argc, char*argv[] ) {
     vector <string > vsColumn;
     vector <string > vsFiles;
     vector <string > vsHeader;
-
+    vector <string > vsArgs;
     map <string, int> mHeader;
+    map <string, int> mOptions = {
+    {"getstat",0 },
+    {"getavg",1 },
+    {"getheader",2 },
+    {"getmax",3 },
+    {"getmin",4 },
+    {"getdat",5 },
+    {"about",6 },
+    {"dispfile",7 },
+    {"when",8 },
+    {"deltatime",9 },
+    {"quit",10 }
+};
+    for (int i = 0; i < argc; i++) {
+    	vsArgs.push_back((string) argv[i]);
+    }
 #ifdef TEST
     ifstream ifFile("test.csv");
     if (!ifFile.good() || ifFile.eof()) {
@@ -291,29 +322,54 @@ int main (int argc, char*argv[] ) {
     float fMinFloat = 0;
     float fAvgFloat = 0;
 #endif
+
 #ifndef TEST
-    do {
-    	system("clear");
-    	printTitle();
-    	cout << "Please Enter a File Name, With the Extension\n\n";
-    	cin >> sFileName;
-    	ifFile.open(sFileName);
-            
-    	if (!ifFile.good()) {
-    		cout << "Invalid File or Cannot Open File.\n";
-    		system("clear");
-    	}
-    	else {
-    		bFileOpen = true;
-    	}
+	if ( argc > 1) {
+
+	} else {
+		do {
+				system("clear");
+				printTitle();
+				cout << "Please Enter a File Name, With the Extension\n\n";
+				cin >> sFileName;
+				ifFile.open(sFileName);
+
+				if (!ifFile.good()) {
+					cout << "Invalid File or Cannot Open File.\n";
+					system("clear");
+				}
+				else {
+					bFileOpen = true;
+				}
+		}
+		while (!bFileOpen);
 	}
-    while (!bFileOpen);
-#endif
+	#endif
     ifFile.clear();
     ifFile.seekg(0, ifFile.beg);
 
+	if ( argc > 1) {
+			ifFile.open(argv[1]);
+			state = IDLE;
+			if (argc > 2) {
+				state = PROCESSING;
+				sscanf(argv[2], "%d",& iTmp);
+				if(iTmp < 1 || iTmp > 11) {
+					iTmp = mOptions[vsArgs[2]];
+					cout << iTmp << "\n";
+					cout  << vsArgs[2] << "\n";
+				} else
+					iTmp -= 1;
+
+				state = PROCESSING;
+				command = (Command) iTmp;
+			} else {
+
+			}
+		}
+
 #ifdef DEBUG
-    cout <<iLines << " Line\n";
+    //cout << iLines << " Line\n";
 #endif
     mHeader = vecToMap(sGetCSVHeader(ifFile));
     vsHeader = sGetCSVHeader(ifFile);
@@ -344,7 +400,7 @@ int main (int argc, char*argv[] ) {
 
 #endif
         	ifFile.clear();
-        	ifFile.seekg(0, ifFile. beg);
+        	ifFile.seekg(0, ifFile.beg);
             if (bFirstRun){
                 cout << "Welcome to LogReader V0.01."; 
                 }
@@ -818,12 +874,10 @@ int main (int argc, char*argv[] ) {
         			sscanf(sGetElement(ifFile, i-1, iColNum).c_str(), "%f", &fLastFloat);
         			sTempLine = sGetElement(ifFile, i, iColNum);
         			if (sTempLine != "ERROR") {
-        				//
-
-        				cout << fLastFloat;
+        				//cout << fLastFloat;
         				if(sscanf(sTempLine.c_str(), "%f", &fTempFloat) < 1) {
         					fTempFloat = 0.00000;
-        					fTempFloat -= fLastFloat;
+        					//fTempFloat -= fLastFloat;
         					vfColData.push_back(fTempFloat);
         				}
         				else
@@ -852,24 +906,26 @@ int main (int argc, char*argv[] ) {
         	{
  			cout << "Would You Like To Quit?\n\n[Y/n] ";
  			cin >> sContinue;
- 			if (sContinue == "y" || sContinue == "Y" || sContinue == "yes" || sContinue == "YES" || sContinue == "Yes" ) {
+ 			if (argc < 1) {
+ 				if (sContinue == "y" || sContinue == "Y" || sContinue == "yes" || sContinue == "YES" || sContinue == "Yes" ) {
 
- 				cout << "Good Bye\n\n";
- 				system("clear");
- 				exit (1);
+ 					cout << "Good Bye\n\n";
+ 					system("clear");
+ 					exit (1);
 
-                		}
-                	else if (sContinue == "n" || sContinue == "N" || sContinue == "no" || sContinue == "NO" || sContinue == "No" ) {
+ 					}
+ 				else if (sContinue == "n" || sContinue == "N" || sContinue == "no" || sContinue == "NO" || sContinue == "No" ) {
 
-                		state = IDLE;
-                		system("clear");
-                		break;
+ 					state = IDLE;
+ 					system("clear");
+ 					break;
 
-                	}
-            
-            
-    			}
+ 				}
+ 			} else {
+ 				exit(1);
+ 			}
         	}
+        }
     	}
     }
 }
