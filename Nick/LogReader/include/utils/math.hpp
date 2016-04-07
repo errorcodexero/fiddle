@@ -52,4 +52,61 @@ T getMax (vector <T> input) {
 }
 template <class T>
 int approx(T input, T target, T range);
+
+template <class T>
+T getAvg(vector<T> vInputData) {
+	T sum = 0;
+	T average = 0;
+	for (unsigned int i = 0; i < vInputData.size(); i++) {
+		sum += vInputData[i];
+	}
+	average = sum / (float) vInputData.size();
+
+	return average;
+}
+template <class T>
+T standardDeviation(vector<T> _vData) {
+	T average = getAvg(_vData);
+	T standardDeviation = 0;
+
+	T difference = 0;
+
+	for (unsigned int i = 0; i < _vData.size(); i++) {
+		difference += pow((average - _vData[i]), 2.0);
+	}
+
+	standardDeviation = sqrt(abs(difference));
+	return standardDeviation;
+}
+
+template <class T>
+T correlationCoefficient(vector<T> _vDataX, vector<T> _vDataY) {
+
+	T coefficient = 0;
+
+	T sumX = 0;
+	T sumY = 0;
+
+	T sumX2 = 0;
+	T sumY2 = 0;
+
+	float averageSize = (_vDataX.size() + _vDataY.size()) / 2;
+
+	for (unsigned int i = 0; i < _vDataX.size(); i++)
+		sumX += _vDataX[i];
+	for (unsigned int i = 0; i < _vDataY.size(); i++)
+		sumY += _vDataY[i];
+	for (unsigned int i = 0; i < _vDataX.size(); i++)
+		sumX2 += pow(_vDataX[i], 2.0);
+	for (unsigned int i = 0; i < _vDataY.size(); i++)
+		sumY2 += pow(_vDataY[i], 2.0);
+
+	//Pardon the large equation. It does, however work
+
+	coefficient = (averageSize * (sumX * sumY) - (sumX * sumY)) / (sqrt(averageSize * sumX2 - pow(sumX, 2.0)) * sqrt(averageSize * sumY2 - pow(sumY, 2.0)));
+
+	return coefficient;
+}
+
+
 #endif /*_MATH_HPP_*/
