@@ -259,7 +259,7 @@ Maze import_maze(const string filename){//Imports a maze from maze.txt or the gi
 		lines.push_back(line);
 	}
 	if(iterator==blank_lines){
-		cout<<"\nError: Imported file \""<<filename<<"\" does not contain a maze: line:"<<__LINE__<<"\n";
+		cerr<<"\nError: Imported file \""<<filename<<"\" does not contain a maze: line:"<<__LINE__<<"\n";
 		exit(44); 
 	}
 	for(unsigned int i=0; i<lines.size(); i++){
@@ -334,7 +334,7 @@ Args_return use_args(const int x,char *arg[]){//Determines what arguments to use
 void estimator(const int A){//Estimates maze generation time based on an area
 	double a=(4.1459087*pow(10,-7)),b=(3.6702795*pow(10,-5)),c=(0.819670217);
 	double t=a*pow(A,2)+b*A+c;//nearbyint()
-	if(t>=5) cout<<"Warning: Estimated generation-time is "<<t<<" seconds (Varies depending on processing power): (Press CTRL+C to abort): Increased generation-time implies increased solving-time: line: "<<__LINE__<<"\n";	
+	if(t>=5) cerr<<"Warning: Estimated generation-time is "<<t<<" seconds (Varies depending on processing power): (Press CTRL+C to abort): Increased generation-time implies increased solving-time: line: "<<__LINE__<<"\n";	
 }
 
 bool check_for_adjacent_wall(const vector<Location> visited,const vector<Location> stack,const Location test){//Checks a location to see if there are any walls in adjacent locations 
@@ -426,7 +426,7 @@ Maze maze_gen(const int X_LIM,const int Y_LIM){//Generates a random maze
 	vector<Location> stack={{0,0}},open={{0,0}};
 	while(!found)open=wall_generator(a.x_lim,a.y_lim,found,stack,open);
 	if(open.size()<2){
-		cout<<"Error: Not enough locations for the start and target to be set: line: "<<__LINE__<<"\n";
+		cerr<<"Error: Not enough locations for the start and target to be set: line: "<<__LINE__<<"\n";
 		exit(44);
 	}
 	a.blocks=invert_blocks(open,a.x_lim,a.y_lim);
