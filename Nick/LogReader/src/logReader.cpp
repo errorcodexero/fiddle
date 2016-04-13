@@ -9,6 +9,7 @@
 #define VERSION "V1.0"
 
 #include "utils/math.hpp"
+#include "utils/csvParser.hpp"
 
 using namespace std;
 
@@ -34,213 +35,7 @@ struct logStats {
 	int iNumOfChars;
 };
 
-string sReadLine( ifstream& _ifFile, int _iLineNum) {
-    
-    //_ifFile.clear();
-    _ifFile.seekg(0, _ifFile.beg);
-    string sLineText_;
-    for (int i = 0; i < _iLineNum; i++) {
-        getline(_ifFile, sLineText_);
-        if(!_ifFile.good()) {
-        	return "ERROR";
-#ifdef DEBUG
-            cerr << "Invalid Line in File\n";
-#endif
-        }
-    }
-    _ifFile.clear();
-    _ifFile.seekg(0, _ifFile.beg);
-    return sLineText_;
-    
-}
 
-vector <string > sGetCSVHeader(ifstream& _ifFile) {
-    
-    _ifFile.clear();
-    _ifFile.seekg(0, _ifFile. beg);
-    
-    int iIndex = 0;
-    unsigned int iCharNum = 0;
-    
-    char tmp;
-    
-    string sLine;
-    string sOutLine;
-    string sTempString;
-    
-    vector <string > sOutput_; 
-    
-    sLine = sReadLine(_ifFile, 1);
-    do {
-        
-        tmp = sLine[iCharNum];
-        if (tmp == ',' || tmp == '\n') {
-            sOutput_.push_back(sOutLine);
-            iIndex++;
-            sOutLine = "";
-        }
-        else
-        	sOutLine += tmp;
-        iCharNum++;
-    }
-    while (iCharNum <= sLine.size());
-    //_ifFile.clear();
-    _ifFile.seekg(0, _ifFile.beg);
-    return sOutput_;
-}
-
-string sGetElement(ifstream& _ifFile, int _iLineNum, int _iColNum) {
-    
-    //_ifFile.clear();
-    _ifFile.seekg(0, _ifFile.beg);
-    
-    int iIndex = 1;
-    
-    char tmp;
-    
-    string sLine = sReadLine( _ifFile, _iLineNum);
-    if (sLine == "ERROR")
-    	return "ERROR";
-    #ifdef DEBUG
-    //cout << "String Contains " << sLine << "\n";
-    #endif
-    string sOutLine_;
-    
-    for (unsigned int i = 0; i <= sLine.size(); i++) {
-        tmp = sLine[i];
-        if ((tmp == ',' || tmp == '\n') && iIndex == _iColNum) {
-        	return sOutLine_;
-        } else if (tmp == ',') {
-        	iIndex++;
-        	sOutLine_ = "";
-        } else {
-
-        		sOutLine_ += tmp;
-        	}
-
-        }
-    //_ifFile.clear();
-    _ifFile.seekg(0, _ifFile.beg);
-    return sOutLine_;
-    
-}
-
-int iGetNumLines (ifstream& _ifFile) {
-
-	_ifFile.clear();
-	_ifFile.seekg(0, _ifFile.beg);
-	int iNumLines = 0;
-	int i = 1;
-	string sLine;
-	while (sLine != "ERROR") {
-		sLine = sReadLine(_ifFile, i);
-		i++;
-		iNumLines++;
-		if (sLine == "ERROR") {
-			break;
-		}
-	}
-#ifdef DEBUG
-cout << iNumLines << " Lines\n";
-#endif
-
-	_ifFile.clear();
-	_ifFile.seekg(0, _ifFile.beg);
-	return iNumLines;
-}
-
-int iGetNumElements(ifstream& _ifFile, int _iNumLines) {
-	_ifFile.clear();
-	_ifFile.seekg(0, _ifFile.beg);
-	int iNumElements;
-	int x = 0;
-	string sElement;
-	string sLine; //Just for reasons
-
-	for (int i = 1; i <= _iNumLines; i++) {
-		while (_ifFile.good() && (sElement != "ERROR" || sLine != "ERROR")) {
-			sLine = sReadLine(_ifFile, i);
-			sElement = sGetElement(_ifFile, i, x);
-			iNumElements++;
-			x++;
-#ifdef DEBUG
-			cout << sElement << "\n";
-#endif
-#ifdef DEBUG
-			cout << "Iteration x " << x << "\n";
-#endif
-		}
-		if (sElement == "ERROR")
-			break;
-#ifdef DEBUG
-			cout << "Iteration i " << i << "\n";
-#endif
-	}
-
-#ifdef DEBUG
-cout << iNumElements << " Elements\n";
-#endif
-	_ifFile.clear();
-	_ifFile.seekg(0, _ifFile.beg);
-	return iNumElements;
-}
-
-int iGetNumChars (ifstream& _ifFile, int _iNumLines, int _iNumElements) {
-	_ifFile.clear();
-	_ifFile.seekg(0, _ifFile.beg);
-	int iNumChars;
-
-	string sElement;
-	for (int i = 1; i <= _iNumLines; i++) {
-		for (int x = 1; x <= _iNumElements; x++) {
-			sElement = sGetElement(_ifFile, i, x);
-			if (sElement == "ERROR")
-				break;
-		iNumChars += sElement.size();
-		}
-		if (sElement == "ERROR")
-			break;
-	}
-
-#ifdef DEBUG
-cout << iNumChars << " Non Space Characters\n";
-#endif
-	_ifFile.clear();
-	_ifFile.seekg(0, _ifFile.beg);
-	return iNumChars;
-}
-
-logStats getLogStats (ifstream& _ifFile) {
-	logStats logStats_;
-
-	int iNumLines = iGetNumLines(_ifFile);
-	int iNumElements = iGetNumElements(_ifFile, iNumLines);
-	int iNumChars = iGetNumChars(_ifFile, iNumLines, iNumElements);
-	logStats_.iNumOfLines = iNumLines;
-	logStats_.iNumOfElements = iNumElements;
-	logStats_.iNumOfChars = iNumChars;
-
-	return logStats_;
-}
-
-void printLogStats (string _sFileName, logStats _logStats) {
-	cout << "The File " << _sFileName << " Has the Following Statistics\n\n";
-
-	cout << _logStats.iNumOfLines << " Lines\n\n";
-	cout << _logStats.iNumOfElements << " Elements\n\n";
-	cout << _logStats.iNumOfChars << " Characters";
-
-}
-
-map <string, int> vecToMap(vector <string> vsVec) {
-	map <string, int> m;
-	for (unsigned int i = 0; i < vsVec.size(); i++) {
-		m[vsVec[i]] = i+1;
-		//cout << i << " = " << vsVec[i] << "\n";
-	}
-	return m;
-
-}
 
 int main (int argc, char*argv[] ) {
     string sTestString = "--TEST";
@@ -271,7 +66,6 @@ int main (int argc, char*argv[] ) {
     bool bFirstRun = true;
     bool bFileOpen = false;
     
-    logStats logStats;
     string sLine;
     string sInput;
     string sFileName;
@@ -288,7 +82,7 @@ int main (int argc, char*argv[] ) {
     vector <string > vsFiles;
     vector <string > vsHeader;
     vector <string > vsArgs;
-    map <string, int> mHeader;
+    map <string, unsigned int> mHeader;
     map <string, int> mOptions = {
     {"getstat",0 },
     {"getavg",1 },
@@ -302,6 +96,10 @@ int main (int argc, char*argv[] ) {
     {"deltatime",9 },
     {"quit",10 }
 };
+
+    vector<vector<string>> vsElements;
+
+
     for (int i = 0; i < argc; i++) {
     	vsArgs.push_back((string) argv[i]);
     }
@@ -373,6 +171,20 @@ int main (int argc, char*argv[] ) {
 #endif
     mHeader = vecToMap(sGetCSVHeader(ifFile));
     vsHeader = sGetCSVHeader(ifFile);
+
+	vector<string> vsLine;
+
+	vsLine = vsReadFile(ifFile);
+
+	ifFile.clear();
+    ifFile.seekg(0, ifFile.beg);
+	unsigned int index = 0;
+    while(ifFile.good() && !ifFile.eof() && index < vsLine.size()) {
+
+    	vsElements.push_back(vsBreakLine(vsLine[index]));
+    	index++;
+    	//cout << index << "\n";
+    }
     while (true ) {
     	switch (state) {
         case IDLE:
@@ -405,7 +217,6 @@ int main (int argc, char*argv[] ) {
                 cout << "Welcome to LogReader V0.01."; 
                 }
                 bFirstRun = false;
-            
             
             cout << "\n\n Please enter an option."
             		""
@@ -520,17 +331,17 @@ int main (int argc, char*argv[] ) {
         	switch (command) {
         	case GETSTAT:
  			{
- 				logStats = getLogStats(ifFile);
- 				printLogStats(sFileName, logStats);
+ 				//logStats = getLogStats(ifFile);
+ 				//printLogStats(sFileName, logStats);
+
+ 				cout << "Major WIP\n";
+
  				state = FINISHED;
  				break;
  			}
         	case GETAVG:
         	{
         		int iColNum;
-        		int i = 1;
-
-        		float fTempFloat = 0;
 #ifndef TEST
         		float fAvgFloat = 0;
 #endif
@@ -545,35 +356,24 @@ int main (int argc, char*argv[] ) {
         		size_t lastChar;
 
         		vector <float > vfColData;
+        		vector <string > vsColData;
 #ifndef TEST
 
         		cout << "What Column Number?\n\n";
         		cin >> sColNum;
 
-        		iColNum = stoi(sColNum, &lastChar, 10);
+        		iColNum = stoi(sColNum, &lastChar, 10)-1;
 #endif
 #ifdef TEST
         		iColNum = 2;
 #endif
         		ifFile.clear();
         		ifFile.seekg(0, ifFile.beg);
-        		while (ifFile.good() && !ifFile.eof()) {
-        			sTempLine = sGetElement(ifFile, i, iColNum);
-        			if (sTempLine != "ERROR") {
-        				if(sscanf(sTempLine.c_str(), "%f", &fTempFloat) < 1) {
-        					fTempFloat = 0.00000;
-        					vfColData.push_back(fTempFloat);
-        				}
-        				else
-        					vfColData.push_back(fTempFloat);
-        				i++;
-        			}
-        		}
 
-        		for (unsigned int i = 0; i < vfColData.size(); i++) {
-        			fSum += vfColData[i];
-        		}
-        		fAvgFloat = fSum / (float) vfColData.size();
+        		vsColData = vsGetColumn(vsElements, iColNum);
+        		vfColData = vfConvertVector(vsColData);
+
+        		fAvgFloat = getAvg(vfColData);
 #ifndef TEST
         		if (fSum == 0 || fAvgFloat == 0)
         			cout << "Either your lines are full of strings, or you have all 0s in your column\n\n";
@@ -609,9 +409,7 @@ int main (int argc, char*argv[] ) {
         	{
 
         		int iColNum;
-    			int i = 1;
 
-        		float fTempFloat;
 #ifndef TEST
         		float fMaxFloat;
 #endif
@@ -621,11 +419,12 @@ int main (int argc, char*argv[] ) {
         		size_t lastChar;
 
         		vector <float > vfColData;
+        		vector <string > vsColData;
 #ifndef TEST
         		cout << "What Column Number?\n\n";
         		cin >> sColNum;
 
-        		iColNum = stoi(sColNum, &lastChar, 10);
+        		iColNum = stoi(sColNum, &lastChar, 10)-1;
 #endif
 #ifdef TEST
         		iColNum = 3;
@@ -633,20 +432,10 @@ int main (int argc, char*argv[] ) {
 
         		ifFile.clear();
         		ifFile.seekg(0, ifFile.beg);
-        		while (ifFile.good() && !ifFile.eof()) {
-        			sTempLine = sGetElement(ifFile, i, iColNum);
-        			if (sTempLine != "ERROR") {
-        				if(ifFile.eof() || ifFile.bad())
-        					break;
-        				if(sscanf(sTempLine.c_str(), "%f", &fTempFloat) < 1) {
-        					fTempFloat = 0.00000;
-        					vfColData.push_back(fTempFloat);
-        				}
-        				else
-        					vfColData.push_back(fTempFloat);
-        				i++;
-        			}
-        		}
+        		cout << "que?\n";
+        		vsColData = vsGetColumn(vsElements, iColNum);
+        		cout << "maybe?\n";
+        		vfColData = vfConvertVector(vsColData);
 
         		fMaxFloat = getMax(vfColData);
 #ifndef TEST
@@ -663,9 +452,7 @@ int main (int argc, char*argv[] ) {
         	{
 
         		int iColNum;
-    			int i = 1;
 
-        		float fTempFloat;
 #ifndef TEST
         		float fMinFloat;
 #endif
@@ -675,25 +462,20 @@ int main (int argc, char*argv[] ) {
         		size_t lastChar;
 
         		vector <float > vfColData;
+        		vector <string > vsColData;
 #ifndef TEST
         		cout << "What Column Number?\n\n";
         		cin >> sColNum;
 
-        		iColNum = stoi(sColNum, &lastChar, 10);
+        		iColNum = stoi(sColNum, &lastChar, 10)-1;
 #endif
 #ifdef TEST
         		iColNum = 1;
 #endif
         		//ifFile.clear();
         		ifFile.seekg(0, ifFile.beg);
-        		while (ifFile.good() && !ifFile.eof()) {
-        			sTempLine = sGetElement(ifFile, i, iColNum);
-        			if (sTempLine != "ERROR") {
-        				if(sscanf(sTempLine.c_str(), "%f", &fTempFloat) >= 1)
-        					vfColData.push_back(fTempFloat);
-        				i++;
-        			}
-        		}
+        		vsColData = vsGetColumn(vsElements, iColNum);
+        		vfColData = vfConvertVector(vsColData);
 
         		fMinFloat = getMin(vfColData);
 #ifndef TEST
@@ -733,14 +515,14 @@ int main (int argc, char*argv[] ) {
         			cout << "Error: Invalid input.\n\n";
         		}
         		iLineNum = stoi(sLineNum, &lastChar, 10);
-        		iColNum = stoi(sColNum, &lastChar, 10);
+        		iColNum = stoi(sColNum, &lastChar, 10)-1;
 #endif
 #ifdef TEST
         		iLineNum = 6;
         		iColNum = 4;
 #endif
         		//try {
-        			sData = sGetElement(ifFile, iLineNum, iColNum );
+        			sData = sGetElement(vsElements, iLineNum, iColNum );
 #ifndef TEST
         			cout << "The data on line " << iLineNum <<", Column " << iColNum << " is " << sData << "\n\n";
 #endif
@@ -812,9 +594,9 @@ int main (int argc, char*argv[] ) {
 
         		float fWhen = 0;
         		int iLine = 1;
-        		int i = 0;
+        		unsigned int i = 0;
         		int iSumOfHeader = 0;
-        		int iCol = mHeader["in_now"];
+        		int iCol = mHeader["in_now"]-1;
 
         		float y = 0;
         		float fTmp = 0.0;
@@ -822,9 +604,12 @@ int main (int argc, char*argv[] ) {
         			iSumOfHeader += sscanf(vsHeader[i].c_str(), "%f", &fTmp);
         		}
         		i = 0;
-
+        		do{
         		cout << "What event are you looking for?\n\n";
         		cin >> sEvent;
+        		if (mHeader[sEvent] < 1 || mHeader[sEvent] > mHeader.size())
+        			cout << "Invalid Event\n";
+        		} while (mHeader[sEvent] < 1 || mHeader[sEvent] > mHeader.size());
 
         		cout << "\n\nWhat Value In That Column?\n\n";
         		cin >> sWhen;
@@ -837,31 +622,41 @@ int main (int argc, char*argv[] ) {
         		else {
         			if (iSumOfHeader != 0)
         				iLine++;
-        			while (y != fWhen) {
+        			while (y != fWhen && i <= vsElements.size()) {
         				y = 0;
         				i++;
-    					iLine++;
+        				if (i == vsElements.size()) {
+        					cout << "That event never takes place!\n";
+        					state = FINISHED;
+        					break;
+        				}
         				//cout << mHeader[sWhen] << "\n";
         				//cout << sGetElement(ifFile, iLine, iCol) << "\n";
-        				sTmp = sGetElement(ifFile,i, mHeader[sEvent]);
+        				sTmp = vsElements[i][mHeader[sEvent]-1];
         				//cout << sTmp << "\n";
         				sscanf(sTmp.c_str(), "%f", &y);
+        				if (y == fWhen) {
+        					break;
+        				}
+    					iLine++;
+
         			}
-        			iLine--;
+        			cout << iLine << "\n";
+        			//iLine--;
         			if (state == FINISHED)
         				break;
-        			cout << "That event takes place at " << sGetElement(ifFile, iLine, iCol) << "; And the value is " << sGetElement(ifFile, iLine, mHeader[sEvent]) << "\n\n";
+        			cout << "That event takes place at " << sGetElement(vsElements, iLine, iCol-1) << "; And the value is " << sGetElement(vsElements, iLine, mHeader[sEvent]) << "\n\n";
         		}
+        		break;
         	}
         	case DELTATIME: {
 
+        		vector<string > vsColData;
         		vector<float > vfColData;
+        		vector<float > vfLastColData;
         		string sTempLine;
-        		int i = 0;
-        		int iColNum = mHeader["in_now"];
-        		float fTempFloat = 0;
-        		float fLastFloat = 0;
-        		float fSum = 0;
+        		unsigned int i = 0;
+        		int iColNum = mHeader["in_now"]-1;
         		float fAvgFloat = 0;
         		ifFile.clear();
         		ifFile.seekg(0, ifFile.beg);
@@ -870,33 +665,24 @@ int main (int argc, char*argv[] ) {
         			state = FINISHED;
         			break;
         		}
-        		while (ifFile.good() && !ifFile.eof()) {
-        			sscanf(sGetElement(ifFile, i-1, iColNum).c_str(), "%f", &fLastFloat);
-        			sTempLine = sGetElement(ifFile, i, iColNum);
-        			if (sTempLine != "ERROR") {
-        				//cout << fLastFloat;
-        				if(sscanf(sTempLine.c_str(), "%f", &fTempFloat) < 1) {
-        					fTempFloat = 0.00000;
-        					//fTempFloat -= fLastFloat;
-        					vfColData.push_back(fTempFloat);
-        				}
-        				else
-        					fTempFloat =- fLastFloat;
-        				fLastFloat = fTempFloat;
-        				vfColData.push_back(fTempFloat);
-        				i++;
-        				//cout << " : " << fTempFloat << "\n";
+        		vsColData = vsGetColumn(vsElements, mHeader["in_now"]-1);
+        		vfColData = vfConvertVector(vsColData);
+        		vfLastColData = vfConvertVector(vsColData);
+        		while ( i < vfColData.size()) {
+        			if (i == 0){
+
         			}
+        			else {
+        				vfColData[i] -= vfLastColData[i-1];
+        			}
+        			i++;
         		}
 
-        		for (unsigned int i = 0; i < vfColData.size(); i++) {
-        			fSum += vfColData[i];
-        		}
-        		fAvgFloat = fSum / (float) vfColData.size();
+        		fAvgFloat = getAvg(vfColData);
 
         		cout << fAvgFloat << " is the average time delta\n";
-        	//	cout << "The maximum delta was" << getMax(vfColData) << "\n";
-        	//	cout << "The minimum delta was" << getMin(vfColData) << "\n";
+        		cout << "The maximum delta was " << getMax(vfColData) << "\n";
+        		cout << "The minimum delta was " << getMin(vfColData) << "\n";
         		state = FINISHED;
         		break;
         	}
@@ -906,7 +692,7 @@ int main (int argc, char*argv[] ) {
         	{
  			cout << "Would You Like To Quit?\n\n[Y/n] ";
  			cin >> sContinue;
- 			if (argc < 1) {
+ 			if (argc < 2) {
  				if (sContinue == "y" || sContinue == "Y" || sContinue == "yes" || sContinue == "YES" || sContinue == "Yes" ) {
 
  					cout << "Good Bye\n\n";
