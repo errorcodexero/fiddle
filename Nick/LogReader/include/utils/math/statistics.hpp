@@ -1,17 +1,13 @@
-#ifndef _MATH_HPP_
-#define _MATH_HPP_
+#ifndef _MATH_STATISTICS_H_
+#define _MATH_STATISTICS_H_
 
-#include <cmath>
+#include "utils/math/math.hpp"
 
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
-#include <limits>
+static const double e = 2.71828182845904523536028747135266249775724709369995;
+static const double pi = 3.14159265358979323846264338327950288419716939937510;
 
-using namespace std;
 template <class T >
-T getMin (vector < T> input) {
+T getMin (std::vector < T> input) {
 	size_t i;
 	T minimum = 0;
 	T minimum_out = 0;
@@ -20,7 +16,7 @@ T getMin (vector < T> input) {
 	if (input.size() == 1)
 		return input[0];
 	else{
-		minimum = numeric_limits< T>::max();
+		minimum = std::numeric_limits< T>::max();
 		for (i = 0; i < input.size(); i++) {
 			if (minimum > fabs(input[i])) {
 				minimum = fabs(input[i]);
@@ -31,7 +27,7 @@ T getMin (vector < T> input) {
 	return minimum_out;
 }
 template <class T >
-T getMax (vector <T> input) {
+T getMax (std::vector <T> input) {
 	size_t i;
 	T maximum = 0;
 	T maximum_out = 0;
@@ -42,7 +38,7 @@ T getMax (vector <T> input) {
 	else{
 		maximum = 0;
 		for (i = 0; i < input.size(); i++) {
-			if (maximum < fabs(input[i])) {
+			if (maximum < std::fabs(input[i])) {
 				maximum = fabs(input[i]);
 				maximum_out = input[i];
 			}
@@ -54,43 +50,58 @@ template <class T>
 int approx(T input, T target, T range);
 
 template <class T>
-T getAvg(vector<T> vInputData) {
-	T sum = 0;
-	T average = 0;
+T getAvg(std::vector<T> vInputData) {
+	double sum = 0;
+	double average = 0;
 	for (unsigned int i = 0; i < vInputData.size(); i++) {
 		sum += vInputData[i];
 	}
-	average = sum / (float) vInputData.size();
+	average = sum / (double) vInputData.size();
 
 	return average;
 }
-template <class T>
-T standardDeviation(vector<T> _vData) {
-	T average = getAvg(_vData);
-	T standardDeviation = 0;
 
-	T difference = 0;
+template<class T>
+double variance(std::vector<T> _vData) {
+
+	double average = getAvg(_vData);
+
+	double difference = 0;
 
 	for (unsigned int i = 0; i < _vData.size(); i++) {
 		difference += pow((average - _vData[i]), 2.0);
 	}
 
-	standardDeviation = sqrt(abs(difference));
+	return difference;
+}
+
+template <class T>
+double standardDeviation(std::vector<T> _vData) {
+	double average = getAvg(_vData);
+	double standardDeviation = 0;
+
+	double difference = 0;
+
+	for (unsigned int i = 0; i < _vData.size(); i++) {
+		difference += pow((average - _vData[i]), 2.0);
+	}
+
+	standardDeviation = sqrt(fabs(difference));
 	return standardDeviation;
 }
 
 template <class T>
-T correlationCoefficient(vector<T> _vDataX, vector<T> _vDataY) {
+double correlationCoefficient(std::vector<T> _vDataX, std::vector<T> _vDataY) {
 
-	T coefficient = 0;
+	double coefficient = 0;
 
-	T sumX = 0;
-	T sumY = 0;
+	double sumX = 0;
+	double sumY = 0;
 
-	T sumX2 = 0;
-	T sumY2 = 0;
+	double sumX2 = 0;
+	double sumY2 = 0;
 
-	float averageSize = (_vDataX.size() + _vDataY.size()) / 2;
+	double averageSize = (_vDataX.size() + _vDataY.size()) / 2;
 
 	for (unsigned int i = 0; i < _vDataX.size(); i++)
 		sumX += _vDataX[i];
@@ -108,5 +119,9 @@ T correlationCoefficient(vector<T> _vDataX, vector<T> _vDataY) {
 	return coefficient;
 }
 
+double normalDistribution(int x,double standardDeviation, double variance, double average) {
+	double p = (pow(e, (-1) * pow((x - average), 2.0) / (2 * variance))) / (standardDeviation * sqrt(2 * pi));
+	return p;
+}
 
-#endif /*_MATH_HPP_*/
+#endif /* _MATH_STATISTIC_H_ */
