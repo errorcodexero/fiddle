@@ -1,17 +1,18 @@
 package com.deathcode;
 
 import java.io.*;
-import java.util.Vector;
+import java.util.ArrayList;
 
-import java.util.Map;
 import java.util.Scanner;
+
+/*import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+*/
 
-
-public class logreader {
-	private static Map <String, Integer> columnMap = new HashMap<String, Integer>();
-	private static Vector<String> columnNames = new Vector<String>();
+public class LogReader {
+	///private static Map <String, Integer> columnMap = new HashMap<String, Integer>();
+	//private static ArrayList<String> columnNames = new ArrayList<String>();
 	private static File file;
 	private static CSVReader csv;
 
@@ -39,21 +40,19 @@ public class logreader {
     		}
     	}
     	reader.close();
-    	Vector<String> data = new Vector<String>();
+    	ArrayList<String> data = new ArrayList<String>();
     	data = csv.getDividedLine(file, 4);
     	for (int i = 1; i < data.size(); i++) {
     		//System.out.println(data.elementAt(i));
     	}
-    	columnNames = csv.getDividedLine(file, 1);
+    	//columnNames = csv.getDividedLine(file, 1);
     	int i = 1;
-    	while ((line = csv.readLine(file, i)) != "ERROR") {
+    	while ((line = CSVReader.readLine(file, i)) != "ERROR") {
     		System.out.println(line);
     		i++;
-    	}
-;
+    	};
     }
 	
-
 }
 
 
