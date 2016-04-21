@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<TitledPane fx:id="titlepane" animated="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="410.0" prefWidth="701.0" text="CSV File" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+  <content>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="375.0" prefWidth="699.0">
+         <children>
+            <GridPane fx:id="gridpane" layoutX="-2.0" layoutY="-1.0" prefHeight="387.0" prefWidth="701.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="226.0" minWidth="0.0" prefWidth="0.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="634.0" minWidth="10.0" prefWidth="519.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.0" minWidth="0.0" prefWidth="148.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints maxHeight="136.0" minHeight="0.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="336.0" minHeight="10.0" prefHeight="336.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="80.0" minHeight="10.0" prefHeight="49.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <ScrollPane fx:id="scrollpane" prefHeight="316.0" prefWidth="689.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" GridPane.rowSpan="2147483647">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="291.0" prefWidth="538.0">
+                           <children>
+                              <TableView layoutX="236.0" layoutY="46.0" prefHeight="291.0" prefWidth="538.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columns>
+                                  <TableColumn prefWidth="75.0" text="C1" />
+                                  <TableColumn prefWidth="75.0" text="C2" />
+                                </columns>
+                              </TableView>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </ScrollPane>
+                  <GridPane GridPane.columnIndex="2" GridPane.rowIndex="1">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="73.0" minWidth="10.0" prefWidth="20.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="139.0" minWidth="10.0" prefWidth="139.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints maxHeight="88.0" minHeight="10.0" prefHeight="37.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="88.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="88.0" minHeight="10.0" prefHeight="34.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="88.0" minHeight="10.0" prefHeight="27.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="88.0" minHeight="10.0" prefHeight="29.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="88.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="94.0" minHeight="10.0" prefHeight="29.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="111.0" minHeight="10.0" prefHeight="31.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="141.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="199.0" minHeight="0.0" prefHeight="31.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="252.0" minHeight="0.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="51.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Button fx:id="getAvg" mnemonicParsing="false" prefHeight="26.0" prefWidth="137.0" text="Get Average" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Button fx:id="getMax" mnemonicParsing="false" prefHeight="26.0" prefWidth="137.0" text="Get Maximum" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Button fx:id="getMin" mnemonicParsing="false" prefHeight="26.0" prefWidth="137.0" text="Get Minimum" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <Button fx:id="getDataElement" mnemonicParsing="false" prefHeight="26.0" prefWidth="137.0" text="Get Data Element" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <Button fx:id="whenDid" mnemonicParsing="false" prefHeight="26.0" prefWidth="137.0" text="When Did..." GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <Button fx:id="getTimeStats" mnemonicParsing="false" prefHeight="26.0" prefWidth="134.0" text="Time Stats" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <Button fx:id="getLogStatistics" mnemonicParsing="false" prefHeight="26.0" prefWidth="137.0" text="Get Log Statistics" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                        <Label text="Data Manipulation" GridPane.columnIndex="1" />
+                     </children>
+                  </GridPane>
+                  <Label text="Data Table" GridPane.columnIndex="1" />
+               </children>
+            </GridPane>
+         </children></AnchorPane>
+  </content>
+</TitledPane>
