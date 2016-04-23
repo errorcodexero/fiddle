@@ -3,7 +3,7 @@ package com.deathcode;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,10 +44,10 @@ public class CSVReader {
     	return output;
     }
     
-    public Vector<String> breakByDelimiter (String string, char delimiter) {
+    public ArrayList<String> breakByDelimiter (String string, char delimiter) {
     	char tempChar = '\0';
     	String tempString = "";
-    	Vector<String> output = new Vector<String>(200, 0);
+    	ArrayList<String> output = new ArrayList<String>();
     	
     	for (int i = 0; i < string.length(); i++) {
     		tempChar = string.charAt(i);
@@ -65,17 +65,17 @@ public class CSVReader {
     	return output;
     }  
     
-    public Vector<String> getDividedLine(File file, int lineNumber) throws IOException {
+    public ArrayList<String> getDividedLine(File file, int lineNumber) throws IOException {
     	String line = "";
-    	Vector<String> output = new Vector<String>();
+    	ArrayList<String> output = new ArrayList<String>();
     	
     	line = readLine(file, lineNumber);
     	output = breakByDelimiter (line, ',');
     	
     	return output;
     }
-    public Vector<String> getCSVHeader(File file) throws IOException {
-    	Vector<String> output = new Vector<String>(200,50);
+    public ArrayList<String> getCSVHeader(File file) throws IOException {
+    	ArrayList<String> output = new ArrayList<String>();
     	String line = "";
     	line = readLine(file, 1);
     	output = breakByDelimiter (line, ',');
@@ -85,13 +85,13 @@ public class CSVReader {
     public String getElement(File file, int lineNumber, int elementNumber) throws IOException{
     	String line = "";
     	String output = "";
-    	Vector<String> brokenLine;
+    	ArrayList<String> brokenLine;
     	line = readLine(file, lineNumber);
     	brokenLine = breakByDelimiter(line, ',');
     	
     	for (int i = 0; i <= brokenLine.size(); i++) {
     		if (i == elementNumber) {
-    			output = brokenLine.elementAt(i);
+    			output = brokenLine.get(i);
     			break;
     		} else
     			output = "";

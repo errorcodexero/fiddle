@@ -9,7 +9,9 @@
 #include <sstream>
 #include <map>
 
-#include "utils/math.hpp"
+#include "utils/math/math.hpp"
+
+int iGetColumnNumber();
 
 std::vector<std::string> sGetCSVHeader(std::ifstream& _ifFile);
 

@@ -2,6 +2,19 @@
 
 using namespace std;
 
+int iGetColumnNumber(){
+
+	string sColNum;
+	int iColNum = 0;
+	size_t lastChar;
+
+	cout << "What Column Number?\n\n";
+	cin >> sColNum;
+
+	iColNum = stoi(sColNum, &lastChar, 10)-1;
+	return iColNum;
+}
+
 string sReadLine( ifstream& _ifFile, int _iLineNum) {
 
     //_ifFile.clear();
