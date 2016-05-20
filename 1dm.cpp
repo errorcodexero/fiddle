@@ -2,7 +2,7 @@
 #include<iostream>
 using namespace std;
 int main(){
-	int y;
+	int y; 
 	int x;
 	cout<<"Hello. Where are you now?\n";
 	int i=0;
