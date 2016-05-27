@@ -6,6 +6,7 @@ clean:
 
 sensors.pdf: sensors.tex
 	pdflatex sensors.tex
+	pdflatex sensors.tex
 
 show: sensors.pdf
 	evince sensors.pdf
