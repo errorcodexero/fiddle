@@ -84,6 +84,19 @@ Encoders may be wired to digital IO ports on the roboRIO or to a port on a Talon
 Costs of encoders vary but can be in the \$40 range.  Local sources are not likely, or at least not likely to have exactly the right type.  Power usage is negligible.  Weights can vary betwwen one ounce and 6 ounces.  
 
 \section{Hall-effect sensors}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=2in]{hall_effect.jpg}
+\caption{Basic Hall-effect sensor}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=2in]{hall-effect-sensor-board.jpg}
+\caption{Pre-made Hall-effect sensor board}
+\end{figure}
+
 Hall effect sensors detect magnets.  They are often used like a limit switch, in which case they can be used to measure proximity rather than direct touching.  They can also be used in place of an encoder in high-speed applications where a very low number of counts per revolution is desirable.  
 
 We have used these to measure speeds on shooters on several robots.  We also used one to measure when an actuator had reached its end on our 2014 robot.  
@@ -91,6 +104,12 @@ We have used these to measure speeds on shooters on several robots.  We also use
 These produce a digital output and are approximately as reliable as the mounting system.  These are programmed the same as a limit switch.  Wiring wise, these can be bought as a bare sensor in which case some circuitry is required to be made, or as a complete setup.  The sensor itself is approximately \$1, while a pre-made board is approximately \$10.  In either case they should weigh under 1/4 of an ounce.  
 
 \section{Magnetic pneumatic cylinder sensor}
+\begin{figure}[ht]
+\centering
+\includegraphics[width=2in]{cylinder_switch.JPG}
+\caption{Bimba-brand switch with mounting hardware}
+\end{figure}
+
 These clamp on to the side of a pneumatic cylinder and reads when the end of the piston is near.  This relies on using a type of pneumatic cylinder that has a magnet inside.  When used in conjunction with the proper type of pneumatic solenoid this allows repeatably stopping a cylinder at a location part way through its stroke.  
 
 We used these on our 2013 robot for raising and lowering our shot.  For programming it's important to look for the edges of when the sensor turns on or off, and note that coming from different directions will yield different results.  
@@ -222,6 +241,12 @@ There are also digital versions that measure only the presence or absense of an 
 
 Wiring is simple and these run in the range of \$10-\$20.
 \section{Light sensor}
+\begin{figure}[ht]
+\centering
+\includegraphics[width=2in]{light_sensor.jpg}
+\caption{A bare light sensor}
+\end{figure}
+
 Light sensors measure the presence or absence of light.  They operate similarly to IR sensors.  
 
 We successfully used a light sensor on our 2004 robot to detect lines on the floor during autonomous mode to help us know where different parts of the field were.  An important implementation detail that may improve the accurace of such systems is to add a skirt around the area with the sensor and your own light source in order to reduce dependency on the surrounding illumination.  
