@@ -1,6 +1,6 @@
 rapier
 katana
-sabre
+chainsaw (for 2017)
 tomahawk
 
 lance
