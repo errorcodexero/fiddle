@@ -1,1 +1,1 @@
-make finish_bounds 2>&1 && ./finish_bounds
+make finish_bounds 2>&1 && rm -f gmon.out && time ./finish_bounds
