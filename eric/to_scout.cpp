@@ -127,6 +127,8 @@ std::vector<T> sorted(std::vector<T> in){
 }
 
 int main(){
+	srand(time(NULL));
+
 	static const int teams=10;
 	const auto team_ids=range(teams);
 	static const int matches=5;
