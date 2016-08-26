@@ -1,6 +1,8 @@
 #include <iostream>
 #include <memory>
 
+//compile w/ -std=c++14
+
 using namespace std;
 
 struct Animal{
