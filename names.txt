@@ -1,7 +1,7 @@
-rapier
-katana
-chainsaw (for 2017)
-tomahawk
+rapier (2018 season?
+katana (2017 bunny bots?)
+chainsaw (2017 season)
+tomahawk (2016 bunny bots?)
 
 lance
 spear
