@@ -7,8 +7,8 @@ int main(){
 		cout<<"is it "<<guess<<"?(y,h,l)";
 		cin>>postition;
 		if(postition=='y')break;
-		if(postition=='h')guess = guess+guess/2;
-		if(postition=='l')guess = guess-guess/2;
+		if(postition=='h')guess = guess+(guess/2);
+		if(postition=='l')guess = guess-(guess/2);
 	}
 	return 0;
 }
