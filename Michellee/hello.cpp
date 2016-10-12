@@ -1,11 +1,20 @@
 #include<iostream>
 using namespace std;
+
+int addtwo(int x, int y){
+	int sum;
+	sum=x+y;
+	return sum;
+
+}
 int main (){
 	string s;
 	s="b";
 	getline(cin,s);
 	cout<<s<<"\n";
 	//cout<<"Hello world!\n";
+	
+	cout<<"x+y="<< addtwo(3,5)<<"\n";
 	if(s=="1"){
 		cout<<"right,right,right!\n";
 	}
