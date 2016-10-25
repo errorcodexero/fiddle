@@ -1,26 +1,34 @@
 #include<iostream>
+#include <stdlib.h>
 using namespace std;
 int main (){
+	cout<< "Where are you now (0-5)?\n";
 	string s;
-	s="b";
+	
 	getline(cin,s);
-	cout<<s<<"\n";
-	//cout<<"Hello world!\n";
-	if(s=="1"){
-		cout<<"right,right,right!\n";
+	cout<< "Where do you want to be?\n";
+	string target;
+	getline(cin,target);
+	cout<<"start:"<<s<<"\n";
+	cout<<"target:"<<target<<"\n";
+	
+	
+	if(s=="0"&& target =="0"){
+		cout<<"stay\n";
 	}
 	if(s=="5") {
-		cout<<"go left\n";
+		cout<<"Go one left\n";
 	}	
 	if(s=="2"){
-		cout<<"two right\n";
+		cout<<" Go two right\n";
 	}
 	if(s=="3"){
-		cout<<"one right\n";
+		cout<<"Go one right\n";
 	}
 	if(s=="4"){
 		cout<<"stay\n";
 	}
+
 }
 //if(left,left,left)
 
