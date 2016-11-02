@@ -1,0 +1,1 @@
+for i in {1..10000}; do sleep 1; ./maze --generate=15:15; done
