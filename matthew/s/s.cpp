@@ -5,8 +5,7 @@
 using namespace std;
 
 struct Price_data {
-	double price, low;//, opening;
-	string opening;
+	double price, low, opening;
 	bool found = 0, multi_match = 0;
 	bool get_open = 1;
 };
@@ -27,12 +26,11 @@ size_t find_price(char* buffer, size_t size, size_t nmemb, Price_data* data) {
 	if (found && !multi_match) data->price = stod(match[1]);
 	if (regex_search(page, match, regex("Day high</p>\\s*<p class=\"column data\">(.*)</p>")))
 		data->low = stod(string(match[1]).substr(1));
-	if (data->get_open && regex_search(page, match, regex(";\">\\s*Open:\\s(.*)\\n"))) {
-		cout<<"HERE"<<endl;
-		data->opening = match[1];//stod(match[1]);
+	if (data->get_open && regex_search(page, match, regex("Open: (.*)"))) {
+		data->opening = stod(match[1]);
 		data->get_open = 0;
 	}
-	return nmemb;	
+	return size*nmemb;	
 }
 
 int main(int argc, char** argv) {
