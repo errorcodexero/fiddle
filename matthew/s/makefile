@@ -1,7 +1,7 @@
 all: s
 
 s: s.cpp
-	g++ s.cpp -std=c++11 -Wall -lcurl -o s
+	g++ s.cpp -std=c++11 -Wall -lcurl -g -o s
 
 .PONHY: clean
 clean:

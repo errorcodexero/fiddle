@@ -4,9 +4,11 @@
 
 using namespace std;
 
-struct Value_data {
-	string value;
-	bool found=0, multi_match=0;
+struct Price_data {
+	double price, low;//, opening;
+	string opening;
+	bool found = 0, multi_match = 0;
+	bool get_open = 1;
 };
 
 int error(string msg) {
@@ -14,35 +16,44 @@ int error(string msg) {
 	return 1;
 }
 
-size_t find_value(char* buffer, size_t size, size_t nmemb, Value_data* data) {
+size_t find_price(char* buffer, size_t size, size_t nmemb, Price_data* data) {
 	string page = buffer;
+	
 	smatch match;
 	bool found = regex_search(page, match, regex("data bgLast\">(.*)</p>"));
 	bool multi_match = match.size() > 2;
 	data->found = data->found || found;
 	data->multi_match = data->multi_match || multi_match;
-	if (found && !multi_match) data->value = match[1];
+	if (found && !multi_match) data->price = stod(match[1]);
+	if (regex_search(page, match, regex("Day high</p>\\s*<p class=\"column data\">(.*)</p>")))
+		data->low = stod(string(match[1]).substr(1));
+	if (data->get_open && regex_search(page, match, regex(";\">\\s*Open:\\s(.*)\\n"))) {
+		cout<<"HERE"<<endl;
+		data->opening = match[1];//stod(match[1]);
+		data->get_open = 0;
+	}
 	return nmemb;	
 }
 
 int main(int argc, char** argv) {
-	Value_data data;
-	if (argc < 2) error("A stock symbol must be supplied as an argument.");
-	string symbol(argv[1]);
-	string ss("http://www.marketwatch.com/investing/stock/" + symbol);
+	Price_data data;
+	if (argc < 2) return error("A stock symbol must be supplied as an argument.");
+	string url("http://www.marketwatch.com/investing/stock/" + string(argv[1]));
 
 	CURL *curl = curl_easy_init();
 	if (!curl) return error("CURL pointer was not initialized.");
 
 	CURLcode res;
-	curl_easy_setopt(curl, CURLOPT_URL, ss.c_str());
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, find_value);
+	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, find_price);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
 	res = curl_easy_perform(curl);
 	curl_easy_cleanup(curl);
 	
-	if (!data.found) return error("Value not found in page");
+	if (!data.found) return error("Price not found in page");
 	if (data.multi_match) return error("Multiple matches found in page.");
-	cout<<"Value: "<<data.value<<endl;
+	cout<<"Price: "<<data.price<<endl;
+	cout<<"Day Low: "<<data.low<<endl;
+	cout<<"Opening: "<<data.opening<<endl;
 	return 0;
 }
