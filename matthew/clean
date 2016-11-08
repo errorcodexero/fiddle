@@ -1,0 +1,15 @@
+#!/bin/bash
+base=$( dirname "${BASH_SOURCE[0]}" )
+find . -type f -iname "*_test" -print0 | while IFS= read -r -d $'\0' test; do
+	i=0
+	echo $test
+	while read -r p; do
+		if [[ $i -gt 0 ]] && [[ $p != *"2>"* ]] && [[ $p != *"g++"* ]]; then
+			line=$(echo $p | rev | cut -c 2- | rev)
+			if [ ! -f $line ]; then
+				echo $line;
+			fi
+		fi
+		i=$((i+1))
+	done <$test
+done
