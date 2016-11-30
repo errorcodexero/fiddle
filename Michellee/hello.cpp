@@ -8,7 +8,7 @@ int main (){
 	cout<< "Where do you want to be?\n";
 //int main_two (){	
 	int i=atoi (s.c_str());
-	cout<<" i is equal to "<<i<<"\n";
+	//cout<<" i is equal to "<<i<<"\n";
 	string target;
 	getline(cin,target);
 	cout<<"start:"<<s<<"\n";
@@ -17,8 +17,41 @@ int main (){
 	target_2=atoi(target.c_str());
 	//cout<<"target_2 "<<target_2<<"\n";
 	int difference =i -target_2;
-	cout<<"difference: 2"<<difference<<"\n";
-	
+	cout<<"difference: 0"<<difference<<"\n";
+	if (difference==0){
+		cout<<"stay\n";
+	}
+	if (difference==1){
+		cout<<"go left\n";
+	}
+	if (difference==2){
+		cout<<"go left two\n";
+	}
+	if (difference==3){
+		cout<<"go left three\n";
+	}
+	if (difference==4){
+		cout<<"go left four\n";
+	}
+	if (difference==5){
+		cout<<"go left five\n";
+	}
+	if (difference==-1){
+		cout<<"go right one\n";
+	} 
+	if (difference==-2){
+		cout<<"go right two\n";
+	} 
+	if (difference==-3){
+		cout<<"go right three\n";
+	}
+	if (difference==-4){
+		cout<<"go right four\n";
+	}
+	if (difference==-5){
+		cout<<"go right five\n";
+	}
+
 	/*if(s=="0"&& target =="0"){
 		cout<<"stay\n";
 	}
