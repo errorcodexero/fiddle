@@ -14,7 +14,8 @@ vector<T> filter(Func f, vector<T> v) {
 template<typename Func, typename T>
 auto map(Func f, vector<T> v) {
 	T x;
-	vector<decltype(f(x))> outputs;
+	typedef decltype(f(x)) R_type;
+	vector<typename remove_reference<typename remove_const<R_type>::type>::type> outputs;
 	for (unsigned i = 0; i < v.size(); i++) outputs.push_back(f(v[i]));
 	return outputs;
 }
