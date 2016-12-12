@@ -1,10 +1,10 @@
 #include <iostream>
 using namespace std;
 int main (){
-	cout<<"choose a number between 1-9\n";
+	cout << "choose a number between 1-9\n";
 	string x;
 	getline(cin,x);
-	int
+	//int
 	cout<<x;
 	cout<<"\n";
 	cout<<"xxxxxxxxxxxxxxxxxxxxxxxxxxxx\n";

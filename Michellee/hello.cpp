@@ -1,50 +1,35 @@
 #include<iostream>
 #include <stdlib.h>
 using namespace std;
-
-int addtwo(int x, int y){
-	int sum;
-	sum=x+y;
-	return sum;
-
+int get_num(){
+	string f;
+	getline (cin,f);
+	int s=atoi (f.c_str());
+	return s;
 }
 int main (){
-	cout<< "Where are you now (0-5)?\n";
-	string s;
 	
-	getline(cin,s);
-<<<<<<< HEAD
-	cout<<s<<"\n";
-	//cout<<"Hello world!\n";
+	cout<< "Where in the \"x\" axis are you now (0-5)?\n";
+	int current_x_value=get_num();
+	cout<< "Where in the \"x\" axis do you want to be (0-5)?\n";	
+	int target_2_wanted_x_value=get_num();
+	int difference_x = current_x_value -target_2_wanted_x_value;
 	
-	cout<<"x+y="<< addtwo(3,5)<<"\n";
-	if(s=="1"){
-		cout<<"right,right,right!\n";
-=======
-	cout<< "Where do you want to be?\n";
-	string target;
-	getline(cin,target);
-	cout<<"start:"<<s<<"\n";
-	cout<<"target:"<<target<<"\n";
-	
-	
-	if(s=="0"&& target =="0"){
-		cout<<"stay\n";
->>>>>>> cf1293fa9d7618cb22d97fdba66bfb93ab65a7d0
+	cout<< "Where in the \"y\" axis are you now (0-5)?\n";
+	int current_y_value=get_num();
+	cout<< "Where in the \"y\" axis do you want to be (0-5)?\n";	
+	int target_2_wanted_y_value=get_num();
+	int difference_y = current_y_value -target_2_wanted_y_value;
+	pair<int,int> at;
+	at.first=current_x_value ;
+	at.second=current_y_value;
+	int target;
+	while (at.first!=target_2_wanted_x_value || at.second!=target_2_wanted_y_value){
+		if (at.first >target){
+			cout<< "Go left\n";
+			at.first--;
+		}
 	}
-	if(s=="5") {
-		cout<<"Go one left\n";
-	}	
-	if(s=="2"){
-		cout<<" Go two right\n";
-	}
-	if(s=="3"){
-		cout<<"Go one right\n";
-	}
-	if(s=="4"){
-		cout<<"stay\n";
-	}
-
 }
-//if(left,left,left)
+
 
