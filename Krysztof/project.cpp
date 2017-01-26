@@ -16,19 +16,19 @@ int main () {
 	start.y=rand()%10;
 	end.x=rand()%10;
 	end.y=rand()%10;
-	cout<<"start"<<" "<<start.x<<","<<start.y<<endl;
+	cout<<"Start"<<" "<<start.x<<","<<start.y<<endl;
 	if (start.x<end.x) {
-		cout<<string(end.x-start.x, 'R')<<endl;
+		cout<<"Go right"<<" "<<(end.x-start.x)<<" "<<"times."<<endl;
 	} 
 	else if (start.x>end.x) {
-		cout<<string(start.x-end.x, 'L')<<endl;
+		cout<<"Go left"<<" "<<(start.x-end.x)<<" "<<"times."<<endl;
 	} 
 	if (start.y<end.y) {
-		cout<<string(end.y-start.y, 'U')<<endl;
+		cout<<"Go up"<<" "<<(end.y-start.y)<<" "<<"times."<<endl;
 	}
 	else if (start.y>end.y) {
-		cout<<string(start.y-end.y, 'D')<<endl;
+		cout<<"Go right"<<" "<<(start.y-end.y)<<" "<<"times."<<endl;
 	}
-	cout<<"end"<<" "<<end.x<<","<<end.y<<endl;
+	cout<<"End"<<" "<<end.x<<","<<end.y<<endl;
 	return 0;
 }
