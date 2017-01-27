@@ -8,14 +8,14 @@ using namespace std;
 struct point {
 	int x, y;
 }start, end;	
-const int X_LENGTH = 10, Y_LENGTH = 10;
+const int X_LENGTH = 20, Y_LENGTH = 20;
 void print_maze(point start, point end){	
-		for(int y = 0; y<Y_LENGTH; y++){
-			for(int x = 0; x<X_LENGTH; x++){
-				if(y == start.y && x == start.x) cout<<"S";
-				else if (y ==end.y && x == end.x) cout<<"E";
-				else cout<<"X";
-			}	
+	for(int y = 0; y<Y_LENGTH; y++){
+		for(int x = 0; x<X_LENGTH; x++)
+		if(y == start.y && x == start.x) cout<<"S";
+		else if (y ==end.y && x == end.x) cout<<"E";
+		else cout<<"X";
+		cout<<endl;
 	}
 }
 int main () {
@@ -33,10 +33,10 @@ int main () {
 		cout<<"Go left"<<" "<<(start.x-end.x)<<" "<<"times."<<endl;
 	} 
 	if (start.y<end.y) {
-		cout<<"Go up"<<" "<<(end.y-start.y)<<" "<<"times."<<endl;
+		cout<<"Go down"<<" "<<(end.y-start.y)<<" "<<"times."<<endl;
 	}
 	else if (start.y>end.y) {
-		cout<<"Go right"<<" "<<(start.y-end.y)<<" "<<"times."<<endl;
+		cout<<"Go up"<<" "<<(start.y-end.y)<<" "<<"times."<<endl;
 	}
 	cout<<"End"<<" "<<end.x<<","<<end.y<<endl;
 	return 0;
