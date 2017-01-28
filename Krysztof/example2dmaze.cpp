@@ -7,15 +7,17 @@ struct point {
 	int x, y;
 }start, end;
 
-const int X_LENGTH = 20, Y_LENTGH = 20;
+const int X_LENGTH = 20, Y_LENGTH = 20;
 
 int wall[] ={0,1};
 
-void print_maze(point start, point end) {
-	for (int x=0; start.x>X_LENGTH; x++) {
-	cout<<endl;	
-	if (int x=0; start.x<X_LENGTH; x++) {
-		cout<<rand()%1;
+void print_maze(point start, point end){	
+	for(int y = 0; y<Y_LENGTH; y++){
+		for(int x = 0; x<X_LENGTH; x++)
+		if(y == start.y && x == start.x) cout<<"S";
+		else if (y ==end.y && x == end.x) cout<<"E";
+		else 
+		cout<<endl;
 	}
 }
 int main() {
