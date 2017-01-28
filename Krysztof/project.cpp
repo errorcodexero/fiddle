@@ -14,7 +14,7 @@ void print_maze(point start, point end){
 		for(int x = 0; x<X_LENGTH; x++)
 		if(y == start.y && x == start.x) cout<<"S";
 		else if (y ==end.y && x == end.x) cout<<"E";
-		else cout<<"X";
+		else cout<<rand()%1;
 		cout<<endl;
 	}
 }
