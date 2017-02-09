@@ -10,8 +10,8 @@ using namespace std;
 struct point {
 	int x, y;
 };	
-const int X_LENGTH = 10, Y_LENGTH = 10;
-void print_maze(point start, point end, vector <point> visited){	
+const int X_LENGTH = 20, Y_LENGTH = 20;
+void print_maze(point start,point mid, point end, vector <point> walls, vector <point> visited){	
 	for(int y = 0; y<Y_LENGTH; y++){
 		string row="";
 		for(int x = 0; x<X_LENGTH; x++){		
@@ -26,19 +26,21 @@ void print_maze(point start, point end, vector <point> visited){
 				for(int i=0; i<visited.size(); i++) {
 					point p=visited[i];					
 					if(y==p.y && x==p.x) {
-						row+=" ";
+						row+="-";
 						unvisited=false;
 					}
 				}
-				bool 
-				for (int i=0; i<walls.size(); i++) {
-					point w=walls[i];
-					if(y==w.y && x==w.x) {
-						row+="-";
+				bool iswall=false;
+				for(int i=0; i<walls.size(); i++) {
+					point p=walls[i];					
+					if(y==p.y && x==p.x) {
+						row+="x";
+						iswall=true;
 					}
 				}
-				if (unvisited)row+="x";
-			}			
+				if (unvisited && !iswall)row+=" ";
+
+			}
 		}
 		cout<<row<<endl;
 	}
@@ -68,7 +70,7 @@ int main () {
 		cout<<"Go right"<<" "<<(mid.x-start.x)<<" "<<"times."<<endl;
 	} 
 	else if (start.x>mid.x) {
-		for (int i=start.x; i>mid.x; i--) {
+		for (int i=start.x; i>=mid.x; i--) {
 			point p;
 			p.x=i;
 			p.y=start.y;
@@ -77,7 +79,7 @@ int main () {
 		cout<<"Go left"<<" "<<(start.x-mid.x)<<" "<<"times."<<endl;
 	}
 	if (start.y<mid.y) {
-		for (int i=mid.y; i>=start.y; i--) {
+		for (int i=mid.y; i>start.y; i--) {
 			point p;
 			p.y=i;
 			p.x=mid.x;
@@ -86,7 +88,7 @@ int main () {
 		cout<<"Go down"<<" "<<(mid.y-start.y)<<" "<<"times."<<endl;
 	}
 	else if (start.y>mid.y) {
-		for (int i=mid.y; i<=start.y; i++) {
+		for (int i=mid.y; i<start.y; i++) {
 			point p;
 			p.y=i;
 			p.x=mid.x;
@@ -95,7 +97,7 @@ int main () {
 		cout<<"Go up"<<" "<<(start.y-mid.y)<<" "<<"times."<<endl;
 	}	
 	if (mid.x<end.x) {
-		for (int i=mid.x; i<end.x; i++) {
+		for (int i=mid.x; i<=end.x; i++) {
 			point p;
 			p.x=i;
 			p.y=mid.y;
@@ -104,7 +106,7 @@ int main () {
 		cout<<"Go right"<<" "<<(end.x-mid.x)<<" "<<"times."<<endl;
 	} 
 	else if (mid.x>end.x) {
-		for (int i=mid.x; i>end.x; i--) {
+		for (int i=mid.x; i>=end.x; i--) {
 			point p;
 			p.x=i;
 			p.y=mid.y;
@@ -114,7 +116,7 @@ int main () {
 	} 
 
 	if (mid.y<end.y) {
-		for (int i=end.y; i>=mid.y; i--) {
+		for (int i=end.y; i>mid.y; i--) {
 			point p;
 			p.y=i;
 			p.x=end.x;
@@ -123,7 +125,7 @@ int main () {
 		cout<<"Go down"<<" "<<(end.y-mid.y)<<" "<<"times."<<endl;
 	}
 	else if (mid.y>end.y) {
-		for (int i=end.y; i<=mid.y; i++) {
+		for (int i=end.y; i<mid.y; i++) {
 			point p;
 			p.y=i;
 			p.x=end.x;
@@ -132,6 +134,6 @@ int main () {
 		cout<<"Go up"<<" "<<(mid.y-end.y)<<" "<<"times."<<endl;
 	}
 	cout<<"End"<<" "<<end.x<<","<<end.y<<endl;
-		print_maze(start,end,visited);
+		print_maze(start,mid,end,walls,visited);
 	return 0;
 }
