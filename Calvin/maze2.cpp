@@ -2,6 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <algorithm>
+#include <cstdlib>
 
 using namespace std;
 
@@ -218,5 +219,21 @@ int main() {
 	nodes.push_back(iota);
 	Map testMap(width, height, nodes);
 	testMap.draw();
+	
+	int choice = -1;
+	string getChoice ="";
+	while (choice != 0) {
+		testMap.draw();
+		cout<<"Which location would you like to go to?\n";
+		getline(cin, getChoice);
+		choice = atoi(getChoice.c_str());
+		if (choice != 0) {
+			for (Node node: testMap.nodes) {
+				if(testMap.current.paths[choice-1].connect == node) {
+					testMap.current = node;
+					break;
+				}
+			}
+		}
+	}
 }
-
