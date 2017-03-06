@@ -103,9 +103,9 @@ struct Map {
                 }
 
                 for (Node node: nodes) {
-                        image[node.loc.x][node.loc.y] = "◈";
+                        image[node.loc.x][node.loc.y] = "▽";
                 }
-                image[current.loc.x][current.loc.y] = "✈️️";
+                image[current.loc.x][current.loc.y] = "◈";
 		for (int i= 0; i < current.paths.size(); i++) {
 			image[current.paths[i].connect->loc.x][current.paths[i].connect->loc.y] = to_string(i+1);
 		}
@@ -163,43 +163,43 @@ int main() {
 	      iota = Node(Point(53, 26), vector<Path>());
 
 	alpha.paths.push_back(Path(&beta, 1));
-	alpha.paths.push_back(Path(&zeta, 1));
 	alpha.paths.push_back(Path(&eta, 1));
+	alpha.paths.push_back(Path(&zeta, 1));
 
 	beta.paths.push_back(Path(&alpha, 1));
-	beta.paths.push_back(Path(&gamma, 1));
 	beta.paths.push_back(Path(&eta, 1));
 	beta.paths.push_back(Path(&theta, 1));
+	beta.paths.push_back(Path(&gamma, 1));
 
 	gamma.paths.push_back(Path(&beta, 1));
-	gamma.paths.push_back(Path(&delta, 1));
 	gamma.paths.push_back(Path(&theta, 1));
+	gamma.paths.push_back(Path(&delta, 1));
 
 	delta.paths.push_back(Path(&gamma, 1));
-	delta.paths.push_back(Path(&epsilon, 1));
 	delta.paths.push_back(Path(&theta, 1));
 	delta.paths.push_back(Path(&iota, 1));
+	delta.paths.push_back(Path(&epsilon, 1));
 	
 	epsilon.paths.push_back(Path(&delta, 1));
-	epsilon.paths.push_back(Path(&zeta, 1));
 	epsilon.paths.push_back(Path(&iota, 1));
+	epsilon.paths.push_back(Path(&zeta, 1));
 
-	zeta.paths.push_back(Path(&epsilon, 1));
 	zeta.paths.push_back(Path(&alpha, 1));
-	zeta.paths.push_back(Path(&iota, 1));
 	zeta.paths.push_back(Path(&eta, 1));
+	zeta.paths.push_back(Path(&iota, 1));
+	zeta.paths.push_back(Path(&epsilon, 1));
 
-	eta.paths.push_back(Path(&theta, 1));
-	eta.paths.push_back(Path(&iota, 1));
 	eta.paths.push_back(Path(&alpha, 1));
 	eta.paths.push_back(Path(&beta, 1));
+	eta.paths.push_back(Path(&theta, 1));
+	eta.paths.push_back(Path(&iota, 1));
 	eta.paths.push_back(Path(&zeta, 1));
 
-	theta.paths.push_back(Path(&iota, 1));
-	theta.paths.push_back(Path(&eta, 1));
 	theta.paths.push_back(Path(&beta, 1));
 	theta.paths.push_back(Path(&gamma, 1));
 	theta.paths.push_back(Path(&delta, 1));
+	theta.paths.push_back(Path(&iota, 1));
+	theta.paths.push_back(Path(&eta, 1));
 
 	iota.paths.push_back(Path(&eta, 1));
 	iota.paths.push_back(Path(&theta, 1));
