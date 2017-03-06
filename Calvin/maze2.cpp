@@ -15,6 +15,14 @@ struct Point {
 	}
 };
 
+bool operator == (Point& a, Point& b) {
+	return a.x == b.x && a.y == b.y;
+}
+
+bool operator != (Point& a, Point& b) {
+	return !(a == b);
+}
+
 struct Node;
 
 struct Path {
@@ -39,6 +47,14 @@ struct Node {
 	}
 };
 
+bool operator == (Node* a, Node b) {
+	return 	a->loc == b.loc;
+}
+
+bool operator != (Node* a, Node b) {
+	return !(a == b);
+}
+
 struct Map {
 	int width, height;
 	vector<Node> nodes;
@@ -58,14 +74,13 @@ struct Map {
 		system("reset");
                 vector<vector<string>> image = vector<vector<string>>(width, vector<string>(height, " "));
 		for (Node node: nodes) {
-			bool exit = false;
                         for (Path path: node.paths) {
                                 int deltaX = path.connect->loc.x-node.loc.x;
                                 int deltaY = path.connect->loc.y-node.loc.y;
                                 int pointNum = max(abs(deltaX-1),abs(deltaY-1));
-				if (node.loc.x < path.connect->loc.xi) {
+				if (node.loc.x <= path.connect->loc.x && path.connect != current) {
                                         for (int i = 1; i < pointNum; i++) {
-                                                image[round(node.loc.x+i*deltaX/pointNum)][round(node.loc.y+i*deltaY/pointNum)]="◦";
+                                                image[round(node.loc.x+i*deltaX/pointNum)][round(node.loc.y+i*deltaY/pointNum)]="-";
                                         }
                                 }
                         }
@@ -90,6 +105,9 @@ struct Map {
                         image[node.loc.x][node.loc.y] = "✖";
                 }
                 image[current.loc.x][current.loc.y] = "✈️️";
+		for (int i= 0; i < current.paths.size(); i++) {
+			image[current.paths[i].connect->loc.x][current.paths[i].connect->loc.y] = to_string(i+1);
+		}
 
 		cout<<"╔═";
 		for (int i = 0; i < image.size(); i++) {
@@ -118,9 +136,9 @@ int randBetween(int min, int max) {
 }
 
 int main() {
-	int width = 90;
+	int width = 85;
 	int height = 44;
-
+	/*
 	srand(time(0));
 	int ax = randBetween(0, width);
 	int ay = randBetween(0, height);
@@ -132,30 +150,61 @@ int main() {
 	int dy = randBetween(0, height);
 	int ex = randBetween(0, width);
 	int ey = randBetween(0, height);
-	Node alpha = Node(Point(ax, ay), vector<Path>()),
-	      beta = Node(Point(bx, by), vector<Path>()),
-	     gamma = Node(Point(gx, gy), vector<Path>()),
-	     delta = Node(Point(dx, dy), vector<Path>()),
-	   epsilon = Node(Point(ex, ey), vector<Path>());
+	*/
+	Node alpha = Node(Point(44, 5), vector<Path>()),
+	      beta = Node(Point(30, 13), vector<Path>()),
+	     gamma = Node(Point(30, 29), vector<Path>()),
+	     delta = Node(Point(44, 37), vector<Path>()),
+	   epsilon = Node(Point(58, 29), vector<Path>()),
+	      zeta = Node(Point(58, 13), vector<Path>()),
+	       eta = Node(Point(44, 11), vector<Path>()),
+	     theta = Node(Point(35, 26), vector<Path>()),
+	      iota = Node(Point(53, 26), vector<Path>());
 
 	alpha.paths.push_back(Path(&beta, 1));
-	alpha.paths.push_back(Path(&gamma, 1));
-	alpha.paths.push_back(Path(&delta, 1));
+	alpha.paths.push_back(Path(&zeta, 1));
+	alpha.paths.push_back(Path(&eta, 1));
 
 	beta.paths.push_back(Path(&alpha, 1));
 	beta.paths.push_back(Path(&gamma, 1));
-	beta.paths.push_back(Path(&delta, 1));
-	beta.paths.push_back(Path(&epsilon, 1));
+	beta.paths.push_back(Path(&eta, 1));
+	beta.paths.push_back(Path(&theta, 1));
 
-	gamma.paths.push_back(Path(&alpha, 1));
 	gamma.paths.push_back(Path(&beta, 1));
-	gamma.paths.push_back(Path(&epsilon, 1));
+	gamma.paths.push_back(Path(&delta, 1));
+	gamma.paths.push_back(Path(&theta, 1));
 
-	delta.paths.push_back(Path(&alpha, 1));
-	delta.paths.push_back(Path(&beta, 1));
+	delta.paths.push_back(Path(&gamma, 1));
+	delta.paths.push_back(Path(&epsilon, 1));
+	delta.paths.push_back(Path(&theta, 1));
+	delta.paths.push_back(Path(&iota, 1));
 	
-	epsilon.paths.push_back(Path(&beta, 1));
-	epsilon.paths.push_back(Path(&gamma, 1));
+	epsilon.paths.push_back(Path(&delta, 1));
+	epsilon.paths.push_back(Path(&zeta, 1));
+	epsilon.paths.push_back(Path(&iota, 1));
+
+	zeta.paths.push_back(Path(&epsilon, 1));
+	zeta.paths.push_back(Path(&alpha, 1));
+	zeta.paths.push_back(Path(&iota, 1));
+	zeta.paths.push_back(Path(&eta, 1));
+
+	eta.paths.push_back(Path(&theta, 1));
+	eta.paths.push_back(Path(&iota, 1));
+	eta.paths.push_back(Path(&alpha, 1));
+	eta.paths.push_back(Path(&beta, 1));
+	eta.paths.push_back(Path(&zeta, 1));
+
+	theta.paths.push_back(Path(&iota, 1));
+	theta.paths.push_back(Path(&eta, 1));
+	theta.paths.push_back(Path(&beta, 1));
+	theta.paths.push_back(Path(&gamma, 1));
+	theta.paths.push_back(Path(&delta, 1));
+
+	iota.paths.push_back(Path(&eta, 1));
+	iota.paths.push_back(Path(&theta, 1));
+	iota.paths.push_back(Path(&delta, 1));
+	iota.paths.push_back(Path(&epsilon, 1));
+	iota.paths.push_back(Path(&zeta, 1));
 	
 	vector<Node> nodes;
 	nodes.push_back(alpha);
@@ -163,6 +212,10 @@ int main() {
 	nodes.push_back(gamma);
 	nodes.push_back(delta);
 	nodes.push_back(epsilon);
+	nodes.push_back(zeta);
+	nodes.push_back(eta);
+	nodes.push_back(theta);
+	nodes.push_back(iota);
 	Map testMap(width, height, nodes);
 	testMap.draw();
 }
