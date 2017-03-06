@@ -103,7 +103,7 @@ struct Map {
                 }
 
                 for (Node node: nodes) {
-                        image[node.loc.x][node.loc.y] = "✖";
+                        image[node.loc.x][node.loc.y] = "◈";
                 }
                 image[current.loc.x][current.loc.y] = "✈️️";
 		for (int i= 0; i < current.paths.size(); i++) {
@@ -220,14 +220,23 @@ int main() {
 	Map testMap(width, height, nodes);
 	testMap.draw();
 	
-	int choice = -1;
+	int choice = -1, current = -1;
 	string getChoice ="";
+	string error = "";
 	while (choice != 0) {
 		testMap.draw();
-		cout<<"Which location would you like to go to?\n";
-		getline(cin, getChoice);
-		choice = atoi(getChoice.c_str());
-		if (choice != 0) {
+		cout<<error<<"Which location would you like to go to?\n";
+		current = choice;
+		try {
+			getline(cin, getChoice);
+			choice = atoi(getChoice.c_str());
+		} catch (int e) {
+			error = "Invalid input: Input must be a number\n";
+			choice = current;
+		}
+		if (choice > testMap.current.paths.size() || choice < 0) {
+			error = "Invalid input: Input must be within range of options shown on map\n";
+		} else if (choice > 0) {
 			for (Node node: testMap.nodes) {
 				if(testMap.current.paths[choice-1].connect == node) {
 					testMap.current = node;
