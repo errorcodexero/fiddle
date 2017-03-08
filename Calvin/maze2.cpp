@@ -78,9 +78,9 @@ struct Map {
                         for (Path path: node.paths) {
                                 int deltaX = path.connect->loc.x-node.loc.x;
                                 int deltaY = path.connect->loc.y-node.loc.y;
-                                int pointNum = max(abs(deltaX-1),abs(deltaY-1));
+                                int pointNum = max(abs(deltaX),abs(deltaY));
 				if (node.loc.x <= path.connect->loc.x && path.connect != current) {
-                                        for (int i = 1; i < pointNum; i++) {
+                                        for (int i = 1; i <= pointNum; i++) {
                                                 image[round(node.loc.x+i*deltaX/pointNum)][round(node.loc.y+i*deltaY/pointNum)]="-";
                                         }
                                 }
@@ -89,13 +89,13 @@ struct Map {
                 for (Path path: current.paths) {
                         int deltaX = path.connect->loc.x-current.loc.x;
                         int deltaY = path.connect->loc.y-current.loc.y;
-                        int pointNum = max(abs(deltaX-1),abs(deltaY-1));
+                        int pointNum = max(abs(deltaX),abs(deltaY));
                         if (current.loc.x < path.connect->loc.x) {
-                                for (int i = 1; i < pointNum; i++) {
+                                for (int i = 1; i <= pointNum; i++) {
                                         image[round(current.loc.x+i*deltaX/pointNum)][round(current.loc.y+i*deltaY/pointNum)]="•";
                                 }
                         } else {
-                                for (int i = 1; i < pointNum; i++) {
+                                for (int i = 1; i <= pointNum; i++) {
                                         image[round(path.connect->loc.x-i*deltaX/pointNum)][round(path.connect->loc.y-i*deltaY/pointNum)]="•";
                                 }
 
@@ -138,20 +138,7 @@ int randBetween(int min, int max) {
 
 int main() {
 	int width = 85;
-	int height = 44;
-	/*
-	srand(time(0));
-	int ax = randBetween(0, width);
-	int ay = randBetween(0, height);
-	int bx = randBetween(0, width);
-	int by = randBetween(0, height);
-	int gx = randBetween(0, width);
-	int gy = randBetween(0, height);
-	int dx = randBetween(0, width);
-	int dy = randBetween(0, height);
-	int ex = randBetween(0, width);
-	int ey = randBetween(0, height);
-	*/
+	int height = 44; 
 	Node alpha = Node(Point(44, 5), vector<Path>()),
 	      beta = Node(Point(30, 13), vector<Path>()),
 	     gamma = Node(Point(30, 29), vector<Path>()),
@@ -161,19 +148,19 @@ int main() {
 	       eta = Node(Point(44, 11), vector<Path>()),
 	     theta = Node(Point(35, 26), vector<Path>()),
 	      iota = Node(Point(53, 26), vector<Path>());
+	
+	alpha.paths = vector<Path>{Path(&beta, 1), Path(&eta, 1), Path(&zeta, 1)};
+	beta.paths = vector<Path>{Path(&alpha, 1), Path(&eta, 1), Path(&theta, 1), Path(&gamma, 1)};
+	gamma.paths = vector<Path>{Path(&beta, 1), Path(&theta, 1), Path(&delta, 1)};
 
-	alpha.paths.push_back(Path(&beta, 1));
-	alpha.paths.push_back(Path(&eta, 1));
-	alpha.paths.push_back(Path(&zeta, 1));
-
-	beta.paths.push_back(Path(&alpha, 1));
+	/*beta.paths.push_back(Path(&alpha, 1));
 	beta.paths.push_back(Path(&eta, 1));
 	beta.paths.push_back(Path(&theta, 1));
 	beta.paths.push_back(Path(&gamma, 1));
 
 	gamma.paths.push_back(Path(&beta, 1));
 	gamma.paths.push_back(Path(&theta, 1));
-	gamma.paths.push_back(Path(&delta, 1));
+	gamma.paths.push_back(Path(&delta, 1));*/
 
 	delta.paths.push_back(Path(&gamma, 1));
 	delta.paths.push_back(Path(&theta, 1));
@@ -220,23 +207,32 @@ int main() {
 	Map testMap(width, height, nodes);
 	testMap.draw();
 	
-	int choice = -1, current = -1;
+	int choice = -1;
 	string getChoice ="";
 	string error = "";
+	bool isInt;
+	string allInts = "0123456789";
 	while (choice != 0) {
 		testMap.draw();
 		cout<<error<<"Which location would you like to go to?\n";
-		current = choice;
-		try {
-			getline(cin, getChoice);
-			choice = atoi(getChoice.c_str());
-		} catch (int e) {
-			error = "Invalid input: Input must be a number\n";
-			choice = current;
+		getline(cin, getChoice);
+		for (int i = 0; i < getChoice.size(); i++) {
+			isInt = false;
+			for (int j = 0; j < allInts.size(); j++) {
+				if (getChoice[i] == allInts[j]) {
+					isInt = true;
+					break;
+				}
+			}
+			if (!isInt) break;
 		}
-		if (choice > testMap.current.paths.size() || choice < 0) {
+		if (isInt) choice = atoi(getChoice.c_str());
+		if (!isInt) {
+			error = "Invalid input: Input must be an integer\n";
+		} else if (choice > testMap.current.paths.size() || choice < 0) {
 			error = "Invalid input: Input must be within range of options shown on map\n";
 		} else if (choice > 0) {
+			error = "";
 			for (Node node: testMap.nodes) {
 				if(testMap.current.paths[choice-1].connect == node) {
 					testMap.current = node;
