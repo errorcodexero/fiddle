@@ -1,3 +1,7 @@
 *.out
-*.obj
 *.o
+*.exe
+*.exe.stackdump
+*.o
+*.class
+*.ctxt
