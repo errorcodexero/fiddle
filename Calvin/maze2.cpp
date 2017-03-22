@@ -91,22 +91,24 @@ struct Map {
                         int pointNum = max(abs(deltaX),abs(deltaY));
                         if (current.loc.x < path.connect->loc.x) {
                                 for (int i = 1; i <= pointNum; i++) {
-                                        image[round(current.loc.x+i*deltaX/pointNum)][round(current.loc.y+i*deltaY/pointNum)]="•";
-					if (i == round(pointNum/2)) {
-						image[round(current.loc.x+i*deltaX/pointNum)-1][round(current.loc.y+i*deltaY/pointNum)]=to_string(path.cost/10);
-						image[round(current.loc.x+i*deltaX/pointNum)][round(current.loc.y+i*deltaY/pointNum)]=to_string(path.cost%10);
+					if (image[round(current.loc.x+i*deltaX/pointNum)][round(current.loc.y+i*deltaY/pointNum)] == " " || image[round(current.loc.x+i*deltaX/pointNum)][round(current.loc.y+i*deltaY/pointNum)] == "-") {
+                                        	image[round(current.loc.x+i*deltaX/pointNum)][round(current.loc.y+i*deltaY/pointNum)] = "•";
+						if (i == round(pointNum/2)) {
+							image[round(current.loc.x+i*deltaX/pointNum)-1][round(current.loc.y+i*deltaY/pointNum)] = to_string(path.cost/10);
+							image[round(current.loc.x+i*deltaX/pointNum)][round(current.loc.y+i*deltaY/pointNum)] = to_string(path.cost%10);
+						}
 					}
                                 }
                         } else {
                                 for (int i = 1; i <= pointNum; i++) {
-                                        image[round(path.connect->loc.x-i*deltaX/pointNum)][round(path.connect->loc.y-i*deltaY/pointNum)]="•";
-                                        if (i == round(pointNum/2)) {
-                                                image[round(current.loc.x+i*deltaX/pointNum)-1][round(current.loc.y+i*deltaY/pointNum)]=to_string(path.cost/10);
-						image[round(current.loc.x+i*deltaX/pointNum)][round(current.loc.y+i*deltaY/pointNum)]=to_string(path.cost%10);
-                                        }
-
+					if (image[round(current.loc.x+i*deltaX/pointNum)][round(current.loc.y+i*deltaY/pointNum)] == " " || image[round(current.loc.x+i*deltaX/pointNum)][round(current.loc.y+i*deltaY/pointNum)] == "-") {
+                                        	image[round(path.connect->loc.x-i*deltaX/pointNum)][round(path.connect->loc.y-i*deltaY/pointNum)] = "•";
+                                        	if (i == round(pointNum/2)) {
+                                        	        image[round(current.loc.x+i*deltaX/pointNum)][round(current.loc.y+i*deltaY/pointNum)] = to_string(path.cost/10);
+							image[round(current.loc.x+i*deltaX/pointNum)+1][round(current.loc.y+i*deltaY/pointNum)] = to_string(path.cost%10);
+                                        	}
+					}
                                 }
-
                         }
                 }
 
