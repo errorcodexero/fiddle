@@ -1,7 +1,13 @@
 rapier (2018 season?
 katana (2017 bunny bots?)
 chainsaw (2017 season)
-tomahawk (2016 bunny bots?)
+machete (2016 bunny bots)
+tomahawk (2016 bunny bots)
+sabre (2016 season)
+halberd (2015 bunny bots)
+sting (2015 season)
+pickaxe (2014 bunny bots)
+hammer (2014 season)
 
 lance
 spear
