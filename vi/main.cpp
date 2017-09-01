@@ -1,12 +1,14 @@
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
 
 
+
 class Student {
 	string name;
-	double grade[6];
+	double grade[6],avg_grade;
 	double avg(double *g, int l) {
 		double s=0;
 		for(int i=0;i<l;i++) {
@@ -58,14 +60,62 @@ public:
 	}
 };
 
+class Gradebook {
+	string id;
+	int current_size=0;
+	vector<Student> list;
+public:
+	Gradebook (string id) {
+		this->id=id;
+	}
+	double getClassAvg() {
+		double s=0;
+		for(int i=0;i<list.size();i++) {
+			s+=list[i].getAvg();			
+		}
+		return (double)(s/20);
+	}
+
+	double getStudentAvg(int index) {
+		return list[index].getAvg();	
+	}
+	Student topStudent() {
+		double e=0,f=0;
+		int i;
+		for(i=0;i<list.size();i++) {
+			double k=list[i].getAvg();
+			if (k>e) { e=k; f=i;};
+		}
+		return list[f];	
+	}
+	Student botStudent() {
+		double e=600,f=0;
+		int i;
+		for(i=0;i<list.size();i++) {
+			double k=list[i].getAvg();
+			if (k<e) { e=k; f=i;};
+		}
+		return list[f];	
+	}
+	void addStudent(Student a) {
+		list.push_back(a);	
+	}
+};
+string topGrade(Gradebook a) {
+	Student r = a.topStudent();
+	return r.getName();
+}
 int main(){
 	//cout<<"Hello World!"<<endl;
-	Student john("John");
-	double g[6] = {60,80,75,34,66,95};
-	john.setGrades(g);
-	john.getGrades();
-	cout << john.getAvg() << endl;
-	cout << john.avgletter() << endl;
-	cout << john.subjLetter(3);
+	Gradebook gb("ABC");
+	Student john("john");
+	Student tim("tim");
+	Student jeff("jeff");
+	double j[6] = {10,20,30,40,50,60}, t[6] = {20,30,40,50,60}, jf[6] = {30,40,50,60,70,80};
+	john.setGrades(j); tim.setGrades(t); jeff.setGrades(jf);
+	gb.addStudent(john);
+	gb.addStudent(tim);
+	gb.addStudent(jeff);
+	cout << topGrade(gb) << endl;
 	return 0;
 }
