@@ -13,7 +13,7 @@ int main(){
 	normal_distribution<double> normal(uniform(generator), 10.0);
 
 	vector<string> names;
-	ifstream roster_in("roster.txt");
+	ifstream roster_in("roster_names.txt");
 	if(!roster_in.good()) {
 		cout<<"Failed to open file."<<endl;
 		return 0;
