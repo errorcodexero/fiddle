@@ -1,4 +1,6 @@
-rapier (2018 season?)
+(2018 season)
+rapier?
+claymore?
 katana (2017 bunny bots)
 chainsaw (2017 season)
 machete (2016 bunny bots)
@@ -8,6 +10,8 @@ halberd (2015 bunny bots)
 sting (2015 season)
 pickaxe (2014 bunny bots)
 hammer (2014 season)
+
+theremin (software test bot)
 
 lance
 spear
@@ -25,10 +29,10 @@ cutlass
 sword
 excaliber
 crossbow
+longbow
 dagger
 kard
 horn
-[text]
 scrimitar
 sickle
 mace
@@ -41,3 +45,10 @@ flail
 bow
 axe
 knife
+morningstar
+warhammer
+quarterstaff
+cannon
+trebuchet
+ballista
+broadsword
